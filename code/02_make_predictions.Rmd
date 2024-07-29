@@ -3,7 +3,7 @@ title: "Make Predictions"
 author: Casey Breen 
 ---
 
-Summary: Make predictions 
+Summary: Make predictions for all LMICs using full training data 
 
 ```{r}
 ## libary packages + custom functions 

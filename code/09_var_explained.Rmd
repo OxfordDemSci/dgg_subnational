@@ -3,7 +3,7 @@ title: "Within vs. between country"
 author: Casey Breen
 ---
 
-Summary: Within vs. between country comparison of variance 
+Summary: Analysis of within vs. between country variance 
 
 ```{r}
 ## libary packages + custom functions 

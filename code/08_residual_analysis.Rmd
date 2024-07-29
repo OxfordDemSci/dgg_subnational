@@ -3,7 +3,7 @@ title: "Residual Analysis"
 author: Casey Breen
 ---
 
-Summary: Calculate residuals for the superlearner model and fit a model to predict absolute error  
+Summary: Calculate and plot model residuals 
 
 ## Library packages 
 

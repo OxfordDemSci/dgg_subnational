@@ -3,7 +3,7 @@ title: "Bootstrap analysis"
 author: Casey Breen
 ---
 
-Summary: Carry out a bootstrap analysis to estimate the uncertainty in the R-squared values (i.e., best we could possibly do)
+Summary: Bootstrap analysis to estimate the uncertainty in the R-squared values (i.e., best we could possibly do)
 
 ```{r}
 ## libary packages + custom functions 

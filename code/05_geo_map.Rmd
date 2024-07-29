@@ -40,9 +40,9 @@ predictions_wide <- read_csv(here("out", "full_predictions.csv"))
 ```
 
 ```{r}
-st_layers(here("data", "gadm_boundaries_v4.1", "gadm_410-levels.gpkg"))
-gadm1_map <- read_sf(here("data", "gadm_boundaries_v4.1", "gadm_410-levels.gpkg"), layer = "ADM_1")
-gadm0_map <- read_sf(here("data", "gadm_boundaries_v4.1", "gadm_410-levels.gpkg"), layer = "ADM_0")
+st_layers(here("data", "gadm_410-levels.gpkg"))
+gadm1_map <- read_sf(here("data", "gadm_410-levels.gpkg"), layer = "ADM_1")
+gadm0_map <- read_sf(here("data", "gadm_410-levels.gpkg"), layer = "ADM_0")
 
 gadm0_map <- gadm0_map %>% 
   filter(COUNTRY %in% gadm1_full$country | COUNTRY == "Côte d'Ivoire" | COUNTRY == "Sudan" | COUNTRY == "South Sudan")

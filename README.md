@@ -1,4 +1,4 @@
-## The Longevity Benefits of Homeownership
+## Mapping subnational gender gaps in internet and mobile adoption using social media data
 
 This repository contains code and materials to replicate ["Mapping subnational gender gaps in internet and mobile adoption using social media data"](https://osf.io/)
 
@@ -8,15 +8,15 @@ This repository includes code to replicate all figures and tables in the paper. 
 
 1. Clone this repository
 2. Download all data from the `/data/` repository
-2. Run the `00_run_all.Rmd` script, which will run all code (or run scripts `01` to `05` individually)
+2. Run the `00_run_all.Rmd` script, which will run all code (or run scripts `01` to `10` individually)
 
 #### Computing 
 
-All computing was carried out on a macbook pro
+All computations were carried out on 2023 MacBook Pro with an Apple M2 Pro chip, 16GB memory, and Sonoma 14.1 operating system.
 
 #### Data 
 
-Please download the CenSoc-DMF file from [CenSoc.berkeley.edu](https://censoc.berkeley.edu/data/). In addition, you will need access to a complete count census repository. Alternatively, you can download files from [IPUMS USA](https://usa.ipums.org/usa/). 
+Please download the open science framework repository. In the same directory as your /code/ folder, create a /data/ folder and place all data files in this folder.
 
 #### Code 
 
@@ -26,15 +26,26 @@ After downloading the required data, researchers can run the following script to
 
 Alternatively, researchers can run the following files individually in order: 
   
-  - `01_identify_sibs.Rmd` - This file identifies sibs in the 1920 Census and links them onto the 1940 Census and DMF mortality records 
-- `02_homeownership_decade.Rmd` - Calculate homeownership rates using complete count census data from 1900, 1910, 1920, 1930, and 1940.   
-- `03_representativity_table.Rmd` - Compare the representativeness of our samples to the general population 
-- `04_lexis_diagram.Rmd` - Create a lexis diagram that 
-- `05_pooled_analysis.Rmd` - Estimate the unadjusted difference in life expectancy between homeowners and renters.  
-- `06_sibling_analysis.Rmd` - Estimate the causal effect of homeownership on longevity 
-- `07_homeownership_homevalue.Rmd` - Estimate effect heterogeity with respect to homeownership 
-- `08_homeownership_homevalue.Rmd` - Estimate unadjusted difference in life expectancy at age 65 between homeowners and renters 
+- `01_fit_models_crossvalidation.Rmd` - Fit subnational models using both leave-one-country-out (LOCO) and 10-fold cross-validation.
+- `02_make_predictions.Rmd` - Make predictions for all LMICs using full training data and estimate uncertainty 
+- `03_model_performance.Rmd` - Generate figures and tables summarizing model performance 
+- `04_within_country_analysis.Rmd` - Generate figures and tables summarizing within country performance 
+- `05_geo_map.Rmd` - Geographic visualizations of model predictions and error
+- `06_feature_importance.Rmd` - Analysis of most important features in a model 
+- `07_superlearner_weights.Rmd` - Run all (full) models and get weights from Superlearner showing relative contribution of each learner 
+- `08_residual_analysis.Rmd` - Calculate and plot model residuals 
+- `09_var_explained.Rmd` - Analysis of within vs. between country variance 
+- `10_bootstrap_analysis.Rmd` - Bootstrap analysis to estimate the uncertainty in the R-squared values
+
 
 ### Authors
 
 - [Casey Breen](caseybreen.com)
+- Masoomali Fatehkia
+- Jiani Yan
+- Xinyi Zhao
+- Douglas R. Leasure
+- Ingmar Weber
+- Ridhi Kashyap
+
+
