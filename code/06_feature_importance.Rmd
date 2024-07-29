@@ -1,0 +1,338 @@
+---
+title: "04 - Quantify R2"
+auhor: "Casey Breen" 
+---
+
+Summary: Generate figures and tables summarizing model performance 
+
+```{r}
+## libary packages + custom functions 
+library(here)
+source(here("code", "helpers.R"))
+```
+
+## Estimate model performance metrics 
+
+```{r}
+## read predictions
+predictions_combined <- read_csv(here("out", "combined_predictions_lmics_national_covars_full.csv")) %>% 
+  mutate(predicted = case_when(predicted < 0 ~ 0,
+                  TRUE ~ predicted)) %>% 
+  mutate(cv_method = case_when(
+    grepl("10fold", cv_method) ~ "10-Fold-CV",
+    grepl("loco", cv_method) ~ "LOCO-CV",
+    TRUE ~ cv_method
+  )) %>% 
+  mutate(outcome_categorical = case_when(
+    outcome %in% c("perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio",
+                   "perc_owns_mobile_telephone_wght_age_15_to_49_men",
+                   "perc_owns_mobile_telephone_wght_age_15_to_49_wom") ~ "Mobile",
+    outcome %in% c("perc_used_internet_past12months_wght_age_15_to_49_fm_ratio",
+                   "perc_used_internet_past12months_wght_age_15_to_49_men",
+                   "perc_used_internet_past12months_wght_age_15_to_49_wom") ~ "Internet",
+  ))
+
+## read in training and test datasets 
+gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_july8.csv"), 
+                  locale = locale(encoding = "ISO-8859-1")) %>%
+  janitor::clean_names() %>% 
+  mutate(pop_all_age_total_dhsyear = pop_all_age_female_dhsyear + pop_all_age_male_dhsyear) %>% 
+  dplyr::select(country, gid_1, dhsyear, pop_all_age_total_dhsyear, continent) %>% 
+   filter(!(country == "India" & dhsyear == 2015)) 
+
+
+predictions_combined <- predictions_combined %>% 
+  left_join(gadm1, by = "gid_1")
+
+## estimate model performance metrics 
+## r2, rmse, mae are fine 
+## mape and mare are a bit tricky because observed value is sometimes 0 
+model_performance_metrics <- predictions_combined %>%
+  group_by(cv_method, model, outcome, feature_set) %>%
+  summarise(r2 = compute_r2(predicted, observed),
+            rmse = compute_rmse(predicted, observed),
+            mape = compute_mape(predicted, observed),
+            mare = compute_mare(predicted, observed),
+            mae = compute_mae(predicted, observed)) %>%
+  pivot_longer(cols = c(r2, rmse, mape, mare, mae), 
+               names_to = "metric", 
+               values_to = "value")
+
+## model metrics 
+model_performance_metrics <- model_performance_metrics %>% 
+  mutate(outcome_clean = case_when(
+    grepl("internet_wght_age_15_to_49_fm_ratio", outcome) ~ "Internet, Ever (Ratio)",
+    grepl("internet_wght_age_15_to_49_men", outcome) ~ "Internet, Ever (Men)",
+    grepl("internet_wght_age_15_to_49_wom", outcome) ~ "Internet, Ever (Women)",
+    grepl("mobile_telephone_wght_age_15_to_49_fm_ratio", outcome) ~ "Mobile (Ratio)",
+    grepl("mobile_telephone_wght_age_15_to_49_men", outcome) ~ "Mobile (Men)",
+    grepl("mobile_telephone_wght_age_15_to_49_wom", outcome) ~ "Mobile (Women)",
+    grepl("used_internet_past12months_wght_age_15_to_49_fm_ratio", outcome) ~ "Internet (Ratio)",
+    grepl("used_internet_past12months_wght_age_15_to_49_men", outcome) ~ "Internet (Men)",
+    grepl("used_internet_past12months_wght_age_15_to_49_wom", outcome) ~ "Internet (Women)",
+    TRUE ~ outcome))  # Default to keep original name if no match
+```
+
+## R-Squared Plot
+
+```{r}
+cbp1 <- c("#E69F00", "#56B4E9", "#009E73",
+          "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+
+## r2 plot -- algo X outcome
+r2_plot <- model_performance_metrics %>% 
+  filter(metric == "r2" & feature_set == "fb_and_offline") %>% 
+  filter(!outcome %in% c("perc_ever_used_internet_wght_age_15_to_49_fm_ratio",
+                         "perc_ever_used_internet_wght_age_15_to_49_men",
+                         "perc_ever_used_internet_wght_age_15_to_49_wom")) %>% 
+  mutate(value = round(value, 2)) %>% 
+  ggplot(aes(x = reorder(model, -value), y = value, fill = cv_method, label = scales::percent(value, accuracy = 1))) + 
+  geom_col(position = "dodge", color = "black") + 
+  geom_text(position = position_dodge(width = .9), vjust = -0.5, size = 3) + 
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits = c(0, 1)) + 
+  theme_cowplot() + 
+  labs(
+    x = "Algorithm",
+    y = "Variance Explained (%)",
+    title = expression(bold("Algorithm Performance " (R^2))),
+    fill = "Cross-Validation") + 
+  facet_grid(rows = vars(outcome_clean), cols = vars(feature_set)) + 
+  theme(legend.position = "bottom") + 
+  scale_fill_manual(values=cbp1)
+
+## save plot 
+ggsave(plot = r2_plot, filename = here("figures", "r2_plot_dhsyear.png"), height = 12, width = 8)
+```
+
+
+
+## feature comparison 
+
+```{r}
+## facet plots
+filtered_data <- model_performance_metrics %>%
+  filter(metric == "r2" & cv_method == "LOCO-CV" & model == "superlearner") %>%
+  mutate(
+    category = case_when(
+      grepl("owns_mobile", outcome) ~ "Own Mobible",
+      grepl("used_internet_past12months", outcome) ~ "Used Internet (12m)",
+      grepl("ever_used_internet", outcome) ~ "Used Internet (ever)",
+      TRUE ~ "Other"
+    ),
+    gender_group = case_when(
+      grepl("_men$", outcome) ~ "Men",
+      grepl("_wom$", outcome) ~ "Women",
+      grepl("_fm_ratio$", outcome) ~ "Gender Gap",
+      TRUE ~ "Other"
+    )
+  )
+
+feature_comparison_plot <- filtered_data %>%
+  filter(!outcome %in% c("perc_ever_used_internet_wght_age_15_to_49_fm_ratio", "perc_ever_used_internet_wght_age_15_to_49_men", "perc_ever_used_internet_wght_age_15_to_49_wom")) %>% 
+  mutate(feature_set = case_when(
+    feature_set == "fb" ~ "FB",
+    feature_set == "fb_and_offline" ~ "FB and Offline",
+    feature_set == "offline" ~ "Offline"
+  )) %>% 
+  ggplot() + 
+  geom_point(aes(x = value, y = gender_group, color = feature_set, shape = feature_set), size = 3, position = position_dodge(width = .25)) +
+  theme_minimal(16) +
+  labs(x = expression("Model Performance: R" ^ 2),
+       y = NULL
+  ) +
+  theme(
+    legend.position = c(0.1, 0.97),
+    legend.justification = c(0, 1),
+    legend.box.background = element_rect(color = "black", fill = "white", linewidth = 0.3),
+    legend.background = element_blank(),
+    panel.border = element_rect(colour = "black", fill = NA, size = 1),
+    strip.background = element_rect(colour = "grey", fill = "grey"),
+    strip.text.y = element_text(angle = 0, color = "black", hjust = 0.5),
+    strip.placement = "inside",
+    legend.key.size = unit(0.3, "cm"),  # Adjusts size of legend keys
+    legend.text = element_text(size = 12),  # Adjusts size of legend text
+    legend.title = element_blank()) +
+  ggsci::scale_color_lancet() + 
+  xlim(0, 0.8) + 
+  facet_grid(category ~ ., scales = "free_y", space = "free_y", switch = "y")
+
+ggsave(plot = feature_comparison_plot, here("figures", "feature_comparison_plot.png"), width = 5, height = 5)
+```
+
+
+
+```{r}
+## read in training and test datasets 
+gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_july8.csv"), 
+                  locale = locale(encoding = "ISO-8859-1")) %>%
+  mutate(tesselation_2024 = ifelse(TRUE, 1, 0)) %>%
+  janitor::clean_names() %>% 
+  dplyr::select(country, gid_1, all_of(c(dhs_vars, fb_feats_2021, off_feats))) %>% ## the vectors of vars are defined in helper function
+  filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% drop_na() %>% 
+  mutate(continent = case_when(continent == "Africa" ~ 1,
+                               TRUE ~ 0)) 
+
+# Define your features and dependent variable
+features <- tolower(c(fb_feats_2021, off_feats)) 
+dependent_vars <- c(
+  "perc_used_internet_past12months_wght_age_15_to_49_wom",
+  "perc_owns_mobile_telephone_wght_age_15_to_49_wom",
+  "perc_owns_mobile_telephone_wght_age_15_to_49_men",
+  "perc_used_internet_past12months_wght_age_15_to_49_men",
+  "perc_used_internet_past12months_wght_age_15_to_49_fm_ratio",
+  "perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio"
+)
+country_col <- "country" # Adjust this to match the country identifier in your dataset
+
+# Loop through each dependent variable
+cv_results_list <- list()
+for (dependent_var in dependent_vars) {
+  # Ensure the data subset does not include missing values for the current dependent variable
+  data_subset <- filter(gadm1, !is.na(!!sym(dependent_var)))
+
+  # Perform cross-validation
+  cv_results <- perform_cross_validation_loco(data_subset, dependent_var, features, country_col = country_col)
+
+  # Store the results
+  cv_results_list[[dependent_var]] <- cv_results %>% 
+    mutate(outcome = dependent_var)
+}
+
+# Print results for each dependent variable
+cv_results <- bind_rows(cv_results_list)
+```
+
+
+
+
+```{r}
+# Assuming cv_results is your dataset
+var_importance_data <- cv_results %>%
+  group_by(outcome) %>%
+  arrange(desc(avg_r_squared)) %>%
+  slice_head(n = 10) %>% 
+  mutate(feature_recode = case_when(
+    grepl("fb_pntr_13p_male_2021_impute", feature) ~ "Facebook Penetration (Male)",
+    grepl("fb_pntr_13p_female_2021_impute", feature) ~ "Facebook Penetration (Female)",
+    grepl("fb_pntr_13p_male_dhsyear_national", feature) ~ "Facebook Penetration National (Male)",
+    grepl("fb_pntr_13p_female_dhsyear_national", feature) ~ "Facebook Penetration National (Female)",
+    grepl("rwi_mean_wght", feature) ~ "Relative Wealth Index (Pop-weighted)",
+    grepl("subnational_hdi_males", feature) ~ "Human Development Index (Male)",
+    grepl("rwi_mean", feature) ~ "Relative Wealth Index (Mean)",
+    grepl("all_devices_age_13_plus_gg_2024_tess", feature) ~ "Facebook Penetration Gender Gap",
+    grepl("subnational_hdi_females", feature) ~ "Human Development Index (Female)",
+    grepl("ios_age_13_plus_female_frac_2021", feature) ~ "iOS FB Usage (Female)",
+    grepl("income_index_males", feature) ~ "Income Index (Male)",
+    grepl("educational_index_females", feature) ~ "Educational Index (Female)",
+    grepl("educational_index_males", feature) ~ "Educational Index (Male)",
+    grepl("nl_mean", feature) ~ "Night Light Mean",
+    grepl("wifi_age_13_plus_female_frac_2024_tess", feature) ~ "WiFi FB Usage (Female)",
+    grepl("wifi_age_13_plus_male_frac_2024_tess", feature) ~ "WiFi FB Usage (Male)",
+    grepl("hdi", feature) ~ "Human Development Index (National)",
+    feature == "gdi" ~ "Gender Development Index (National)",
+    feature == "subnational_gdi_dhsyear" ~ "Gender Development Index",
+    grepl("ios_age_13_plus_male_frac_2021", feature) ~ "iOS FB Usage (Male)",
+    grepl("income_index_females", feature) ~ "Income Index (Female)",
+    grepl("pop_density", feature) ~ "Population Density",
+    grepl("wifi_age_13_plus_male_frac_2021", feature) ~ "WiFi FB Usage (Male)",
+    grepl("wifi_age_13_plus_female_frac_2021", feature) ~ "WiFi FB Usage (Female)",
+    grepl("dhsyear", feature) ~ "DHS Survey Year",
+    grepl("gdi_nation", feature) ~ "Gender Development Index",
+    grepl("all_devices_age_13_dhsyear_gg_national", feature) ~ "Facebook National Gender Gap",
+    grepl("all_devices_age_13_plus_gg_2021_impute", feature) ~ "Facebook Gender Gap",
+    TRUE ~ feature  # Default case
+  )) %>% 
+  group_by(outcome) %>%
+  arrange(avg_r_squared) %>%
+  mutate(feature_idea = paste0(outcome, '_', feature_recode)) %>% 
+  mutate(feature_idea = factor(feature_idea, levels = unique(feature_idea))) %>%
+  ungroup() %>% 
+  mutate(outcome_clean = case_when(
+    grepl("internet_wght_age_15_to_49_fm_ratio", outcome) ~ "Internet, Ever (Ratio)",
+    grepl("internet_wght_age_15_to_49_men", outcome) ~ "Internet, Ever (Men)",
+    grepl("internet_wght_age_15_to_49_wom", outcome) ~ "Internet, Ever (Women)",
+    grepl("mobile_telephone_wght_age_15_to_49_fm_ratio", outcome) ~ "Mobile (Ratio)",
+    grepl("mobile_telephone_wght_age_15_to_49_men", outcome) ~ "Mobile (Men)",
+    grepl("mobile_telephone_wght_age_15_to_49_wom", outcome) ~ "Mobile (Women)",
+    grepl("used_internet_past12months_wght_age_15_to_49_fm_ratio", outcome) ~ "Internet (Ratio)",
+    grepl("used_internet_past12months_wght_age_15_to_49_men", outcome) ~ "Internet (Men)",
+    grepl("used_internet_past12months_wght_age_15_to_49_wom", outcome) ~ "Internet (Women)",
+    TRUE ~ outcome
+  )) # Default to keep original name if no match
+
+var_importance_plot <- var_importance_data %>% 
+  filter(outcome == "perc_used_internet_past12months_wght_age_15_to_49_wom") %>% 
+  ggplot(aes(y = feature_idea, x = avg_r_squared)) +
+  geom_point() +
+  theme_cowplot() +
+  geom_segment(aes(yend = feature_idea, x = 0, xend = avg_r_squared), linewidth = 0.5) +
+  geom_segment(aes(yend = feature_idea, x = 0, xend = max(avg_r_squared)), linetype = "dashed", size = 0.1) +
+  labs(x = expression("R" ^ 2),
+       y = "",
+       title = "Variable Importance") +
+  # facet_wrap(~outcome_clean, scales = "free_y") +
+  scale_y_discrete(breaks = var_importance_data$feature_idea,
+                   labels = var_importance_data$feature_recode)
+
+ggsave(plot = var_importance_plot, filename = here("figures", "var_importance.png"), width = 26, height = 16, units = "in", dpi = 300)
+```
+
+
+
+```{r}
+r_squaredplot <- plot_grid(feature_comparison_plot, var_importance_plot, labels = "AUTO")
+
+ggsave(plot = r_squaredplot, filename = here("figures", "feature_and_var_importance.png"), width = 13, height = 6, units = "in", dpi = 300)
+
+```
+
+
+
+```{r}
+var_importance_data$outcome_clean_f = factor(var_importance_data$outcome_clean, 
+                                             levels=c('Internet (Women)',
+                                                      'Internet (Men)',
+                                                      'Mobile (Women)',
+                                                      'Mobile (Men)',
+                                                      'Internet (Ratio)',
+                                                      'Mobile (Ratio)'))
+
+var_importance_plot <- var_importance_data %>% 
+  ggplot(aes(y = feature_idea, x = avg_r_squared)) +
+  geom_point() +
+  theme_cowplot() +
+  geom_segment(aes(yend = feature_idea, x = 0, xend = avg_r_squared), size = 0.5) +
+  geom_segment(aes(yend = feature_idea, x = 0, xend = max(avg_r_squared)), linetype = "dashed", size = 0.1) +
+  labs(x = expression("R" ^ 2),
+       y = "",
+       title = "Variable Importance") +
+  facet_wrap(~outcome_clean_f, scales = "free_y", nrow = 3) +
+  scale_y_discrete(breaks = var_importance_data$feature_idea,
+                   labels = var_importance_data$feature_recode)
+
+ggsave(plot = var_importance_plot, filename = here( "figures", "variable_importance.png"), width = 13, height = 8, units = "in", dpi = 300)
+```
+
+```{r}
+# var_importance_list <- list()
+# 
+# for (outcome in outcomes){
+# ## sl predictions for internet women
+# sl_predictions_internet_wom <- superlearner_train_and_predict(data = gadm1, 
+#                                                  covar_list = c(fb_feats, off_feats_current),
+#                                                  outcome = "perc_used_internet_past12months_wght_age_15_to_49_wom",
+#                                                  predict_data = gadm1_full,
+#                                                  return_fit = TRUE)
+# 
+# sl_fit = sl_predictions_internet_wom[[1]]
+# 
+# washb_varimp <- sl3::importance(
+#   fit = sl_fit, eval_fun = loss_squared_error, type = "remove")
+# }
+```
+
+
+
+
+
+

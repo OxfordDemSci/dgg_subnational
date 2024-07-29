@@ -1,0 +1,139 @@
+---
+title: "Within-country variation"
+author: Casey Breen
+---
+
+Summary: Create plots of within-country variation in internet adoption and mobile ownership. 
+
+
+```{r}
+## library packages + custom functions 
+library(here)
+source(here("code", "helpers.R"))
+
+## read in prediction 
+predictions <- read_csv(here("out", "full_predictions.csv"))
+
+## read in prediction 
+predictions_long <- read_csv(here("out", "predictions_with_uncertainty.csv"))
+
+## predictions continent 
+predictions$continent <- countrycode(predictions$gid_0, origin = 'iso3c', destination = 'continent')
+
+## predictions continent 
+predictions_long$continent <- countrycode(predictions_long$gid_0, origin = 'iso3c', destination = 'continent')
+```
+
+
+```{r}
+spread_plot <- predictions_long %>% mutate(outcome_clean = case_when(
+    grepl("mobile_telephone_wght_age_15_to_49_fm_ratio", outcome) ~ "Mobile (Ratio)",
+    grepl("mobile_telephone_wght_age_15_to_49_men", outcome) ~ "Mobile (Men)",
+    grepl("mobile_telephone_wght_age_15_to_49_wom", outcome) ~ "Mobile (Women)",
+    grepl("used_internet_past12months_wght_age_15_to_49_fm_ratio", outcome) ~ "Internet (Ratio)",
+    grepl("used_internet_past12months_wght_age_15_to_49_men", outcome) ~ "Internet (Men)",
+    grepl("used_internet_past12months_wght_age_15_to_49_wom", outcome) ~ "Internet (Women)",
+    TRUE ~ outcome
+  )) %>% 
+  filter(!gid_1 %in% c("MRT.9_1", "UGA.32_1", "UGA.31_1")) %>% 
+  group_by(continent, gid_0, outcome_clean) %>% 
+  summarize(diff = max(predicted) - min(predicted),
+            mean = mean(predicted)) %>% 
+  ggplot(aes(x = mean, y = diff)) + 
+  geom_text(aes(label = gid_0, color = continent)) + 
+  labs(x = "National Estimate",
+       y = "Within-Country Range",
+       color = "Region") + 
+  theme_cowplot() + 
+  scale_color_manual(values = cud) + 
+  geom_smooth(se = F, method = "lm") + 
+  theme(legend.position = "bottom") + 
+  stat_cor(method = "pearson", label.x = Inf, label.y = Inf, size = 3.5,  hjust=1.1, vjust = 5.4, p.accuracy = 0.01) + 
+  facet_wrap(~outcome_clean, scales = "free")
+
+ggsave(spread_plot, filename = here("figures", "spread_plot.png"), width = 12, height = 8)
+```
+
+
+
+```{r}
+## create spread plot 
+spread_plot <- predictions %>% 
+  filter(!gid_1 %in% c("MRT.9_1", "UGA.32_1", "UGA.31_1")) %>% 
+  group_by(continent, gid_0) %>% 
+  summarize(diff = max(predicted_perc_used_internet_past12months_wght_age_15_to_49_wom) - min(predicted_perc_used_internet_past12months_wght_age_15_to_49_wom),
+            mean = mean(predicted_perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% 
+  ggplot(aes(x = mean, y = diff)) + 
+  geom_text(aes(label = gid_0, color = continent)) + 
+  labs(x = "National Internet Adoption (Women)",
+       y = "Within-Country Range (Women)",
+       color = "Region") + 
+  theme_cowplot() + 
+  scale_color_manual(values = cud) + 
+  geom_smooth(se = F, method = "lm") + 
+  theme(legend.position = "bottom") + 
+  stat_cor(method = "pearson", label.x = 55, label.y = 45, size = 6, p.accuracy = 0.01)
+
+## write rds 
+write_rds(spread_plot, file = here("figures", "spread_plot.rds"))
+
+```
+
+
+
+
+```{r}
+internet_vs_mobile_predictions_women <- predictions %>% 
+  ggplot(aes(x = predicted_perc_used_internet_past12months_wght_age_15_to_49_wom, y =predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom )) + 
+  geom_point(aes(color = continent), alpha = 0.4) + 
+  theme_cowplot() + 
+  scale_color_manual(values = cud) + 
+  labs(x = "Predicted Internet (Women)",
+       y = "Predicted Mobile Ownership (Women)",
+       fill = "Gender Ratio") + 
+    ylim(0, 100) + 
+  xlim(0, 100) + 
+  theme(legend.position = "none")
+
+internet_vs_mobile_predictions_men <- predictions %>% 
+  ggplot(aes(x = predicted_perc_used_internet_past12months_wght_age_15_to_49_men, y =predicted_perc_owns_mobile_telephone_wght_age_15_to_49_men )) + 
+  geom_point(aes(color = continent), alpha = 0.4) + 
+  theme_cowplot() + 
+  scale_color_manual(values = cud) + 
+  labs(x = "Predicted Internet (Men)",
+       y = "Predicted Mobile Ownership (Men)",
+       fill = "Gender Ratio") + 
+  ylim(0, 100) + 
+  xlim(0, 100) + 
+  theme(legend.position = "none")
+
+internet_vs_mobile_predictions_fm_ratio <- predictions %>% 
+  ggplot(aes(x = predicted_perc_used_internet_past12months_wght_age_15_to_49_fm_ratio, y =predicted_perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio )) + 
+  geom_point(aes(color = continent), alpha = 0.4) + 
+  theme_cowplot() + 
+  labs(x = "Predicted Internet (Ratio)",
+       y = "Predicted Mobile Ownership (Ratio)",
+       fill = "Gender Ratio") + 
+  ylim(0, 1.5) + 
+  xlim(0, 1.5) + 
+  scale_color_manual(values = cud) + 
+  theme(legend.position = c(0.95, 0.05), 
+        legend.justification = c("right", "bottom"),
+        legend.box = "vertical",
+        legend.title = element_blank(),
+        legend.background = element_rect(color = "black", linewidth = 0.5),
+        legend.key.size = unit(0.5, "cm")) 
+
+combined_internet_mobile_plot <- cowplot::plot_grid(internet_vs_mobile_predictions_women, 
+                   internet_vs_mobile_predictions_men,
+                   internet_vs_mobile_predictions_fm_ratio,
+                   nrow = 3,
+                   labels = 'AUTO')
+
+ggsave(combined_internet_mobile_plot, filename = here("figures", "combined_internet_mobile_plot.png"), width = 4.7, height = 13)
+```
+
+
+
+
+

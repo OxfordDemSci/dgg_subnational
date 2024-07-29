@@ -1,0 +1,44 @@
+---
+title: "Run all Scripts"
+author: Casey Breen
+---
+
+## Summary 
+
+This script runs all code to replicate figures and tables. 
+
+The scripts are numbered in the order they should be run.
+
+```{r}
+## library packages
+library(here)
+source(here("code", "helpers.R"))
+
+## list of Rmd files excluding '00_run_all.Rmd'
+rmd_files <- list.files(path = here("code"), pattern = "\\.Rmd$")
+rmd_files <- rmd_files[!rmd_files %in% c("00_run_all.Rmd", "10_bootstrap_analysis.Rmd")]
+
+## set seed for reproducibility
+set.seed(1)
+
+## write output 
+con <- file(here("code", "run_all.log"))
+sink(con, append=TRUE, split=TRUE)
+sink(con, append=TRUE, type = "message")
+
+
+## Loop to process files
+for (cur_file in rmd_files[2:10]) {
+
+  cat("================================\n")
+  source(here("code", "helpers.R"))
+  tictoc::tic(glue::glue("Finished with {cur_file}, time:"))
+  cat("Running ", cur_file, "\n")
+  source_rmd(here("code", cur_file))
+  tictoc::toc()
+  cat("================================\n")
+
+}
+sink()
+sink()
+```

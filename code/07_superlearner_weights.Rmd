@@ -1,0 +1,135 @@
+---
+title: "Calculate superlearner weights"
+author: Casey Breen
+---
+
+Summary: Run all (full) models and get weights from super learner for all outcomes 
+
+
+```{r}
+## libary packages + custom functions 
+library(here)
+source(here("code", "helpers.R"))
+
+## read in training and test datasets 
+gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_july8.csv"), 
+                  locale = locale(encoding = "ISO-8859-1")) %>%
+  janitor::clean_names() %>% 
+    mutate(continent = case_when(continent == "Africa" ~ 1,
+                               TRUE ~ 0)) %>% 
+  dplyr::select(country, all_of(c(dhs_vars, fb_feats, off_feats_current))) %>% 
+  filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% drop_na() 
+```
+
+## Read in data 
+
+```{r}
+## define covariate list 
+covar_list <- c(fb_feats, off_feats_current)
+outcomes <- c(
+  "perc_used_internet_past12months_wght_age_15_to_49_wom",
+  "perc_owns_mobile_telephone_wght_age_15_to_49_wom",
+  "perc_owns_mobile_telephone_wght_age_15_to_49_men",
+  "perc_used_internet_past12months_wght_age_15_to_49_men",
+  "perc_used_internet_past12months_wght_age_15_to_49_fm_ratio",
+  "perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio"
+)
+
+
+# Define learners for the super learner ensemble
+lrn_glm <- make_learner(Lrnr_glm)
+lrn_lasso <- make_learner(Lrnr_glmnet)
+lrn_ridge <- Lrnr_glmnet$new(alpha = 0)
+lrn_enet.5 <- make_learner(Lrnr_glmnet, alpha = 0.5)
+lrn_polspline <- Lrnr_polspline$new()
+lrn_ranger100 <- make_learner(Lrnr_ranger, num.trees = 100)
+lrnr_gbm <- make_learner(Lrnr_gbm)
+lrnr_xgb <- Lrnr_xgboost$new()
+
+# Create list of learners and assign names
+learners <- c(lrn_glm, lrn_lasso, lrn_ridge, lrn_enet.5, lrn_polspline, lrn_ranger100, lrnr_gbm, lrnr_xgb)
+learner_names <- c("glm", "lasso", "ridge", "elastic_new", "poly_spline", "ranger", "gbm", "xgb")
+names(learners) <- learner_names
+
+# Create super learner stack
+stack <- make_learner(Stack, learners)
+
+# Extract covariates from training data
+covars <- colnames(gadm1 %>% dplyr::select(all_of(covar_list)))
+
+# Create k-fold CV with countries as clusters
+folds <- make_folds(cluster_ids = gadm1$country)
+
+# Initialize a list to store results
+results_list <- list()
+
+for (outcome in outcomes) {
+  # Define SL3 task for training data
+  superlearner_task <- make_sl3_Task(
+    data = gadm1,
+    folds = folds,
+    covariates = covars,
+    outcome = outcome,
+    outcome_type = "continuous",
+    drop_missing_outcome = TRUE
+  )
+  
+  # Create super learner object
+  sl <- make_learner(Lrnr_sl, learners = stack, metalearner = Lrnr_nnls$new())
+  
+  # Train the super learner model on the task
+  sl_fit <- sl$train(task = superlearner_task)
+  
+  # Extract weights from the Lrnr_nnls metalearner
+  nnls_fit <- sl_fit$fit_object$full_fit$learner_fits$Lrnr_nnls_FALSE
+  weights <- nnls_fit$coefficients
+  coef_df <- data.frame(
+    outcome = rep(outcome, length(weights)),
+    learner = learner_names,
+    weight = as.numeric(weights)
+  )
+  
+  # Append to results list
+  results_list[[outcome]] <- coef_df
+  cat(outcome, "\n")
+}
+
+# Combine all results into a single dataframe
+results_df <- do.call(rbind, results_list)
+
+# Print the results dataframe
+results_df
+
+
+```
+
+```{r}
+results_df <- results_df %>% mutate(outcome_alt = case_when(
+    grepl("internet_wght_age_15_to_49_fm_ratio", outcome) ~ "Internet, Ever (Ratio)",
+    grepl("internet_wght_age_15_to_49_men", outcome) ~ "Internet, Ever (Men)",
+    grepl("internet_wght_age_15_to_49_wom", outcome) ~ "Internet, Ever (Women)",
+    grepl("mobile_telephone_wght_age_15_to_49_fm_ratio", outcome) ~ "Mobile (Ratio)",
+    grepl("mobile_telephone_wght_age_15_to_49_men", outcome) ~ "Mobile (Men)",
+    grepl("mobile_telephone_wght_age_15_to_49_wom", outcome) ~ "Mobile (Women)",
+    grepl("used_internet_past12months_wght_age_15_to_49_fm_ratio", outcome) ~ "Internet (Ratio)",
+    grepl("used_internet_past12months_wght_age_15_to_49_men", outcome) ~ "Internet (Men)",
+    grepl("used_internet_past12months_wght_age_15_to_49_wom", outcome) ~ "Internet (Women)",
+    TRUE ~ outcome
+  )) # Default to keep original name if no match
+
+
+# Pivot the dataframe
+pivoted_df <- results_df %>%
+  dplyr::select(learner, weight, outcome_alt) %>% 
+  pivot_wider(names_from = outcome_alt, values_from = weight)
+
+
+# Convert the pivoted dataframe to a LaTeX table
+latex_table <- xtable(pivoted_df)
+
+# Print the LaTeX table with appropriate options
+print(latex_table, type = "latex", include.rownames = FALSE, booktabs = TRUE, file = here("figures", "superlearner_weights.tex"))
+
+```
+
+

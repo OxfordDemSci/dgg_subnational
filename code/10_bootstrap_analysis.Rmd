@@ -1,0 +1,354 @@
+---
+title: "Bootstrap analysis" 
+author: Casey Breen
+---
+
+Summary: Carry out a bootstrap analysis to estimate the uncertainty in the R-squared values (i.e., best we could possibly do)
+
+```{r}
+## libary packages + custom functions 
+library(here)
+source(here("code", "helpers.R"))
+```
+
+
+```{r}
+## read in crosswalk 
+xwalk <- read_csv(here("data", "dhs_cluster_gamd1_crosswalk.csv"), 
+                  locale = locale(encoding = "ISO-8859-1")) %>% 
+  mutate(GID_0 = substring(GID_1, 1, 3))
+
+xwalk <- xwalk %>% 
+  filter(!(GID_0 == "BGD" & DHSYEAR == 2014)) %>% 
+  filter(!(GID_0 == "KHM" & DHSYEAR == 2014)) %>% 
+  filter(!(GID_0 == "NPL" & DHSYEAR == 2016)) %>% 
+  filter(!(GID_0 == "PHL" & DHSYEAR == 2017)) %>% 
+  filter(!(GID_0 == "IND" & DHSYEAR == 2014))
+
+```
+
+
+
+```{r}
+# Define the list of country names in lowercase
+countries <- c("angola", "armenia", "benin", "burkina_faso", "burundi", "cambodia", 
+               "cameroon", "ethiopia", "gabon", "gambia", "guinea", "haiti", "india", 
+               "kenya", "liberia", "madagascar", "malawi", "mali", "mauritania", "nepal", 
+               "nigeria", "pakistan", "rwanda", "senegal", "sierra leone", "south_africa", 
+               "tanzania", "timor-leste", "uganda", "zambia", "zimbabwe")
+ 
+# Define a function to check if a folder name contains any country names
+folder_contains_country <- function(folder_name, countries) {
+  any(sapply(countries, function(country) grepl(country, folder_name, ignore.case = TRUE)))
+}
+
+# List all folders in the specified paths
+wave_paths <- c(
+  here("data", "national", "data_refresh", "dhs", "wave7"),
+  here("data", "national", "data_refresh", "dhs", "wave8"))
+
+# Retrieve all folder paths
+all_folders <- unlist(lapply(wave_paths, list.dirs, full.names = TRUE, recursive = FALSE))
+
+# Filter folders containing any of the country names and exclude certain folders
+selected_folders <- Filter(function(folder) folder_contains_country(folder, countries), all_folders)
+selected_folders <- selected_folders[!grepl("cambodia_2014|india_2015|kenya_2014|rwanda_2014", selected_folders, ignore.case = TRUE)]
+
+# Initialize lists to store data
+data_list_wom <- list()
+data_list_men <- list()
+
+# Loop through selected folders to read women's and men's survey files
+for (folder in selected_folders) {
+  # Women's files with 'IR' in the title
+  files_wom <- list.files(path = folder, pattern = "IR", full.names = TRUE)
+  for (file in files_wom) {
+    data_list_wom[[file]] <- read_dta(file, col_select = c("v000", "v001", "v101", "v005", "v017", "v169a", "v171a")) %>% 
+      mutate(v101 = as.numeric(v101)) %>% 
+      mutate(path = file)
+  }
+  
+  # Men's files with 'MR7' or 'MR8' in the title
+  files_men <- list.files(path = folder, pattern = "MR7|MR8", full.names = TRUE)
+  for (file in files_men) {
+    data_list_men[[file]] <- read_dta(file, col_select = c("mv000", "mv001", "mv101", "mv005", "mv169a", "mv171a")) %>% 
+      mutate(mv101 = as.numeric(mv101))
+  }
+  cat(file)
+}
+
+# Combine all women's and men's data into single data frames
+dhs_surveys_wom <- bind_rows(data_list_wom)
+dhs_surveys_men <- bind_rows(data_list_men)
+
+```
+
+## clean up dhs surveys 
+
+```{r}
+## clean up dhs surveys 
+dhs_surveys_wom <- dhs_surveys_wom %>% 
+  mutate(country_code = as.character(substring(v000, 1, 2))) %>% 
+  mutate(v001 = as.numeric(v001)) %>%
+  mutate(v017 = as.numeric(v017)) %>%
+  left_join(xwalk,
+            by = c("country_code" = "DHSCC", "v001" = "DHSCLUST"))
+  
+dhs_surveys_men <- dhs_surveys_men %>% 
+  mutate(country_code = as.character(substring(mv000, 1, 2))) %>% 
+  mutate(mv001 = as.numeric(mv001)) %>%
+  left_join(xwalk,
+            by = c("country_code" = "DHSCC", "mv001" = "DHSCLUST"),
+            relationship = "many-to-many")
+```
+
+
+
+```{r}
+truth_women_internet <- dhs_surveys_wom %>% 
+  filter(!is.na(v171a)) %>%
+  group_by(GID_0, GID_1) %>%
+    mutate(internet = case_when(
+      GID_0 != "IND" & v171a == 1 ~ 1,
+      GID_0 == "IND" & v171a == 3 ~ 1,
+      TRUE ~ 0)) %>% 
+  summarize(true_women = sum(internet * v005) / sum(v005)) %>%
+  mutate(gender = "wom")
+
+truth_men_internet <- dhs_surveys_men %>% 
+  filter(!is.na(mv171a)) %>%
+  group_by(GID_0, GID_1) %>%
+     mutate(internet = case_when(
+      GID_0 != "IND" & mv171a == 1 ~ 1,
+      GID_0 == "IND" & mv171a == 3 ~ 1,
+      TRUE ~ 0)) %>% 
+  summarize(true_men = sum(internet * mv005) / sum(mv005)) %>%
+  mutate(gender = "men")
+
+truth_combined_internet <- left_join(truth_women_internet, truth_men_internet, by = c("GID_0", "GID_1")) %>%
+  mutate(ratio_true = true_women / true_men)
+```
+
+
+```{r}
+# Define a bootstrap iteration for women focused on internet usage
+internet_usage_women <- function(data, gender_var) {
+  data %>%
+    filter(!is.na(v171a)) %>%
+    mutate(is_internet_user = case_when(
+      GID_0 != "IND" & v171a == 1 ~ 1,
+      GID_0 == "IND" & v171a == 3 ~ 1,
+      TRUE ~ 0
+    )) %>%
+    group_by(GID_1) %>%
+    sample_n(size = n(), replace = TRUE) %>%
+    summarize(avg_internet_usage = sum(is_internet_user * v005) / sum(v005),
+              sample_size = n()) %>%
+    ungroup() %>%
+    mutate(gender = gender_var)
+}
+
+# Define a bootstrap iteration for men focused on internet usage
+internet_usage_men <- function(data, gender_var) {
+  data %>%
+    filter(!is.na(mv171a)) %>%
+    mutate(is_internet_user = case_when(
+      GID_0 != "IND" & mv171a == 1 ~ 1,
+      GID_0 == "IND" & mv171a == 3 ~ 1,
+      TRUE ~ 0
+    )) %>%
+    group_by(GID_1) %>%
+    sample_n(size = n(), replace = TRUE) %>%
+    summarize(avg_internet_usage = sum(is_internet_user * mv005) / sum(mv005),
+              sample_size = n()) %>%
+    ungroup() %>%
+    mutate(gender = gender_var)
+}
+
+# Perform the bootstrap for both women and men
+bootstrap_results_women <- map_dfr(1:100, ~internet_usage_women(dhs_surveys_wom, "women"), .id = "iteration", .progress = T)
+bootstrap_results_men <- map_dfr(1:100, ~internet_usage_men(dhs_surveys_men, "men"), .id = "iteration",  .progress = T)
+
+# Combine results and calculate gender ratios
+combined_internet_usage <- bind_rows(bootstrap_results_women, bootstrap_results_men)
+
+gender_internet_ratios <- combined_internet_usage %>%
+  group_by(GID_1, iteration) %>%
+  pivot_wider(
+    names_from = gender,
+    values_from = c(avg_internet_usage, sample_size)
+  ) %>% 
+  mutate(internet_usage_ratio = avg_internet_usage_women / avg_internet_usage_men)
+
+# Calculate R-squared values for men, women, and ratios
+gender_internet_ratios <- gender_internet_ratios %>% 
+  inner_join(truth_combined_internet, by = "GID_1")
+
+gender_internet_ratios <- gender_internet_ratios %>% 
+  filter(!is.na(internet_usage_ratio) & !is.na(ratio_true) & 
+         !is.infinite(internet_usage_ratio) & !is.infinite(ratio_true)) %>% 
+  filter(!GID_1 %in% c("Z07.3_1", "Z06.6_1", "Z06.1_1", "Z01.14_1")) %>% 
+  filter(!is.na(GID_1)) %>% 
+  ungroup() %>% 
+  mutate(country = substring(GID_1, 1, 3)) %>%
+  filter(country != "UGA") %>%
+  group_by(country, iteration) %>%
+  summarize(
+    r2_women = compute_r2(avg_internet_usage_women, true_women),
+    r2_men = compute_r2(avg_internet_usage_men, true_men),
+    r2_ratio = compute_r2(internet_usage_ratio, ratio_true),
+    avg_sample_size_women = mean(sample_size_women),
+    avg_sample_size_men = mean(sample_size_men)
+  ) %>%
+  ungroup()
+
+# Pivot and calculate summary statistics
+final_stats_internet <- gender_internet_ratios %>%
+  select(-avg_sample_size_women, -avg_sample_size_men) %>% 
+  pivot_longer(cols = -c(country, iteration), names_to = "name", values_to = "value") %>%
+  group_by(name) %>%
+  summarize(
+     perc_2.5 = quantile(value, probs = 0.025),
+     perc_50 = median(value),
+     mean_50 = mean(value),
+     perc_97.5 = quantile(value, probs = 0.975)
+   ) %>% 
+  mutate(stat = "internet")
+```
+
+
+
+## truth mobile 
+
+
+```{r}
+# Compute mobile usage for women
+truth_women_mobile <- dhs_surveys_wom %>% 
+  filter(!is.na(v169a)) %>%
+  group_by(GID_0, GID_1) %>%
+  mutate(mobile = if_else(v169a == 1, 1, 0)) %>% 
+  summarize(true_women_mobile = sum(mobile * v005) / sum(v005)) %>%
+  mutate(gender = "wom")
+
+# Compute mobile usage for men
+truth_men_mobile <- dhs_surveys_men %>% 
+  filter(!is.na(mv169a)) %>%
+  group_by(GID_0, GID_1) %>%
+  mutate(mobile = if_else(mv169a == 1, 1, 0)) %>% 
+  summarize(true_men_mobile = sum(mobile * mv005) / sum(mv005)) %>%
+  mutate(gender = "men")
+
+# Combine the truth data for women and men and calculate the ratio of mobile usage
+truth_combined_mobile <- left_join(truth_women_mobile, truth_men_mobile, by = c("GID_0", "GID_1")) %>%
+  mutate(ratio_true = true_women_mobile / true_men_mobile)
+```
+
+
+
+```{r}
+# Define a bootstrap iteration function for women focused on mobile usage
+bootstrap_iteration_mobile_wom <- function(data, gender_var) {
+  data %>%
+    filter(!is.na(v169a)) %>%
+    mutate(mobile = case_when(
+      v169a == 1 ~ 1,
+      TRUE ~ 0
+    )) %>%
+    group_by(GID_1) %>%
+    sample_n(size = n(), replace = TRUE) %>%
+    summarize(mobile_usage = sum(mobile * v005) / sum(v005),
+              n = n()) %>%
+    ungroup() %>%
+    mutate(gender = gender_var)
+}
+
+# Define a bootstrap iteration function for men focused on mobile usage
+bootstrap_iteration_mobile_men <- function(data, gender_var) {
+  data %>%
+    filter(!is.na(mv169a)) %>%
+    mutate(mobile = case_when(
+     mv169a == 1 ~ 1,
+     TRUE ~ 0
+    )) %>%
+    group_by(GID_1) %>%
+    sample_n(size = n(), replace = TRUE) %>%
+    summarize(mobile_usage = sum(mobile * mv005) / sum(mv005),
+              n = n()) %>%
+    ungroup() %>%
+    mutate(gender = gender_var)
+}
+
+# Perform the bootstrap for women and men, focusing on mobile usage
+bootstrap_women <- map_dfr(1:100, ~bootstrap_iteration_mobile_wom(dhs_surveys_wom, "women"), .id = "iteration", .progress = T)
+bootstrap_men <- map_dfr(1:100, ~bootstrap_iteration_mobile_men(dhs_surveys_men, "men"), .id = "iteration", .progress = T)
+
+# Combine results from both genders and calculate mobile usage ratios
+bootstrap_combined <- bind_rows(bootstrap_women, bootstrap_men)
+
+gender_ratios_mobile <- bootstrap_combined %>%
+  group_by(GID_1, iteration) %>%
+  pivot_wider(
+    names_from = gender,
+    values_from = c(mobile_usage, n)
+  ) %>% 
+  mutate(ratio_wom_men = mobile_usage_women / mobile_usage_men)
+
+# Assuming compute_r2 and truth_combined are defined elsewhere correctly for mobile data
+# Join with ground truth data and calculate R-squared values
+gender_ratios_mobile <- gender_ratios_mobile %>% 
+  inner_join(truth_combined_mobile, by = "GID_1")
+
+# Filter and calculate statistics
+gender_ratios_mobile <- gender_ratios_mobile %>% 
+  filter(!is.na(ratio_wom_men) & !is.na(ratio_true) & 
+         !is.infinite(ratio_wom_men) & !is.infinite(ratio_true)) %>% 
+  filter(!GID_1 %in% c("Z07.3_1", "Z06.6_1", "Z06.1_1", "Z01.14_1")) %>% 
+  filter(!is.na(GID_1)) %>% 
+  ungroup() %>% 
+  mutate(country = substring(GID_1, 1, 3)) %>%
+  filter(country != "UGA") %>%
+  group_by(country, iteration) %>%
+  summarize(
+    r2_women = compute_r2(mobile_usage_women, true_women_mobile),
+    r2_men = compute_r2(mobile_usage_men, true_men_mobile),
+    r2_ratio = compute_r2(ratio_wom_men, ratio_true),
+    n_women = mean(n_women),
+    n_men = mean(n_men)
+  ) %>% 
+  ungroup()
+
+# Pivot to longer format for final statistics
+gender_ratios_mobile_long <- gender_ratios_mobile %>%
+  select(-n_women, -n_men) %>% 
+  pivot_longer(cols = -c(country, iteration), names_to = "name", values_to = "value")
+
+# Compute summary statistics for each metric
+final_stats_mobile <- gender_ratios_mobile_long %>% 
+  group_by(name) %>%
+  summarize(
+     perc_2.5 = quantile(value, probs = 0.025),
+     perc_50 = median(value),
+     perc_97.5 = quantile(value, probs = 0.975),
+  ) %>% 
+  mutate(stat = "mobile")
+```
+
+
+
+
+```{r}
+# Assuming final_stats_mobile and final_stats_internet are already defined
+combined_stats <- bind_rows(
+  mutate(final_stats_mobile),
+  mutate(final_stats_internet)
+)
+
+# Convert to xtable
+latex_table <- xtable(combined_stats,
+                      caption = "Comparison of R-Squared Statistics for Mobile and Internet",
+                      label = "tab:stats_comparison",
+                      digits = 3,
+                      file = here("tables", "superlearner_weights.tex"))
+```
+
+

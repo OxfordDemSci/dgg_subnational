@@ -1,0 +1,123 @@
+---
+title: "Residual Analysis"
+author: Casey Breen
+---
+
+Summary: Calculate residuals for the superlearner model and fit a model to predict absolute error  
+
+## Library packages 
+
+```{r}
+## libary packages + custom functions 
+library(here)
+source(here("code", "helpers.R"))
+```
+
+## Read in data files 
+
+```{r}
+## read in predictions 
+predictions_combined <- read_csv(here("out", "combined_predictions_lmics_national_covars_full.csv")) %>% 
+  mutate(predicted = case_when(predicted < 0 ~ 0,
+                  TRUE ~ predicted)) %>% 
+  filter(cv_method == "loco") %>% 
+  filter(feature_set == "fb_and_offline") 
+
+## read in training and test datasets 
+gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_july8.csv"), 
+                  locale = locale(encoding = "ISO-8859-1")) %>%
+  janitor::clean_names() %>% 
+  dplyr::select(country, gid_1, all_of(c(dhs_vars, fb_feats, off_feats))) %>% ## the vectors of vars are defined in helper function 
+  filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>%
+  mutate(continent = case_when(continent == "Africa" ~ 1,
+                               TRUE ~ 0)) %>% drop_na() %>% 
+  filter(!(country == "Nepal" & dhsyear == 2016))
+```
+
+
+```{r}
+predictions_filter <- predictions_combined %>% 
+  dplyr::select(-country) %>% 
+  filter(model == "superlearner") 
+```
+
+
+
+```{r}
+predictions_filter <- predictions_filter %>% 
+  left_join(gadm1, by = "gid_1")
+
+predictions_filter <- predictions_filter %>% 
+  mutate(residual = observed-predicted)
+```
+
+
+```{r}
+# Filter the data for Internet and Mobile outcomes
+internet_data <- filter(predictions_filter, )
+mobile_data <- filter(predictions_filter, grepl("Mobile", outcome_clean))
+
+## calculate mean residual 
+predictions_filter <- predictions_filter %>% 
+  group_by(outcome_clean) %>% 
+  mutate(mean_residual = mean(residual, na.rm = TRUE))
+ 
+# Plot for "perc_ever_used_internet_wght_age_15_to_49_men"
+plot1_residuals <- predictions_filter %>%
+  filter(
+    outcome %in% c("perc_owns_mobile_telephone_wght_age_15_to_49_wom", "perc_used_internet_past12months_wght_age_15_to_49_wom"),
+  ) %>%
+  ggplot() + 
+  geom_histogram(aes(x = residual), bins = 50, fill = "grey", color = "black") + 
+  geom_vline(aes(xintercept = mean_residual), linetype = "dashed", color = "red", linewidth = 1) + 
+  theme_cowplot() + 
+  facet_wrap(~outcome_clean, scales = "free", nrow = 1) + 
+    labs(x = "") + 
+  xlim(-100, 100)
+
+
+# Plot for "perc_ever_used_internet_wght_age_15_to_49_men"
+plot2_residuals <- predictions_filter %>%
+  filter(
+    outcome %in% c("perc_owns_mobile_telephone_wght_age_15_to_49_men", "perc_used_internet_past12months_wght_age_15_to_49_men"),
+  ) %>%
+  ggplot() + 
+  geom_histogram(aes(x = residual), bins = 50, fill = "grey", color = "black") + 
+  geom_vline(aes(xintercept = mean_residual), linetype = "dashed", color = "red", linewidth = 1) + 
+  theme_cowplot() + 
+  labs(x = "") + 
+  labs(x = "Residual", y = "Count") + 
+  facet_wrap(~outcome_clean, scales = "free", nrow = 1) + 
+  xlim(-100, 100)
+
+
+# Plot for "perc_ever_used_internet_wght_age_15_to_49_men"
+plot3_residuals <- predictions_filter %>%
+  filter(
+    outcome %in% c("perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio", "perc_used_internet_past12months_wght_age_15_to_49_fm_ratio"),
+  ) %>%
+  ggplot() + 
+  geom_histogram(aes(x = residual), bins = 50, fill = "grey", color = "black") + 
+  geom_vline(aes(xintercept = mean_residual), linetype = "dashed", color = "red", linewidth = 1) + 
+  theme_cowplot() + 
+  labs(x = "Residual", y = "Count") + 
+  facet_wrap(~outcome_clean, scales = "free", nrow = 1) + 
+  xlim(-1.5, 1.5)
+
+## combined plot 
+combined_plot_residuals <- plot_grid(plot1_residuals, 
+                                     plot2_residuals, 
+                                     plot3_residuals, ncol = 1, labels = "AUTO")
+
+
+ggsave(plot = combined_plot_residuals, filename = here("figures", "combined_plot_residuals.png"), height = 10, width = 8)
+```
+
+
+
+
+
+
+
+
+

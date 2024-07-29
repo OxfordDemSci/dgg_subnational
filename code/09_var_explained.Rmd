@@ -1,0 +1,191 @@
+---
+title: "Within vs. between country"
+author: Casey Breen
+---
+
+Summary: Within vs. between country comparison of variance 
+
+```{r}
+## libary packages + custom functions 
+library(here)
+source(here("code", "helpers.R"))
+```
+
+
+```{r}
+## read in training and test datasets 
+predictions <- read_csv(here("out", "full_predictions.csv"))
+
+gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_july8.csv"), 
+                  locale = locale(encoding = "ISO-8859-1")) %>% 
+  select(gid_1, hdi_national_2022)
+
+predictions <- predictions %>% 
+  left_join(gadm1, by = c("gid_1" = "gid_1")) %>% 
+  mutate(hdi_bin = ntile(hdi_national_2022, 4)) 
+```
+
+
+
+```{r}
+# Function to calculate MLD and its components
+calculate_mld_components <- function(data, rate_col, constant = 1) {
+  
+  # Convert rate_col and country_col to symbols for NSE
+  rate_col_sym <- sym(rate_col)
+
+  # Add a small constant to avoid logarithm of zero
+  data <- data %>%
+    mutate(!!rate_col_sym := !!rate_col_sym + constant)
+  
+  # Calculate overall mean rate (mu)
+  overall_mean <- mean(data[[rate_col]], na.rm = TRUE)
+  
+  # Function to calculate MLD for a given vector of rates
+  calc_mld <- function(rates, mean_rate) {
+    n <- length(rates)
+    mld <- sum(log(mean_rate / rates), na.rm = TRUE) / n
+    return(mld)
+  }
+  
+  # Calculate within-country MLD
+  within_mlds <- data %>%
+    group_by(country) %>%
+    summarise(
+      N_k = n(),
+      mu_k = mean(!!rate_col_sym, na.rm = TRUE),
+      MLD_k = calc_mld(!!rate_col_sym, mu_k),
+      .groups = 'drop'
+    )
+  
+  # Calculate within-country MLD component (MLD_W)
+  within_mlds <- within_mlds %>%
+    mutate(weight = N_k / sum(N_k, na.rm = TRUE)) %>%
+    mutate(weighted_MLD_k = weight * MLD_k)
+  
+  MLD_W <- sum(within_mlds$weighted_MLD_k, na.rm = TRUE)
+  
+  # Calculate between-country MLD component (MLD_B)
+  between_mlds <- within_mlds %>%
+    mutate(MLD_B_component = weight * log(overall_mean / mu_k))
+  
+  MLD_B <- sum(between_mlds$MLD_B_component, na.rm = TRUE)
+  
+  # Calculate total MLD
+  total_MLD <- MLD_W + MLD_B
+  
+  # Print results
+  cat("Within-country MLD (MLD_W):", MLD_W, "\n")
+  cat("Between-country MLD (MLD_B):", MLD_B, "\n")
+  cat("Total MLD:", total_MLD, "\n")
+  cat("Ratio of Within-country to Between-country MLD:", MLD_W / MLD_B, "\n")
+  
+  # Return results as a list
+  return(data.frame(MLD_W = MLD_W, 
+                    MLD_B = MLD_B,
+                    total_MLD = total_MLD,
+                    ratio = MLD_W / total_MLD ))
+}
+
+
+hdi_bins <- c(1, 2, 3, 4)
+result_list <- list()
+
+# List of columns to calculate MLD for
+predicted_cols <- c(
+  "predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom",
+  "predicted_perc_owns_mobile_telephone_wght_age_15_to_49_men",
+  "predicted_perc_used_internet_past12months_wght_age_15_to_49_wom",
+  "predicted_perc_used_internet_past12months_wght_age_15_to_49_men"
+)
+
+## store results 
+for (hdi_bin in hdi_bins) {
+  for (col in predicted_cols) {
+    
+    result <- calculate_mld_components(predictions %>% filter(hdi_bin == !!hdi_bin), 
+                                       rate_col = col) %>% 
+      mutate(hdi_bin = hdi_bin) %>% 
+      mutate(col = col)
+    
+    key <- paste0(hdi_bin, "_", col)
+    
+    result_list[[key]] <- result
+  
+} 
+}
+
+result_list_all <- list()
+
+for (col in predicted_cols) {
+  overall_result <- calculate_mld_components(predictions, 
+                                             rate_col = col) %>%
+    mutate(hdi_bin = "Overall", col = col)
+  
+  key <- paste0("Overall_", col)
+  result_list_all[[key]] <- overall_result
+}
+
+result_list_df <- bind_rows(result_list) %>% 
+  mutate(hdi_bin = case_when(
+    hdi_bin == 1 ~ "Very Low HDI",
+    hdi_bin == 2 ~ "Low HDI",
+    hdi_bin == 3 ~ "Medium HDI",
+    hdi_bin == 4 ~ "High HDI"))
+
+
+result_list_all_df <- bind_rows(result_list_all)
+
+results_full <- bind_rows(result_list_df, result_list_all_df)
+
+
+results_full <- results_full %>% 
+  mutate(outcome_clean = case_when(
+    grepl("mobile_telephone_wght_age_15_to_49_fm_ratio", col) ~ "Mobile (Ratio)",
+    grepl("mobile_telephone_wght_age_15_to_49_men", col) ~ "Mobile (Men)",
+    grepl("mobile_telephone_wght_age_15_to_49_wom", col) ~ "Mobile (Women)",
+    grepl("used_internet_past12months_wght_age_15_to_49_fm_ratio", col) ~ "Internet (Ratio)",
+    grepl("used_internet_past12months_wght_age_15_to_49_men", col) ~ "Internet (Men)",
+    grepl("used_internet_past12months_wght_age_15_to_49_wom", col) ~ "Internet (Women)",
+    TRUE ~ col
+  )) 
+
+result <- calculate_mld_components(predictions %>% filter(hdi_bin == 3),
+                                   rate_col = "predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom")
+```
+
+
+
+```{r}
+results_full$cat <- factor(results_full$hdi_bin, levels = c("Very Low HDI", "Low HDI", "Medium HDI", "High HDI", "Overall"))
+
+var_expalained_fig <- results_full %>% 
+  ggplot(aes(x = outcome_clean, y = ratio, fill = as.factor(cat))) + 
+  theme_cowplot() + 
+ # scale_fill_manual(values = c("#f0f9e8", "#bae4bc", "#7bccc4", "#2b8cbe","darkorange")) +
+  scale_fill_manual(values = cud) +
+ # scale_fill_viridis_d(alpha = 1) +
+  theme(legend.position = "bottom") + 
+   background_grid() + s
+    geom_bar(stat = "identity", 
+           width = 0.5, 
+           position = position_dodge(width = 0.5),
+           color = "black") + 
+  labs(fill = "",
+       x = "",
+       y = "Within-country contribution \n (% total variation)") + 
+  geom_hline(yintercept = 0.5, linetype = "dashed", color = "black") 
+
+ggsave(var_expalained_fig, filename = here("figures", "var_expalained_fig.png"), height = 4, width = 7)
+```
+
+
+
+
+```{r}
+# library(lme4)
+
+# # Fit a multilevel model
+# model <- lmer(predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom ~ 1 + (1|country), data = predictions %>% filter(hdi_bin == 1) , REML = TRUE)
+# summary(model)
+```

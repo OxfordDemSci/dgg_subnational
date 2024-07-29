@@ -1,0 +1,336 @@
+================================
+Running  02_make_predictions.Rmd 
+Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
+  Missing covariate data detected: imputing covariates.
+Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
+  Missing outcome data detected. This is okay for prediction, but will likely break training. 
+ You can drop observations with missing outcomes by setting drop_missing_outcome=TRUE in make_sl3_Task.
+Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
+  Missing covariate data detected: imputing covariates.
+Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
+  Missing outcome data detected. This is okay for prediction, but will likely break training. 
+ You can drop observations with missing outcomes by setting drop_missing_outcome=TRUE in make_sl3_Task.
+Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
+  Missing covariate data detected: imputing covariates.
+Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
+  Missing outcome data detected. This is okay for prediction, but will likely break training. 
+ You can drop observations with missing outcomes by setting drop_missing_outcome=TRUE in make_sl3_Task.
+Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
+  Missing covariate data detected: imputing covariates.
+Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
+  Missing outcome data detected. This is okay for prediction, but will likely break training. 
+ You can drop observations with missing outcomes by setting drop_missing_outcome=TRUE in make_sl3_Task.
+Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
+  Missing covariate data detected: imputing covariates.
+Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
+  Missing outcome data detected. This is okay for prediction, but will likely break training. 
+ You can drop observations with missing outcomes by setting drop_missing_outcome=TRUE in make_sl3_Task.
+Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
+  Missing covariate data detected: imputing covariates.
+Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
+  Missing outcome data detected. This is okay for prediction, but will likely break training. 
+ You can drop observations with missing outcomes by setting drop_missing_outcome=TRUE in make_sl3_Task.
+Rows: 126000 Columns: 9
+── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr (7): gid_1, country, model, outcome, feature_set, cv_method, outcome_clean
+dbl (2): observed, predicted
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Finished with 02_make_predictions.Rmd, time:: 144.637 sec elapsed
+================================
+================================
+Running  03_model_performance.Rmd 
+Rows: 126000 Columns: 9
+── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr (7): gid_1, country, model, outcome, feature_set, cv_method, outcome_clean
+dbl (2): observed, predicted
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 2616 Columns: 111
+── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): gid_1, gid_0, country, name_1, continent
+dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subna...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Warning in left_join(., gadm1, by = c("gid_1", "country")) :
+  Detected an unexpected many-to-many relationship between `x` and `y`.
+ℹ Row 148 of `x` matches multiple rows in `y`.
+ℹ Row 71 of `y` matches multiple rows in `x`.
+ℹ If a many-to-many relationship is expected, set `relationship = "many-to-many"` to silence this warning.
+`summarise()` has grouped output by 'cv_method', 'model', 'outcome'. You can override using the `.groups` argument.
+`summarise()` has grouped output by 'cv_method', 'model', 'outcome', 'feature_set'. You can override using the `.groups` argument.
+Finished with 03_model_performance.Rmd, time:: 11.345 sec elapsed
+================================
+================================
+Running  04_within_country_analysis.Rmd 
+Rows: 2158 Columns: 15
+── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (3): gid_0, gid_1, country
+dbl (12): observed_perc_owns_mobile_telephone_wght_age_15_to_49_wom, observed_perc_owns_mobile_telephone_wght_age_15_to_49_men, observed_perc_owns_mo...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 12948 Columns: 6
+── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr (4): gid_0, gid_1, country, outcome
+dbl (2): predicted, predicted_error
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+`summarise()` has grouped output by 'continent', 'gid_0'. You can override using the `.groups` argument.
+`geom_smooth()` using formula = 'y ~ x'
+`summarise()` has grouped output by 'continent'. You can override using the `.groups` argument.
+Finished with 04_within_country_analysis.Rmd, time:: 2.189 sec elapsed
+================================
+================================
+Running  05_geo_map.Rmd 
+Rows: 2616 Columns: 111
+── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): gid_1, gid_0, country, name_1, continent
+dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subna...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 2616 Columns: 111
+── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): gid_1, gid_0, country, name_1, continent
+dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subna...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 2158 Columns: 15
+── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (3): gid_0, gid_1, country
+dbl (12): observed_perc_owns_mobile_telephone_wght_age_15_to_49_wom, observed_perc_owns_mobile_telephone_wght_age_15_to_49_men, observed_perc_owns_mo...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 126000 Columns: 9
+── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr (7): gid_1, country, model, outcome, feature_set, cv_method, outcome_clean
+dbl (2): observed, predicted
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 126000 Columns: 9
+── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr (7): gid_1, country, model, outcome, feature_set, cv_method, outcome_clean
+dbl (2): observed, predicted
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 126000 Columns: 9
+── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr (7): gid_1, country, model, outcome, feature_set, cv_method, outcome_clean
+dbl (2): observed, predicted
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+`geom_smooth()` using formula = 'y ~ x'
+Finished with 05_geo_map.Rmd, time:: 43.636 sec elapsed
+================================
+================================
+Running  06_feature_importance.Rmd 
+Rows: 126000 Columns: 9
+── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr (7): gid_1, country, model, outcome, feature_set, cv_method, outcome_clean
+dbl (2): observed, predicted
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 2616 Columns: 111
+── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): gid_1, gid_0, country, name_1, continent
+dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subna...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Warning in left_join(., gadm1, by = "gid_1") :
+  Detected an unexpected many-to-many relationship between `x` and `y`.
+ℹ Row 148 of `x` matches multiple rows in `y`.
+ℹ Row 71 of `y` matches multiple rows in `x`.
+ℹ If a many-to-many relationship is expected, set `relationship = "many-to-many"` to silence this warning.
+`summarise()` has grouped output by 'cv_method', 'model', 'outcome'. You can override using the `.groups` argument.
+Warning: The `size` argument of `element_rect()` is deprecated as of ggplot2 3.4.0.
+ℹ Please use the `linewidth` argument instead.
+This warning is displayed once every 8 hours.
+Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.
+Rows: 2616 Columns: 111
+── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): gid_1, gid_0, country, name_1, continent
+dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subna...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+ℹ Please use `linewidth` instead.
+This warning is displayed once every 8 hours.
+Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.
+Finished with 06_feature_importance.Rmd, time:: 7.639 sec elapsed
+================================
+================================
+Running  07_superlearner_weights.Rmd 
+Rows: 2616 Columns: 111
+── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): gid_1, gid_0, country, name_1, continent
+dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subna...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+perc_used_internet_past12months_wght_age_15_to_49_wom 
+perc_owns_mobile_telephone_wght_age_15_to_49_wom 
+perc_owns_mobile_telephone_wght_age_15_to_49_men 
+perc_used_internet_past12months_wght_age_15_to_49_men 
+perc_used_internet_past12months_wght_age_15_to_49_fm_ratio 
+perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio 
+Finished with 07_superlearner_weights.Rmd, time:: 142.725 sec elapsed
+================================
+================================
+Running  08_residual_analysis.Rmd 
+Rows: 126000 Columns: 9
+── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr (7): gid_1, country, model, outcome, feature_set, cv_method, outcome_clean
+dbl (2): observed, predicted
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 2616 Columns: 111
+── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): gid_1, gid_0, country, name_1, continent
+dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subna...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Finished with 08_residual_analysis.Rmd, time:: 0.683 sec elapsed
+================================
+================================
+Running  09_var_explained.Rmd 
+Rows: 2158 Columns: 15
+── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr  (3): gid_0, gid_1, country
+dbl (12): observed_perc_owns_mobile_telephone_wght_age_15_to_49_wom, observed_perc_owns_mobile_telephone_wght_age_15_to_49_men, observed_perc_owns_mo...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 2616 Columns: 111
+── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Delimiter: ","
+chr   (5): gid_1, gid_0, country, name_1, continent
+dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subna...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Within-country MLD (MLD_W): 0.02561287 
+Between-country MLD (MLD_B): 0.05394308 
+Total MLD: 0.07955595 
+Ratio of Within-country to Between-country MLD: 0.4748129 
+Within-country MLD (MLD_W): 0.005557388 
+Between-country MLD (MLD_B): 0.01662224 
+Total MLD: 0.02217963 
+Ratio of Within-country to Between-country MLD: 0.3343344 
+Within-country MLD (MLD_W): 0.1945503 
+Between-country MLD (MLD_B): 0.2631139 
+Total MLD: 0.4576643 
+Ratio of Within-country to Between-country MLD: 0.7394147 
+Within-country MLD (MLD_W): 0.05658829 
+Between-country MLD (MLD_B): 0.04850215 
+Total MLD: 0.1050904 
+Ratio of Within-country to Between-country MLD: 1.166717 
+Within-country MLD (MLD_W): 0.004375497 
+Between-country MLD (MLD_B): 0.008238424 
+Total MLD: 0.01261392 
+Ratio of Within-country to Between-country MLD: 0.5311085 
+Within-country MLD (MLD_W): 0.0006438553 
+Between-country MLD (MLD_B): 0.001908586 
+Total MLD: 0.002552441 
+Ratio of Within-country to Between-country MLD: 0.3373468 
+Within-country MLD (MLD_W): 0.0125368 
+Between-country MLD (MLD_B): 0.03738811 
+Total MLD: 0.04992491 
+Ratio of Within-country to Between-country MLD: 0.3353153 
+Within-country MLD (MLD_W): 0.006334013 
+Between-country MLD (MLD_B): 0.01137593 
+Total MLD: 0.01770995 
+Ratio of Within-country to Between-country MLD: 0.5567906 
+Within-country MLD (MLD_W): 0.0006521867 
+Between-country MLD (MLD_B): 0.003039558 
+Total MLD: 0.003691744 
+Ratio of Within-country to Between-country MLD: 0.2145663 
+Within-country MLD (MLD_W): 0.000229737 
+Between-country MLD (MLD_B): 0.001505242 
+Total MLD: 0.001734979 
+Ratio of Within-country to Between-country MLD: 0.1526246 
+Within-country MLD (MLD_W): 0.002179064 
+Between-country MLD (MLD_B): 0.017938 
+Total MLD: 0.02011706 
+Ratio of Within-country to Between-country MLD: 0.1214775 
+Within-country MLD (MLD_W): 0.001420933 
+Between-country MLD (MLD_B): 0.004778739 
+Total MLD: 0.006199672 
+Ratio of Within-country to Between-country MLD: 0.2973447 
+Within-country MLD (MLD_W): 0.0008270385 
+Between-country MLD (MLD_B): 0.001465384 
+Total MLD: 0.002292423 
+Ratio of Within-country to Between-country MLD: 0.5643833 
+Within-country MLD (MLD_W): 5.437684e-05 
+Between-country MLD (MLD_B): 0.0006789214 
+Total MLD: 0.0007332982 
+Ratio of Within-country to Between-country MLD: 0.08009299 
+Within-country MLD (MLD_W): 0.001542988 
+Between-country MLD (MLD_B): 0.008819943 
+Total MLD: 0.01036293 
+Ratio of Within-country to Between-country MLD: 0.1749431 
+Within-country MLD (MLD_W): 0.000547788 
+Between-country MLD (MLD_B): 0.004108097 
+Total MLD: 0.004655885 
+Ratio of Within-country to Between-country MLD: 0.1333435 
+Within-country MLD (MLD_W): 0.007873374 
+Between-country MLD (MLD_B): 0.05124922 
+Total MLD: 0.0591226 
+Ratio of Within-country to Between-country MLD: 0.1536291 
+Within-country MLD (MLD_W): 0.001624764 
+Between-country MLD (MLD_B): 0.01428194 
+Total MLD: 0.01590671 
+Ratio of Within-country to Between-country MLD: 0.1137635 
+Within-country MLD (MLD_W): 0.05274155 
+Between-country MLD (MLD_B): 0.2599045 
+Total MLD: 0.3126461 
+Ratio of Within-country to Between-country MLD: 0.2029267 
+Within-country MLD (MLD_W): 0.01626178 
+Between-country MLD (MLD_B): 0.09885709 
+Total MLD: 0.1151189 
+Ratio of Within-country to Between-country MLD: 0.1644978 
+Within-country MLD (MLD_W): 0.0006521867 
+Between-country MLD (MLD_B): 0.003039558 
+Total MLD: 0.003691744 
+Ratio of Within-country to Between-country MLD: 0.2145663 
+Error in `ggplot_add()`:
+! Can't add `s` to a <ggplot> object
+ℹ Did you forget to add parentheses, as in `s()`?
+Backtrace:
+ 1. global source_rmd(here("code", cur_file))
+ 6. ggplot2:::`+.gg`(...)
+      at /RtmpQnM0Pi/file1504a12b70785.R:150:0
+ 7. ggplot2:::add_ggplot(e1, e2, e2name)
+ 9. ggplot2:::ggplot_add.function(object, p, objectname)
