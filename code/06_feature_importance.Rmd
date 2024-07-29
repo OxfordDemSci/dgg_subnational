@@ -273,8 +273,6 @@ var_importance_plot <- var_importance_data %>%
   # facet_wrap(~outcome_clean, scales = "free_y") +
   scale_y_discrete(breaks = var_importance_data$feature_idea,
                    labels = var_importance_data$feature_recode)
-
-ggsave(plot = var_importance_plot, filename = here("figures", "var_importance.png"), width = 26, height = 16, units = "in", dpi = 300)
 ```
 
 

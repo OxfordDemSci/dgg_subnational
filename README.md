@@ -22,7 +22,7 @@ Please download the open science framework repository. In the same directory as 
 
 After downloading the required data, researchers can run the following script to replicate all figures and tables: 
   
-  - `00_run_all.Rmd` - this file runs all scripts. 
+- `00_run_all.Rmd` - this file runs all scripts. 
 
 Alternatively, researchers can run the following files individually in order: 
   
