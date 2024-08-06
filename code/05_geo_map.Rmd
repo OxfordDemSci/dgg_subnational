@@ -37,6 +37,10 @@ gadm1_full <- read_csv(here("data", "aggregated_indicators_lmic_july8.csv"),
 
 ## read in predictions 
 predictions_wide <- read_csv(here("out", "full_predictions.csv"))
+
+predictions_uncertainty <- read_csv(here("out", "predictions_with_uncertainty.csv")) %>% 
+  filter(outcome == "perc_used_internet_past12months_wght_age_15_to_49_wom") %>% 
+  filter(predicted_error < 100)
 ```
 
 ```{r}
@@ -54,7 +58,8 @@ gadm1_map <- gadm1_map %>%
 
 ```{r}
 shapefile_df <- gadm1_map %>% 
-  left_join(predictions_wide, by = c("GID_1" = "gid_1")) 
+  left_join(predictions_wide, by = c("GID_1" = "gid_1")) %>% 
+  left_join(predictions_uncertainty, by = c("GID_1" = "gid_1"))
 ```
 
 
@@ -83,9 +88,22 @@ internet_women_predicted <- ggplot() +
   labs(fill = "Internet Use",
        title = "Women, predicted")
 
+# Women, error 
+internet_women_predicted_error <- ggplot() +
+  geom_sf(data = gadm1_map, fill = "grey70", color = "black", linewidth = 0.5) +
+  geom_sf(data = shapefile_df, aes(fill = predicted_error), 
+          color = "white", size = 0.01, alpha = 0.8, linewidth = 0.05) +
+  scale_fill_viridis(option = "magma", na.value = "transparent", limits = c(-.1, 35), alpha = 1) +
+  theme_void() +
+  theme(legend.position = "bottom", plot.title = element_text(hjust = 0.3)) + 
+  labs(fill = "Internet Use",
+       title = "Women, predicted")
+
 ggsave(plot = internet_women_observed, filename = here("figures", "internet_lmic_observed.png"), height = 7, width = 10)
 
 ggsave(plot = internet_women_predicted, filename = here("figures", "internet_lmic_predicted.png"), height = 7, width = 10)
+
+ggsave(plot = internet_women_predicted_error, filename = here("figures", "internet_women_predicted_error.png"), height = 7, width = 10)
 ```
 
 
@@ -135,7 +153,7 @@ error_dist_nigeria <- shapefile_df_nigeria %>%
   ggplot(aes(x = observed, y = predicted_loco)) + 
   geom_point(aes(size = pop_all_age_total_dhsyear), alpha = 0.3) +
   # geom_smooth() +
-  stat_cor(aes(label = paste(after_stat(r.label)))) + 
+  stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..))) +  
   labs(title = "", 
        x = "Observed", 
        y = "Predicted",
@@ -197,7 +215,7 @@ plot_prediction_zimbabwe <- ggplot(shapefile_df_zimbabwe, aes(fill = predicted_l
 error_dist_zim <- shapefile_df_zimbabwe %>% 
   ggplot(aes(x = observed, y = predicted_loco)) + 
   geom_point(aes(size = pop_all_age_total_dhsyear), alpha = 0.3) +
-  stat_cor(aes(label = paste(after_stat(r.label)))) + 
+  stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..))) +  
   labs(title = "",
        x = "Observed",
        y = "Predicted",
@@ -259,7 +277,7 @@ plot_prediction_senegal <- ggplot(shapefile_df_senegal, aes(fill = predicted_loc
 error_dist_senegal <- shapefile_df_senegal %>% 
   ggplot(aes(x = observed, y = predicted_loco)) + 
   geom_point(aes(size = pop_all_age_total_dhsyear), alpha = 0.3) +
-  stat_cor(aes(label = paste(after_stat(r.label)))) + 
+  stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..))) +  
   labs(title = "",
        x = "Observed",
        y = "Predicted",

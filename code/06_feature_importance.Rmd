@@ -269,7 +269,7 @@ var_importance_plot <- var_importance_data %>%
   geom_segment(aes(yend = feature_idea, x = 0, xend = max(avg_r_squared)), linetype = "dashed", size = 0.1) +
   labs(x = expression("R" ^ 2),
        y = "",
-       title = "Variable Importance") +
+       title = "Feature Importance") +
   # facet_wrap(~outcome_clean, scales = "free_y") +
   scale_y_discrete(breaks = var_importance_data$feature_idea,
                    labels = var_importance_data$feature_recode)

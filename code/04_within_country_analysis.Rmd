@@ -22,11 +22,14 @@ predictions$continent <- countrycode(predictions$gid_0, origin = 'iso3c', destin
 
 ## predictions continent 
 predictions_long$continent <- countrycode(predictions_long$gid_0, origin = 'iso3c', destination = 'continent')
+
+## filter outlier in Macedonia 
 ```
 
 
 ```{r}
-spread_plot <- predictions_long %>% mutate(outcome_clean = case_when(
+spread_plot_df <- predictions_long %>% 
+  mutate(outcome_clean = case_when(
     grepl("mobile_telephone_wght_age_15_to_49_fm_ratio", outcome) ~ "Mobile (Ratio)",
     grepl("mobile_telephone_wght_age_15_to_49_men", outcome) ~ "Mobile (Men)",
     grepl("mobile_telephone_wght_age_15_to_49_wom", outcome) ~ "Mobile (Women)",
@@ -35,10 +38,19 @@ spread_plot <- predictions_long %>% mutate(outcome_clean = case_when(
     grepl("used_internet_past12months_wght_age_15_to_49_wom", outcome) ~ "Internet (Women)",
     TRUE ~ outcome
   )) %>% 
-  filter(!gid_1 %in% c("MRT.9_1", "UGA.32_1", "UGA.31_1")) %>% 
+  filter(!gid_1 %in% c("MRT.9_1", "UGA.32_1", "UGA.31_1", "MKD.1_1", "MKD.10_1")) %>% 
   group_by(continent, gid_0, outcome_clean) %>% 
   summarize(diff = max(predicted) - min(predicted),
-            mean = mean(predicted)) %>% 
+            mean = mean(predicted))
+  
+
+# Define the order of the levels explicitly
+spread_plot_df <- spread_plot_df %>% 
+  mutate(outcome_clean = factor(outcome_clean, 
+                                levels = c("Internet (Women)", "Internet (Men)", "Internet (Ratio)",
+                                           "Mobile (Women)", "Mobile (Men)", "Mobile (Ratio)")))
+
+spread_plot <- spread_plot_df %>% 
   ggplot(aes(x = mean, y = diff)) + 
   geom_text(aes(label = gid_0, color = continent)) + 
   labs(x = "National Estimate",
@@ -48,7 +60,8 @@ spread_plot <- predictions_long %>% mutate(outcome_clean = case_when(
   scale_color_manual(values = cud) + 
   geom_smooth(se = F, method = "lm") + 
   theme(legend.position = "bottom") + 
-  stat_cor(method = "pearson", label.x = Inf, label.y = Inf, size = 3.5,  hjust=1.1, vjust = 5.4, p.accuracy = 0.01) + 
+  stat_cor(method = "pearson", label.x = Inf, label.y = Inf, size = 3.5,  hjust=1.1, vjust = 5.4, p.accuracy = 0.01,
+            aes(label = paste0("italic(r)~`=`~", ..r..))) + 
   facet_wrap(~outcome_clean, scales = "free")
 
 ggsave(spread_plot, filename = here("figures", "spread_plot.png"), width = 12, height = 8)
@@ -72,7 +85,7 @@ spread_plot <- predictions %>%
   scale_color_manual(values = cud) + 
   geom_smooth(se = F, method = "lm") + 
   theme(legend.position = "bottom") + 
-  stat_cor(method = "pearson", label.x = 55, label.y = 45, size = 6, p.accuracy = 0.01)
+  stat_cor(label.x = 55, label.y = 45, size = 6, p.accuracy = 0.01, aes(label = paste0("italic(r)~`=`~", ..r..)))
 
 ## write rds 
 write_rds(spread_plot, file = here("figures", "spread_plot.rds"))

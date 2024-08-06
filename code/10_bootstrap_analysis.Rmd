@@ -14,7 +14,7 @@ source(here("code", "helpers.R"))
 
 ```{r}
 ## read in crosswalk 
-xwalk <- read_csv(here("data", "dhs_cluster_gamd1_crosswalk.csv"), 
+xwalk <- read_csv("/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/subnational/data_processing/result_gadm1_LMIC/dhs_cluster_gamd1_crosswalk.csv", 
                   locale = locale(encoding = "ISO-8859-1")) %>% 
   mutate(GID_0 = substring(GID_1, 1, 3))
 
@@ -34,7 +34,7 @@ xwalk <- xwalk %>%
 countries <- c("angola", "armenia", "benin", "burkina_faso", "burundi", "cambodia", 
                "cameroon", "ethiopia", "gabon", "gambia", "guinea", "haiti", "india", 
                "kenya", "liberia", "madagascar", "malawi", "mali", "mauritania", "nepal", 
-               "nigeria", "pakistan", "rwanda", "senegal", "sierra leone", "south_africa", 
+               "nigeria", "pakistan", "rwanda", "senegal", "sierra_leone", "south_africa", 
                "tanzania", "timor-leste", "uganda", "zambia", "zimbabwe")
  
 # Define a function to check if a folder name contains any country names
@@ -44,8 +44,8 @@ folder_contains_country <- function(folder_name, countries) {
 
 # List all folders in the specified paths
 wave_paths <- c(
-  here("data", "national", "data_refresh", "dhs", "wave7"),
-  here("data", "national", "data_refresh", "dhs", "wave8"))
+  "/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7/",
+  "/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8/")
 
 # Retrieve all folder paths
 all_folders <- unlist(lapply(wave_paths, list.dirs, full.names = TRUE, recursive = FALSE))
@@ -74,7 +74,7 @@ for (folder in selected_folders) {
     data_list_men[[file]] <- read_dta(file, col_select = c("mv000", "mv001", "mv101", "mv005", "mv169a", "mv171a")) %>% 
       mutate(mv101 = as.numeric(mv101))
   }
-  cat(file)
+  cat(file) 5
 }
 
 # Combine all women's and men's data into single data frames
@@ -166,8 +166,8 @@ internet_usage_men <- function(data, gender_var) {
 }
 
 # Perform the bootstrap for both women and men
-bootstrap_results_women <- map_dfr(1:100, ~internet_usage_women(dhs_surveys_wom, "women"), .id = "iteration", .progress = T)
-bootstrap_results_men <- map_dfr(1:100, ~internet_usage_men(dhs_surveys_men, "men"), .id = "iteration",  .progress = T)
+bootstrap_results_women <- map_dfr(1:1000, ~internet_usage_women(dhs_surveys_wom, "women"), .id = "iteration", .progress = T)
+bootstrap_results_men <- map_dfr(1:1000, ~internet_usage_men(dhs_surveys_men, "men"), .id = "iteration",  .progress = T)
 
 # Combine results and calculate gender ratios
 combined_internet_usage <- bind_rows(bootstrap_results_women, bootstrap_results_men)
@@ -208,11 +208,11 @@ final_stats_internet <- gender_internet_ratios %>%
   pivot_longer(cols = -c(country, iteration), names_to = "name", values_to = "value") %>%
   group_by(name) %>%
   summarize(
-     perc_2.5 = quantile(value, probs = 0.025),
+     perc_10 = quantile(value, probs = .1),
      perc_50 = median(value),
      mean_50 = mean(value),
-     perc_97.5 = quantile(value, probs = 0.975)
-   ) %>% 
+     perc_90 = quantile(value, probs = .9),
+  ) %>% 
   mutate(stat = "internet")
 ```
 
@@ -279,8 +279,8 @@ bootstrap_iteration_mobile_men <- function(data, gender_var) {
 }
 
 # Perform the bootstrap for women and men, focusing on mobile usage
-bootstrap_women <- map_dfr(1:100, ~bootstrap_iteration_mobile_wom(dhs_surveys_wom, "women"), .id = "iteration", .progress = T)
-bootstrap_men <- map_dfr(1:100, ~bootstrap_iteration_mobile_men(dhs_surveys_men, "men"), .id = "iteration", .progress = T)
+bootstrap_women <- map_dfr(1:1000, ~bootstrap_iteration_mobile_wom(dhs_surveys_wom, "women"), .id = "iteration", .progress = T)
+bootstrap_men <- map_dfr(1:1000, ~bootstrap_iteration_mobile_men(dhs_surveys_men, "men"), .id = "iteration", .progress = T)
 
 # Combine results from both genders and calculate mobile usage ratios
 bootstrap_combined <- bind_rows(bootstrap_women, bootstrap_men)
@@ -326,9 +326,10 @@ gender_ratios_mobile_long <- gender_ratios_mobile %>%
 final_stats_mobile <- gender_ratios_mobile_long %>% 
   group_by(name) %>%
   summarize(
-     perc_2.5 = quantile(value, probs = 0.025),
+     perc_10 = quantile(value, probs = .1),
      perc_50 = median(value),
-     perc_97.5 = quantile(value, probs = 0.975),
+     mean_50 = mean(value),
+     perc_90 = quantile(value, probs = .9),
   ) %>% 
   mutate(stat = "mobile")
 ```

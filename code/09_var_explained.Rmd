@@ -29,7 +29,7 @@ predictions <- predictions %>%
 
 ```{r}
 # Function to calculate MLD and its components
-calculate_mld_components <- function(data, rate_col, constant = 1) {
+calculate_mld_components <- function(data, rate_col, constant = 0.5) {
   
   # Convert rate_col and country_col to symbols for NSE
   rate_col_sym <- sym(rate_col)
@@ -84,7 +84,7 @@ calculate_mld_components <- function(data, rate_col, constant = 1) {
   return(data.frame(MLD_W = MLD_W, 
                     MLD_B = MLD_B,
                     total_MLD = total_MLD,
-                    ratio = MLD_W / total_MLD ))
+                    proportion_within = MLD_W / total_MLD ))
 }
 
 
@@ -128,10 +128,10 @@ for (col in predicted_cols) {
 
 result_list_df <- bind_rows(result_list) %>% 
   mutate(hdi_bin = case_when(
-    hdi_bin == 1 ~ "Very Low HDI",
-    hdi_bin == 2 ~ "Low HDI",
-    hdi_bin == 3 ~ "Medium HDI",
-    hdi_bin == 4 ~ "High HDI"))
+    hdi_bin == 1 ~ "HDI Q1 (Lowest)",
+    hdi_bin == 2 ~ "HDI Q2",
+    hdi_bin == 3 ~ "HDI Q3",
+    hdi_bin == 4 ~ "HDI Q4 (Highest)"))
 
 
 result_list_all_df <- bind_rows(result_list_all)
@@ -157,26 +157,25 @@ result <- calculate_mld_components(predictions %>% filter(hdi_bin == 3),
 
 
 ```{r}
-results_full$cat <- factor(results_full$hdi_bin, levels = c("Very Low HDI", "Low HDI", "Medium HDI", "High HDI", "Overall"))
+results_full$cat <- factor(results_full$hdi_bin, levels = c("HDI Q1 (Lowest)", "HDI Q2", "HDI Q3", "HDI Q4 (Highest)", "Overall"))
 
-var_expalained_fig <- results_full %>% 
-  ggplot(aes(x = outcome_clean, y = ratio, fill = as.factor(cat))) + 
-  theme_cowplot() + 
- # scale_fill_manual(values = c("#f0f9e8", "#bae4bc", "#7bccc4", "#2b8cbe","darkorange")) +
+var_explained_fig <- results_full %>%
+  ggplot(aes(x = outcome_clean, y = proportion_within, fill = as.factor(cat))) +
+  geom_bar(stat = "identity", width = .75, position = position_dodge(width = .75), color = "black") +
+  geom_text(aes(label = round(proportion_within* 100, 0)), 
+            position = position_dodge(width = .75), vjust = -0.5, hjust = .5, size = 3.5) +
   scale_fill_manual(values = cud) +
- # scale_fill_viridis_d(alpha = 1) +
-  theme(legend.position = "bottom") + 
-   background_grid() + s
-    geom_bar(stat = "identity", 
-           width = 0.5, 
-           position = position_dodge(width = 0.5),
-           color = "black") + 
+  theme_cowplot() +
+scale_y_continuous(labels = scales::percent_format(accuracy = 5L), limits = c(0, .55)) + 
+  theme(legend.position = "bottom",
+        legend.text = element_text(size = 10)) +
   labs(fill = "",
        x = "",
-       y = "Within-country contribution \n (% total variation)") + 
-  geom_hline(yintercept = 0.5, linetype = "dashed", color = "black") 
+       y = "Within-country contribution \n (% total variation)") +
+     background_grid() + 
+  geom_hline(yintercept = 0.5, linetype = "dashed", color = "black")
 
-ggsave(var_expalained_fig, filename = here("figures", "var_expalained_fig.png"), height = 4, width = 7)
+ggsave(var_explained_fig, filename = here("figures", "var_explained_fig.png"), height = 4, width = 7)
 ```
 
 

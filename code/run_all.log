@@ -1,5 +1,13 @@
 ================================
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::select over any other package.
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::filter over any other package.
 Running  02_make_predictions.Rmd 
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::select over any other package.
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::filter over any other package.
 Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
   Missing covariate data detected: imputing covariates.
 Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
@@ -31,167 +39,217 @@ Warning in process_data(data, nodes, column_names = column_names, flag = flag,  
   Missing outcome data detected. This is okay for prediction, but will likely break training. 
  You can drop observations with missing outcomes by setting drop_missing_outcome=TRUE in make_sl3_Task.
 Rows: 126000 Columns: 9
-── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+── Column specification ──────────────────────────────────────────
 Delimiter: ","
-chr (7): gid_1, country, model, outcome, feature_set, cv_method, outcome_clean
+chr (7): gid_1, country, model, outcome, feature_set, cv_metho...
 dbl (2): observed, predicted
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Finished with 02_make_predictions.Rmd, time:: 144.637 sec elapsed
+Finished with 02_make_predictions.Rmd, time:: 144.007 sec elapsed
 ================================
 ================================
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::select over any other package.
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::filter over any other package.
 Running  03_model_performance.Rmd 
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::select over any other package.
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::filter over any other package.
 Rows: 126000 Columns: 9
-── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+── Column specification ──────────────────────────────────────────
 Delimiter: ","
-chr (7): gid_1, country, model, outcome, feature_set, cv_method, outcome_clean
+chr (7): gid_1, country, model, outcome, feature_set, cv_metho...
 dbl (2): observed, predicted
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 Rows: 2616 Columns: 111
-── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+── Column specification ──────────────────────────────────────────
 Delimiter: ","
 chr   (5): gid_1, gid_0, country, name_1, continent
-dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subna...
+dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_ma...
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 Warning in left_join(., gadm1, by = c("gid_1", "country")) :
-  Detected an unexpected many-to-many relationship between `x` and `y`.
+  Detected an unexpected many-to-many relationship between `x` and
+`y`.
 ℹ Row 148 of `x` matches multiple rows in `y`.
 ℹ Row 71 of `y` matches multiple rows in `x`.
-ℹ If a many-to-many relationship is expected, set `relationship = "many-to-many"` to silence this warning.
-`summarise()` has grouped output by 'cv_method', 'model', 'outcome'. You can override using the `.groups` argument.
-`summarise()` has grouped output by 'cv_method', 'model', 'outcome', 'feature_set'. You can override using the `.groups` argument.
-Finished with 03_model_performance.Rmd, time:: 11.345 sec elapsed
+ℹ If a many-to-many relationship is expected, set `relationship =
+  "many-to-many"` to silence this warning.
+`summarise()` has grouped output by 'cv_method', 'model',
+'outcome'. You can override using the `.groups` argument.
+`summarise()` has grouped output by 'cv_method', 'model',
+'outcome', 'feature_set'. You can override using the `.groups`
+argument.
+Finished with 03_model_performance.Rmd, time:: 10.843 sec elapsed
 ================================
 ================================
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::select over any other package.
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::filter over any other package.
 Running  04_within_country_analysis.Rmd 
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::select over any other package.
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::filter over any other package.
 Rows: 2158 Columns: 15
-── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+── Column specification ──────────────────────────────────────────
 Delimiter: ","
 chr  (3): gid_0, gid_1, country
-dbl (12): observed_perc_owns_mobile_telephone_wght_age_15_to_49_wom, observed_perc_owns_mobile_telephone_wght_age_15_to_49_men, observed_perc_owns_mo...
+dbl (12): observed_perc_owns_mobile_telephone_wght_age_15_to_4...
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 Rows: 12948 Columns: 6
-── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+── Column specification ──────────────────────────────────────────
 Delimiter: ","
 chr (4): gid_0, gid_1, country, outcome
 dbl (2): predicted, predicted_error
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-`summarise()` has grouped output by 'continent', 'gid_0'. You can override using the `.groups` argument.
+`summarise()` has grouped output by 'continent', 'gid_0'. You can
+override using the `.groups` argument.
 `geom_smooth()` using formula = 'y ~ x'
-`summarise()` has grouped output by 'continent'. You can override using the `.groups` argument.
-Finished with 04_within_country_analysis.Rmd, time:: 2.189 sec elapsed
+`summarise()` has grouped output by 'continent'. You can override
+using the `.groups` argument.
+Finished with 04_within_country_analysis.Rmd, time:: 1.514 sec elapsed
 ================================
 ================================
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::select over any other package.
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::filter over any other package.
 Running  05_geo_map.Rmd 
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::select over any other package.
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::filter over any other package.
 Rows: 2616 Columns: 111
-── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+── Column specification ──────────────────────────────────────────
 Delimiter: ","
 chr   (5): gid_1, gid_0, country, name_1, continent
-dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subna...
+dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_ma...
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 Rows: 2616 Columns: 111
-── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+── Column specification ──────────────────────────────────────────
 Delimiter: ","
 chr   (5): gid_1, gid_0, country, name_1, continent
-dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subna...
+dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_ma...
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 Rows: 2158 Columns: 15
-── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+── Column specification ──────────────────────────────────────────
 Delimiter: ","
 chr  (3): gid_0, gid_1, country
-dbl (12): observed_perc_owns_mobile_telephone_wght_age_15_to_49_wom, observed_perc_owns_mobile_telephone_wght_age_15_to_49_men, observed_perc_owns_mo...
+dbl (12): observed_perc_owns_mobile_telephone_wght_age_15_to_4...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Rows: 12948 Columns: 6
+── Column specification ──────────────────────────────────────────
+Delimiter: ","
+chr (4): gid_0, gid_1, country, outcome
+dbl (2): predicted, predicted_error
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 Rows: 126000 Columns: 9
-── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+── Column specification ──────────────────────────────────────────
 Delimiter: ","
-chr (7): gid_1, country, model, outcome, feature_set, cv_method, outcome_clean
+chr (7): gid_1, country, model, outcome, feature_set, cv_metho...
 dbl (2): observed, predicted
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 Rows: 126000 Columns: 9
-── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+── Column specification ──────────────────────────────────────────
 Delimiter: ","
-chr (7): gid_1, country, model, outcome, feature_set, cv_method, outcome_clean
+chr (7): gid_1, country, model, outcome, feature_set, cv_metho...
 dbl (2): observed, predicted
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 Rows: 126000 Columns: 9
-── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+── Column specification ──────────────────────────────────────────
 Delimiter: ","
-chr (7): gid_1, country, model, outcome, feature_set, cv_method, outcome_clean
+chr (7): gid_1, country, model, outcome, feature_set, cv_metho...
 dbl (2): observed, predicted
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 `geom_smooth()` using formula = 'y ~ x'
-Finished with 05_geo_map.Rmd, time:: 43.636 sec elapsed
+Finished with 05_geo_map.Rmd, time:: 63.095 sec elapsed
 ================================
 ================================
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::select over any other package.
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::filter over any other package.
 Running  06_feature_importance.Rmd 
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::select over any other package.
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::filter over any other package.
 Rows: 126000 Columns: 9
-── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+── Column specification ──────────────────────────────────────────
 Delimiter: ","
-chr (7): gid_1, country, model, outcome, feature_set, cv_method, outcome_clean
+chr (7): gid_1, country, model, outcome, feature_set, cv_metho...
 dbl (2): observed, predicted
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 Rows: 2616 Columns: 111
-── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+── Column specification ──────────────────────────────────────────
 Delimiter: ","
 chr   (5): gid_1, gid_0, country, name_1, continent
-dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subna...
+dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_ma...
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 Warning in left_join(., gadm1, by = "gid_1") :
-  Detected an unexpected many-to-many relationship between `x` and `y`.
+  Detected an unexpected many-to-many relationship between `x` and
+`y`.
 ℹ Row 148 of `x` matches multiple rows in `y`.
 ℹ Row 71 of `y` matches multiple rows in `x`.
-ℹ If a many-to-many relationship is expected, set `relationship = "many-to-many"` to silence this warning.
-`summarise()` has grouped output by 'cv_method', 'model', 'outcome'. You can override using the `.groups` argument.
-Warning: The `size` argument of `element_rect()` is deprecated as of ggplot2 3.4.0.
-ℹ Please use the `linewidth` argument instead.
-This warning is displayed once every 8 hours.
-Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.
+ℹ If a many-to-many relationship is expected, set `relationship =
+  "many-to-many"` to silence this warning.
+`summarise()` has grouped output by 'cv_method', 'model',
+'outcome'. You can override using the `.groups` argument.
 Rows: 2616 Columns: 111
-── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+── Column specification ──────────────────────────────────────────
 Delimiter: ","
 chr   (5): gid_1, gid_0, country, name_1, continent
-dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subna...
+dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_ma...
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-ℹ Please use `linewidth` instead.
-This warning is displayed once every 8 hours.
-Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.
-Finished with 06_feature_importance.Rmd, time:: 7.639 sec elapsed
+Finished with 06_feature_importance.Rmd, time:: 5.859 sec elapsed
 ================================
 ================================
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::select over any other package.
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::filter over any other package.
 Running  07_superlearner_weights.Rmd 
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::select over any other package.
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::filter over any other package.
 Rows: 2616 Columns: 111
-── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+── Column specification ──────────────────────────────────────────
 Delimiter: ","
 chr   (5): gid_1, gid_0, country, name_1, continent
-dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subna...
+dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_ma...
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
@@ -201,199 +259,164 @@ perc_owns_mobile_telephone_wght_age_15_to_49_men
 perc_used_internet_past12months_wght_age_15_to_49_men 
 perc_used_internet_past12months_wght_age_15_to_49_fm_ratio 
 perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio 
-Finished with 07_superlearner_weights.Rmd, time:: 142.725 sec elapsed
+Finished with 07_superlearner_weights.Rmd, time:: 142.732 sec elapsed
 ================================
 ================================
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::select over any other package.
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::filter over any other package.
 Running  08_residual_analysis.Rmd 
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::select over any other package.
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::filter over any other package.
 Rows: 126000 Columns: 9
-── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+── Column specification ──────────────────────────────────────────
 Delimiter: ","
-chr (7): gid_1, country, model, outcome, feature_set, cv_method, outcome_clean
+chr (7): gid_1, country, model, outcome, feature_set, cv_metho...
 dbl (2): observed, predicted
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 Rows: 2616 Columns: 111
-── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+── Column specification ──────────────────────────────────────────
 Delimiter: ","
 chr   (5): gid_1, gid_0, country, name_1, continent
-dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subna...
+dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_ma...
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Finished with 08_residual_analysis.Rmd, time:: 0.683 sec elapsed
+Finished with 08_residual_analysis.Rmd, time:: 0.897 sec elapsed
 ================================
 ================================
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::select over any other package.
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::filter over any other package.
 Running  09_var_explained.Rmd 
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::select over any other package.
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::filter over any other package.
 Rows: 2158 Columns: 15
-── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+── Column specification ──────────────────────────────────────────
 Delimiter: ","
 chr  (3): gid_0, gid_1, country
-dbl (12): observed_perc_owns_mobile_telephone_wght_age_15_to_49_wom, observed_perc_owns_mobile_telephone_wght_age_15_to_49_men, observed_perc_owns_mo...
+dbl (12): observed_perc_owns_mobile_telephone_wght_age_15_to_4...
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 Rows: 2616 Columns: 111
-── Column specification ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+── Column specification ──────────────────────────────────────────
 Delimiter: ","
 chr   (5): gid_1, gid_0, country, name_1, continent
-dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subna...
+dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_ma...
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Within-country MLD (MLD_W): 0.02561287 
-Between-country MLD (MLD_B): 0.05394308 
-Total MLD: 0.07955595 
-Ratio of Within-country to Between-country MLD: 0.4748129 
-Within-country MLD (MLD_W): 0.005557388 
-Between-country MLD (MLD_B): 0.01662224 
-Total MLD: 0.02217963 
-Ratio of Within-country to Between-country MLD: 0.3343344 
-Within-country MLD (MLD_W): 0.1945503 
-Between-country MLD (MLD_B): 0.2631139 
-Total MLD: 0.4576643 
-Ratio of Within-country to Between-country MLD: 0.7394147 
-Within-country MLD (MLD_W): 0.05658829 
-Between-country MLD (MLD_B): 0.04850215 
-Total MLD: 0.1050904 
-Ratio of Within-country to Between-country MLD: 1.166717 
-Within-country MLD (MLD_W): 0.004375497 
-Between-country MLD (MLD_B): 0.008238424 
-Total MLD: 0.01261392 
-Ratio of Within-country to Between-country MLD: 0.5311085 
-Within-country MLD (MLD_W): 0.0006438553 
-Between-country MLD (MLD_B): 0.001908586 
-Total MLD: 0.002552441 
-Ratio of Within-country to Between-country MLD: 0.3373468 
-Within-country MLD (MLD_W): 0.0125368 
-Between-country MLD (MLD_B): 0.03738811 
-Total MLD: 0.04992491 
-Ratio of Within-country to Between-country MLD: 0.3353153 
-Within-country MLD (MLD_W): 0.006334013 
-Between-country MLD (MLD_B): 0.01137593 
-Total MLD: 0.01770995 
-Ratio of Within-country to Between-country MLD: 0.5567906 
-Within-country MLD (MLD_W): 0.0006521867 
-Between-country MLD (MLD_B): 0.003039558 
-Total MLD: 0.003691744 
-Ratio of Within-country to Between-country MLD: 0.2145663 
-Within-country MLD (MLD_W): 0.000229737 
-Between-country MLD (MLD_B): 0.001505242 
-Total MLD: 0.001734979 
-Ratio of Within-country to Between-country MLD: 0.1526246 
-Within-country MLD (MLD_W): 0.002179064 
-Between-country MLD (MLD_B): 0.017938 
-Total MLD: 0.02011706 
-Ratio of Within-country to Between-country MLD: 0.1214775 
-Within-country MLD (MLD_W): 0.001420933 
-Between-country MLD (MLD_B): 0.004778739 
-Total MLD: 0.006199672 
-Ratio of Within-country to Between-country MLD: 0.2973447 
-Within-country MLD (MLD_W): 0.0008270385 
-Between-country MLD (MLD_B): 0.001465384 
-Total MLD: 0.002292423 
-Ratio of Within-country to Between-country MLD: 0.5643833 
-Within-country MLD (MLD_W): 5.437684e-05 
-Between-country MLD (MLD_B): 0.0006789214 
-Total MLD: 0.0007332982 
-Ratio of Within-country to Between-country MLD: 0.08009299 
-Within-country MLD (MLD_W): 0.001542988 
-Between-country MLD (MLD_B): 0.008819943 
-Total MLD: 0.01036293 
-Ratio of Within-country to Between-country MLD: 0.1749431 
-Within-country MLD (MLD_W): 0.000547788 
-Between-country MLD (MLD_B): 0.004108097 
-Total MLD: 0.004655885 
-Ratio of Within-country to Between-country MLD: 0.1333435 
-Within-country MLD (MLD_W): 0.007873374 
-Between-country MLD (MLD_B): 0.05124922 
-Total MLD: 0.0591226 
-Ratio of Within-country to Between-country MLD: 0.1536291 
-Within-country MLD (MLD_W): 0.001624764 
-Between-country MLD (MLD_B): 0.01428194 
-Total MLD: 0.01590671 
-Ratio of Within-country to Between-country MLD: 0.1137635 
-Within-country MLD (MLD_W): 0.05274155 
-Between-country MLD (MLD_B): 0.2599045 
-Total MLD: 0.3126461 
-Ratio of Within-country to Between-country MLD: 0.2029267 
-Within-country MLD (MLD_W): 0.01626178 
-Between-country MLD (MLD_B): 0.09885709 
-Total MLD: 0.1151189 
-Ratio of Within-country to Between-country MLD: 0.1644978 
-Within-country MLD (MLD_W): 0.0006521867 
-Between-country MLD (MLD_B): 0.003039558 
-Total MLD: 0.003691744 
-Ratio of Within-country to Between-country MLD: 0.2145663 
-Error in `ggplot_add()`:
-! Can't add `s` to a <ggplot> object
-ℹ Did you forget to add parentheses, as in `s()`?
-Backtrace:
- 1. global source_rmd(here("code", cur_file))
- 6. ggplot2:::`+.gg`(...)
-      at /RtmpQnM0Pi/file1504a12b70785.R:150:0
- 7. ggplot2:::add_ggplot(e1, e2, e2name)
- 9. ggplot2:::ggplot_add.function(object, p, objectname)
-[1] "/Users/caseybreen/workspace/dgg_subnational_code_release"
-[1mindexing[0m [34mpredictions_with_uncertainty.csv[0m [======] [32m290.37GB/s[0m, eta: [36m 0s[0m                                                                                                          Rows: 12948 Columns: 6
-── Column specification ───────────────────────────────────────────────
-Delimiter: ","
-chr (4): gid_0, gid_1, country, outcome
-dbl (2): predicted, predicted_error
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-# A tibble: 12,948 × 6
-   gid_0 gid_1    country     outcome         predicted predicted_error
-   <chr> <chr>    <chr>       <chr>               <dbl>           <dbl>
- 1 AFG   AFG.1_1  Afghanistan perc_owns_mobi…   25.9             5.57  
- 2 AFG   AFG.1_1  Afghanistan perc_owns_mobi…   78.9             3.33  
- 3 AFG   AFG.1_1  Afghanistan perc_owns_mobi…    0.333           0.0464
- 4 AFG   AFG.1_1  Afghanistan perc_used_inte…    4.78            5.20  
- 5 AFG   AFG.1_1  Afghanistan perc_used_inte…   30.4             6.84  
- 6 AFG   AFG.1_1  Afghanistan perc_used_inte…    0.0921          0.0871
- 7 AFG   AFG.10_1 Afghanistan perc_owns_mobi…   30.2             5.81  
- 8 AFG   AFG.10_1 Afghanistan perc_owns_mobi…   77.7             3.39  
- 9 AFG   AFG.10_1 Afghanistan perc_owns_mobi…    0.355           0.0946
-10 AFG   AFG.10_1 Afghanistan perc_used_inte…    6.46            4.82  
-# ℹ 12,938 more rows
-# ℹ Use `print(n = ...)` to see more rows
-# A tibble: 12,948 × 6
-   gid_0 gid_1    country     outcome                                                   predicted predicted_error
-   <chr> <chr>    <chr>       <chr>                                                         <dbl>           <dbl>
- 1 AFG   AFG.1_1  Afghanistan perc_owns_mobile_telephone_wght_age_15_to_49_wom            25.9             5.57  
- 2 AFG   AFG.1_1  Afghanistan perc_owns_mobile_telephone_wght_age_15_to_49_men            78.9             3.33  
- 3 AFG   AFG.1_1  Afghanistan perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio        0.333           0.0464
- 4 AFG   AFG.1_1  Afghanistan perc_used_internet_past12months_wght_age_15_to_49_wom        4.78            5.20  
- 5 AFG   AFG.1_1  Afghanistan perc_used_internet_past12months_wght_age_15_to_49_men       30.4             6.84  
- 6 AFG   AFG.1_1  Afghanistan perc_used_internet_past12months_wght_age_15_to_49_fm_rat…    0.0921          0.0871
- 7 AFG   AFG.10_1 Afghanistan perc_owns_mobile_telephone_wght_age_15_to_49_wom            30.2             5.81  
- 8 AFG   AFG.10_1 Afghanistan perc_owns_mobile_telephone_wght_age_15_to_49_men            77.7             3.39  
- 9 AFG   AFG.10_1 Afghanistan perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio        0.355           0.0946
-10 AFG   AFG.10_1 Afghanistan perc_used_internet_past12months_wght_age_15_to_49_wom        6.46            4.82  
-# ℹ 12,938 more rows
-# ℹ Use `print(n = ...)` to see more rows
-Rows: 126000 Columns: 9
-── Column specification ──────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr (7): gid_1, country, model, outcome, feature_set, cv_method, outcome_clean
-dbl (2): observed, predicted
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+Within-country MLD (MLD_W): 0.01470646 
+Between-country MLD (MLD_B): 0.02216679 
+Total MLD: 0.03687325 
+Ratio of Within-country to Between-country MLD: 0.6634457 
+Within-country MLD (MLD_W): 0.00435425 
+Between-country MLD (MLD_B): 0.01058508 
+Total MLD: 0.01493933 
+Ratio of Within-country to Between-country MLD: 0.4113573 
+Within-country MLD (MLD_W): 0.1148993 
+Between-country MLD (MLD_B): 0.1309974 
+Total MLD: 0.2458968 
+Ratio of Within-country to Between-country MLD: 0.8771115 
+Within-country MLD (MLD_W): 0.02858477 
+Between-country MLD (MLD_B): 0.02545928 
+Total MLD: 0.05404405 
+Ratio of Within-country to Between-country MLD: 1.122765 
+Within-country MLD (MLD_W): 0.004081585 
+Between-country MLD (MLD_B): 0.006297557 
+Total MLD: 0.01037914 
+Ratio of Within-country to Between-country MLD: 0.648122 
+Within-country MLD (MLD_W): 0.0006772629 
+Between-country MLD (MLD_B): 0.00198931 
+Total MLD: 0.002666573 
+Ratio of Within-country to Between-country MLD: 0.3404511 
+Within-country MLD (MLD_W): 0.01631413 
+Between-country MLD (MLD_B): 0.05394119 
+Total MLD: 0.07025531 
+Ratio of Within-country to Between-country MLD: 0.3024429 
+Within-country MLD (MLD_W): 0.005878265 
+Between-country MLD (MLD_B): 0.01542673 
+Total MLD: 0.02130499 
+Ratio of Within-country to Between-country MLD: 0.3810442 
+Within-country MLD (MLD_W): 0.0005554336 
+Between-country MLD (MLD_B): 0.003020647 
+Total MLD: 0.00357608 
+Ratio of Within-country to Between-country MLD: 0.183879 
+Within-country MLD (MLD_W): 0.0001669004 
+Between-country MLD (MLD_B): 0.0008018457 
+Total MLD: 0.000968746 
+Ratio of Within-country to Between-country MLD: 0.2081453 
+Within-country MLD (MLD_W): 0.004122879 
+Between-country MLD (MLD_B): 0.02676797 
+Total MLD: 0.03089085 
+Ratio of Within-country to Between-country MLD: 0.1540228 
+Within-country MLD (MLD_W): 0.002307105 
+Between-country MLD (MLD_B): 0.007305421 
+Total MLD: 0.009612526 
+Ratio of Within-country to Between-country MLD: 0.3158073 
+Within-country MLD (MLD_W): 0.0004777096 
+Between-country MLD (MLD_B): 0.001578295 
+Total MLD: 0.002056004 
+Ratio of Within-country to Between-country MLD: 0.3026745 
+Within-country MLD (MLD_W): 0.0001105872 
+Between-country MLD (MLD_B): 0.0006151869 
+Total MLD: 0.0007257741 
+Ratio of Within-country to Between-country MLD: 0.1797619 
+Within-country MLD (MLD_W): 0.002484774 
+Between-country MLD (MLD_B): 0.01362864 
+Total MLD: 0.01611342 
+Ratio of Within-country to Between-country MLD: 0.18232 
+Within-country MLD (MLD_W): 0.001423577 
+Between-country MLD (MLD_B): 0.005573705 
+Total MLD: 0.006997283 
+Ratio of Within-country to Between-country MLD: 0.2554095 
+Within-country MLD (MLD_W): 0.004962445 
+Between-country MLD (MLD_B): 0.02938361 
+Total MLD: 0.03434606 
+Ratio of Within-country to Between-country MLD: 0.1688848 
+Within-country MLD (MLD_W): 0.001330481 
+Between-country MLD (MLD_B): 0.009048258 
+Total MLD: 0.01037874 
+Ratio of Within-country to Between-country MLD: 0.1470427 
+Within-country MLD (MLD_W): 0.03452999 
+Between-country MLD (MLD_B): 0.1607495 
+Total MLD: 0.1952795 
+Ratio of Within-country to Between-country MLD: 0.2148062 
+Within-country MLD (MLD_W): 0.009574128 
+Between-country MLD (MLD_B): 0.05830402 
+Total MLD: 0.06787815 
+Ratio of Within-country to Between-country MLD: 0.1642104 
+Within-country MLD (MLD_W): 0.0005554336 
+Between-country MLD (MLD_B): 0.003020647 
+Total MLD: 0.00357608 
+Ratio of Within-country to Between-country MLD: 0.183879 
+Finished with 09_var_explained.Rmd, time:: 0.672 sec elapsed
+================================
+================================
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::select over any other package.
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::filter over any other package.
+Running  11_dhs_table.Rmd 
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::select over any other package.
+[conflicted] Removing existing preference.
+[conflicted] Will prefer dplyr::filter over any other package.
 Rows: 2616 Columns: 111
-── Column specification ──────────────────────────────────────────────────────────────────────────────────
+── Column specification ──────────────────────────────────────────
 Delimiter: ","
 chr   (5): gid_1, gid_0, country, name_1, continent
-dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop...
+dbl (106): dhsyear, pop_all_age_female_dhsyear, pop_all_age_ma...
 
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Warning in left_join(., gadm1, by = c("gid_1", "country")) :
-  Detected an unexpected many-to-many relationship between `x` and `y`.
-ℹ Row 148 of `x` matches multiple rows in `y`.
-ℹ Row 71 of `y` matches multiple rows in `x`.
-ℹ If a many-to-many relationship is expected, set `relationship = "many-to-many"` to silence this
-  warning.
-`summarise()` has grouped output by 'cv_method', 'model', 'outcome'. You can override using the `.groups`
-argument.
+/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//angola_2015-16/AOMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//armenia_2015-16/AMMR72FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//benin_2017-18/BJMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//burundi_2016-17/BUMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//cameroon_2018/CMMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//ethiopia_2016/ETMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//gabon_2019-21/GAMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//guinea_2018/GNMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//haiti_2016-17/HTMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//india_2019-21/IAMR7EFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//liberia_2019-20/LBMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//malawi_2015-16/MWMR7AFL.DTA

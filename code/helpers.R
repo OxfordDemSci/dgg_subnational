@@ -32,11 +32,14 @@ pacman::p_load(
   ggspatial,    # north arrow and scale bar
   countrycode,  # country code 
   xtable,       # package for making latex tables
-  haven,         # read stata files
-  tidyverse   # data manipulation and visualization
+  haven,        # read stata files
+  tidyverse,    # data manipulation and visualization
+  conflicted    # custom functions
 )
 
 ## custom functions 
+conflict_prefer("select", "dplyr")
+conflict_prefer("filter", "dplyr")
 
 ## Source .Rmd 
 
@@ -351,6 +354,7 @@ superlearner_train_and_predict <- function(data,
 
   # Extract covariates from training data
   covars <- colnames(data %>% dplyr::select(all_of(covar_list)))
+
 
   # Create k-fold CV with countries as clusters
   folds <- make_folds(cluster_ids = data$country)

@@ -19,7 +19,7 @@ gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_july8.csv"),
   janitor::clean_names() %>% 
   mutate(continent = case_when(continent == "Africa" ~ 1,
                                TRUE ~ 0)) %>% 
-  dplyr::select(country, all_of(c(dhs_vars, fb_feats, off_feats_current))) %>% 
+  dplyr::select(country, all_of(c(dhs_vars, fb_feats, off_feats_current, fb_feats_2021, off_feats))) %>% 
   filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% drop_na() 
 
 gadm1_full <- read_csv(here("data", "aggregated_indicators_lmic_july8.csv"), 
@@ -35,7 +35,37 @@ gadm1_full <- read_csv(here("data", "aggregated_indicators_lmic_july8.csv"),
   filter(!(country == "Philippines" & dhsyear == "2017")) %>%
   mutate(pop_all_age_total_dhsyear = pop_all_age_female_dhsyear + pop_all_age_male_dhsyear) %>%
   filter(!is.na(fb_pntr_13p_female_2024_tess)) %>% 
-  mutate(dhsyear = 2024)
+  # mutate(
+  #   fb_pntr_13p_male_2021_impute = fb_pntr_13p_male_2024,
+  #   fb_pntr_13p_female_2021_impute = fb_pntr_13p_female_2024,
+  #   all_devices_age_13_plus_gg_2021_impute = all_devices_age_13_plus_gg_2024,
+  #   ios_age_13_plus_female_frac_2021_impute = ios_age_13_plus_female_frac_2024,
+  #   ios_age_13_plus_male_frac_2021_impute = ios_age_13_plus_male_frac_2024,
+  #   wifi_age_13_plus_female_frac_2021_impute = wifi_age_13_plus_female_frac_2024,
+  #   wifi_age_13_plus_male_frac_2021_impute = wifi_age_13_plus_male_frac_2024,
+  #   x4g_age_13_plus_female_frac_2021_impute = x4g_age_13_plus_female_frac_2024,
+  #   x4g_age_13_plus_male_frac_2021_impute = x4g_age_13_plus_male_frac_2024,
+  #   fb_pntr_13p_male_dhsyear_national = fb_pntr_13p_male_2020_national,
+  #   fb_pntr_13p_female_dhsyear_national = fb_pntr_13p_female_2020_national,
+  #   all_devices_age_13_dhsyear_gg_national = all_devices_age_13_plus_gg_2020_national,
+  #   dhsyear = 2024)
+  mutate(
+    nl_mean_dhsyear = nl_mean_2021,
+    pop_density_dhsyear = pop_density_2020,
+    pop_all_age_female_dhsyear = pop_all_age_female_2020,
+    pop_all_age_male_dhsyear = pop_all_age_male_2020,
+    subnational_gdi_dhsyear = subnational_gdi_2021,
+    subnational_hdi_males_dhsyear = subnational_hdi_males_2021,
+    subnational_hdi_females_dhsyear = subnational_hdi_females_2021,
+    educational_index_females_dhsyear = educational_index_females_2021,
+    educational_index_males_dhsyear = educational_index_males_2021,
+    income_index_females_dhsyear = income_index_females_2021,
+    income_index_males_dhsyear = income_index_males_2021,
+    internet_speed = internet_speed,
+    continent = continent,
+    hdi_national_dhsyear = hdi_national_2022,
+    gdi_national_dhsyear = gdi_national_2022,
+    dhsyear = 2024)
 ```
 
 
@@ -44,21 +74,21 @@ gadm1_full <- read_csv(here("data", "aggregated_indicators_lmic_july8.csv"),
 ```{r}
 ## sl predictions for internet women
 sl_predictions_internet_wom <- superlearner_train_and_predict(data = gadm1, 
-                                                 covar_list = c(fb_feats, off_feats_current),
-                                                 outcome = "perc_used_internet_past12months_wght_age_15_to_49_wom",
-                                                 predict_data = gadm1_full) 
+                                                              covar_list = c(fb_feats_2021, off_feats),
+                                                              outcome = "perc_used_internet_past12months_wght_age_15_to_49_wom",
+                                                              predict_data = gadm1_full) 
 
 ## sl predictions for internet men
 sl_predictions_internet_men <- superlearner_train_and_predict(data = gadm1, 
-                                                 covar_list = c(fb_feats, off_feats_current),
-                                                 outcome = "perc_used_internet_past12months_wght_age_15_to_49_men",
-                                                 predict_data = gadm1_full) 
+                                                              covar_list = c(fb_feats_2021, off_feats),
+                                                              outcome = "perc_used_internet_past12months_wght_age_15_to_49_men",
+                                                              predict_data = gadm1_full) 
 
 ## sl predictions for internet fm ratio  
 sl_predictions_internet_fm_ratio <- superlearner_train_and_predict(data = gadm1, 
-                                                 covar_list = c(fb_feats, off_feats_current),
-                                                 outcome = "perc_used_internet_past12months_wght_age_15_to_49_fm_ratio",
-                                                 predict_data = gadm1_full) 
+                                                                   covar_list = c(fb_feats_2021, off_feats),
+                                                                   outcome = "perc_used_internet_past12months_wght_age_15_to_49_fm_ratio",
+                                                                   predict_data = gadm1_full) 
 
 predictions_internet <- bind_rows(sl_predictions_internet_wom, sl_predictions_internet_men, sl_predictions_internet_fm_ratio) %>%
   mutate(gid_0 = substring(gid_1, 1, 3)) %>% 
@@ -84,17 +114,17 @@ predictions_internet <- bind_rows(sl_predictions_internet_wom, sl_predictions_in
 ```{r}
 ## sl predictions 
 sl_predictions_mobile_wom <- superlearner_train_and_predict(data = gadm1, 
-                                                 covar_list = c(fb_feats, off_feats_current),
+                                                 covar_list = c(fb_feats_2021, off_feats_current),
                                                  outcome = "perc_owns_mobile_telephone_wght_age_15_to_49_wom",
                                                  predict_data = gadm1_full) 
 ## sl prediction men 
 sl_predictions_mobile_men <- superlearner_train_and_predict(data = gadm1, 
-                                                 covar_list = c(fb_feats, off_feats_current),
+                                                 covar_list = c(fb_feats_2021, off_feats_current),
                                                  outcome = "perc_owns_mobile_telephone_wght_age_15_to_49_men",
                                                  predict_data = gadm1_full) 
 ## sl prediction fm ratio  
 sl_predictions_mobile_fm_ratio <- superlearner_train_and_predict(data = gadm1, 
-                                                 covar_list = c(fb_feats, off_feats_current),
+                                                 covar_list = c(fb_feats_2021, off_feats_current),
                                                  outcome = "perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio",
                                                  predict_data = gadm1_full) 
 
@@ -197,6 +227,8 @@ calculate_uncertainty <- function(outcome, data = predictions_filter_dropped, da
   
   # Extract coefficients
   coefficients <- coef(nnls_model)
+  
+  coef_df <- data.frame(coef = coefficients, predictor = predictors)
   
   X_new <- as.matrix(x = full_dataset[, -1])
   
