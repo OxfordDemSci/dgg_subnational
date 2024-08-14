@@ -18,14 +18,15 @@ source(here("code", "helpers.R"))
 
 ```{r}
 ## read in training and test datasets 
-gadm1 <- read_csv(here("data",  "aggregated_indicators_lmic_july8.csv"),locale = locale(encoding = "ISO-8859-1")) 
+gadm1 <- read_csv(here("data",  "aggregated_indicators_lmic_aug13.csv"), locale = locale(encoding = "ISO-8859-1")) 
 
-## read in covariates 
+## read in covariates  
+
 gadm1 <- gadm1 %>% 
-  dplyr::select(country, gid_0, gid_1, perc_used_internet_past12months_wght_age_15_to_49_wom, continent, all_of(c(dhs_vars, fb_feats_2021, off_feats))) %>% ## the vectors of vars are defined in helper function
+  dplyr::select(country, gid_0, gid_1, perc_used_internet_past12months_wght_age_15_to_49_wom, continent, all_of(c(dhs_vars, fb_feats, off_feats))) %>% ## the vectors of vars are defined in helper function
   mutate(continent = case_when(continent == "Africa" ~ 1,
                                TRUE ~ 0)) %>%
-  drop_na(dhs_vars, fb_feats_2021) %>% #off_feats
+  drop_na(dhs_vars) %>% #off_feats
   mutate(perc_used_internet_past12months_wght_age_15_to_49_fm_ratio =  perc_used_internet_past12months_wght_age_15_to_49_wom/perc_used_internet_past12months_wght_age_15_to_49_men,
          perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio =  perc_owns_mobile_telephone_wght_age_15_to_49_wom/perc_owns_mobile_telephone_wght_age_15_to_49_men)
 ```
@@ -38,7 +39,7 @@ gadm1 %>%
   pivot_longer(-1) %>%
   View()
 
-## impute missing values as median (only necessary for a handful of cases)
+## impute missing values as median (only necessary f or a handful of cases)
 gadm1 <- gadm1 %>% 
   mutate(across(where(is.numeric), ~ ifelse(is.na(.), median(., na.rm = TRUE), .)))
 
@@ -62,20 +63,24 @@ gadm1 <- gadm1 %>%
   filter(!(country == "Nepal" & dhsyear == 2016))
 
 gadm1 <- gadm1 %>% 
-  mutate(fb_pntr_13p_female_2021_impute = case_when(
-    fb_pntr_13p_female_2021_impute > 1.1 ~ 1.5,
-    TRUE ~ fb_pntr_13p_female_2021_impute
+  mutate(fb_pntr_13p_female_dhsyear_national = case_when(
+    fb_pntr_13p_female_dhsyear_national > 1.1 ~ 1.1,
+    TRUE ~ fb_pntr_13p_female_dhsyear_national
   )) %>% 
-  mutate(fb_pntr_13p_male_2021_impute = case_when(
-    fb_pntr_13p_male_2021_impute > 1.1 ~ 1.5,
-    TRUE ~ fb_pntr_13p_male_2021_impute
+  mutate(fb_pntr_13p_male_dhsyear_national = case_when(
+    fb_pntr_13p_male_dhsyear_national > 1.1 ~ 1.1,
+    TRUE ~ fb_pntr_13p_male_dhsyear_national
   ))
+
+gadm1 %>% 
+  count(gid_1) %>% 
+  arrange(desc(n))
 
 gadm1 %>%
   group_by(country) %>%
   filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>%
-  filter(!is.na(fb_pntr_13p_female_2021_impute)) %>%
-  summarize(cor = cor(perc_used_internet_past12months_wght_age_15_to_49_wom, subnational_hdi_females_dhsyear),
+  filter(!is.na(fb_pntr_13p_male_dhsyear_impute)) %>%
+  summarize(cor = cor(perc_used_internet_past12months_wght_age_15_to_49_wom, fb_pntr_13p_male_dhsyear_impute),
             n()) %>% arrange(cor)
 ```
 
@@ -85,19 +90,19 @@ gadm1 %>%
 # Define a list of outcomes and corresponding feature sets
 outcomes <- c(
   "perc_used_internet_past12months_wght_age_15_to_49_wom",
-   "perc_owns_mobile_telephone_wght_age_15_to_49_wom",
-   "perc_owns_mobile_telephone_wght_age_15_to_49_men",
-   "perc_used_internet_past12months_wght_age_15_to_49_men",
-   "perc_used_internet_past12months_wght_age_15_to_49_fm_ratio",
-   "perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio"
+  "perc_owns_mobile_telephone_wght_age_15_to_49_wom",
+  "perc_owns_mobile_telephone_wght_age_15_to_49_men",
+  "perc_used_internet_past12months_wght_age_15_to_49_men",
+  "perc_used_internet_past12months_wght_age_15_to_49_fm_ratio",
+  "perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio"
 )
 
-fb_feats <- fb_feats_2021
+fb_feats
 
 ## define feature sets 
 feature_sets <- list(
- fb = fb_feats,
- offline = off_feats,
+  fb = fb_feats,
+  offline = off_feats,
   fb_and_offline = c(fb_feats, off_feats) # , national_covars national_covars
 )
 

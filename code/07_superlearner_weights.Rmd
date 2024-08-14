@@ -12,7 +12,7 @@ library(here)
 source(here("code", "helpers.R"))
 
 ## read in training and test datasets 
-gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_july8.csv"), 
+gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_aug13.csv"), 
                   locale = locale(encoding = "ISO-8859-1")) %>%
   janitor::clean_names() %>% 
     mutate(continent = case_when(continent == "Africa" ~ 1,

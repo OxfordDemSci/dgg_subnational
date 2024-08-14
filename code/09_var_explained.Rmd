@@ -13,17 +13,112 @@ source(here("code", "helpers.R"))
 
 
 ```{r}
-## read in training and test datasets 
+ set.seed(1234)
+
+ ## read in training and test datasets
+ gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_aug13.csv"),
+                   locale = locale(encoding = "ISO-8859-1"),
+                                   show_col_types = FALSE) %>%
+   janitor::clean_names() %>%
+   mutate(continent = case_when(continent == "Africa" ~ 1,
+                                TRUE ~ 0)) %>%
+   dplyr::select(country, all_of(c(dhs_vars, fb_feats, off_feats_current, fb_feats_current, off_feats))) %>%
+   filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% drop_na()
+
+ gadm1_full <- read_csv(here("data", "aggregated_indicators_lmic_aug13.csv"),
+                        locale = locale(encoding = "ISO-8859-1"),
+                        show_col_types = FALSE) %>%
+   janitor::clean_names() %>%
+   mutate(continent = case_when(continent == "Africa" ~ 1,
+                                TRUE ~ 0)) %>%
+   filter(!(country == "Bangladesh" & dhsyear == "2014")) %>%
+   filter(!(country == "India" & dhsyear == "2014")) %>%
+   filter(!(country == "Cambodia" & dhsyear == "2014")) %>%
+   filter(!(country == "Nepal" & dhsyear == "2016")) %>%
+   filter(!(country == "Philippines" & dhsyear == "2017")) %>%
+   mutate(pop_all_age_total_dhsyear = pop_all_age_female_dhsyear + pop_all_age_male_dhsyear) %>%
+   filter(!is.na(fb_pntr_13p_female_2024_tess))
+```
+
+
+```{r}
+# 
+# 
+# ## predictions for internet 
+# 
+# ```{r}
+# ## sl predictions for internet women
+# sl_predictions_internet_wom <- superlearner_train_and_predict(data = gadm1, 
+#                                                               covar_list = c(fb_feats, off_feats),
+#                                                               outcome = "perc_used_internet_past12months_wght_age_15_to_49_wom",
+#                                                               predict_data = gadm1_full) 
+# 
+# ## sl predictions for internet men
+# sl_predictions_internet_men <- superlearner_train_and_predict(data = gadm1, 
+#                                                               covar_list = c(fb_feats, off_feats),
+#                                                               outcome = "perc_used_internet_past12months_wght_age_15_to_49_men",
+#                                                               predict_data = gadm1_full) 
+# 
+# 
+# predictions_internet <- bind_rows(sl_predictions_internet_wom, sl_predictions_internet_men) %>%
+#   mutate(gid_0 = substring(gid_1, 1, 3)) %>% 
+#   dplyr::select(predicted = superlearner, observed, country, gid_1, gid_0, outcome) %>%
+#   pivot_wider(id_cols = c(gid_1, gid_0, country), names_from = outcome, values_from = c(observed, predicted)) %>% 
+#   mutate(predicted_perc_used_internet_past12months_wght_age_15_to_49_wom = case_when(
+#     predicted_perc_used_internet_past12months_wght_age_15_to_49_wom < 0 ~ 0, 
+#     predicted_perc_used_internet_past12months_wght_age_15_to_49_wom > 100 ~ 100,
+#     TRUE ~ predicted_perc_used_internet_past12months_wght_age_15_to_49_wom
+#   )) %>% 
+#   mutate(predicted_perc_used_internet_past12months_wght_age_15_to_49_men = case_when(
+#     predicted_perc_used_internet_past12months_wght_age_15_to_49_men < 0 ~ 0,
+#     predicted_perc_used_internet_past12months_wght_age_15_to_49_men > 100 ~ 100,
+#     TRUE ~ predicted_perc_used_internet_past12months_wght_age_15_to_49_men)) 
+# ```
+# 
+# ## uncertainty predictions for mobile 
+# 
+# ```{r}
+# ## sl predictions 
+# sl_predictions_mobile_wom <- superlearner_train_and_predict(data = gadm1, 
+#                                                  covar_list = c(fb_feats, off_feats),
+#                                                  outcome = "perc_owns_mobile_telephone_wght_age_15_to_49_wom",
+#                                                  predict_data = gadm1_full) 
+# ## sl prediction men 
+# sl_predictions_mobile_men <- superlearner_train_and_predict(data = gadm1, 
+#                                                  covar_list = c(fb_feats, off_feats),
+#                                                  outcome = "perc_owns_mobile_telephone_wght_age_15_to_49_men",
+#                                                  predict_data = gadm1_full) 
+# 
+# predictions_mobile <- bind_rows(sl_predictions_mobile_wom, sl_predictions_mobile_men) %>% 
+#   dplyr::select(predicted = superlearner, observed, country, gid_1, outcome) %>%
+#   distinct(country, observed, predicted, gid_1, outcome) %>% 
+#   mutate(gid_0 = substring(gid_1, 1, 3)) %>% 
+#   ungroup() %>% 
+#   pivot_wider(id_cols = c(gid_0, gid_1, country), names_from = outcome, values_from = c(observed, predicted)) %>% 
+#   mutate(predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom = case_when(
+#     predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom < 0 ~ 0, 
+#     predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom > 100 ~ 100,
+#     TRUE ~ predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom
+#   )) %>% 
+#   mutate(predicted_perc_owns_mobile_telephone_wght_age_15_to_49_men = case_when(
+#     predicted_perc_owns_mobile_telephone_wght_age_15_to_49_men < 0 ~ 0,
+#     predicted_perc_owns_mobile_telephone_wght_age_15_to_49_men > 100 ~ 100,
+#     TRUE ~ predicted_perc_owns_mobile_telephone_wght_age_15_to_49_men)) 
+# ```
+
+```
+
+ 
+
+```{r}
 predictions <- read_csv(here("out", "full_predictions.csv"))
 
-gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_july8.csv"), 
-                  locale = locale(encoding = "ISO-8859-1")) %>% 
-  select(gid_1, hdi_national_2022)
-
 predictions <- predictions %>% 
-  left_join(gadm1, by = c("gid_1" = "gid_1")) %>% 
+  left_join(gadm1_full %>% select(-country), by = c("gid_1" = "gid_1")) %>% 
   mutate(hdi_bin = ntile(hdi_national_2022, 4)) 
 ```
+
+## save file 
 
 
 
@@ -149,9 +244,6 @@ results_full <- results_full %>%
     grepl("used_internet_past12months_wght_age_15_to_49_wom", col) ~ "Internet (Women)",
     TRUE ~ col
   )) 
-
-result <- calculate_mld_components(predictions %>% filter(hdi_bin == 3),
-                                   rate_col = "predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom")
 ```
 
 
@@ -179,12 +271,3 @@ ggsave(var_explained_fig, filename = here("figures", "var_explained_fig.png"), h
 ```
 
 
-
-
-```{r}
-# library(lme4)
-
-# # Fit a multilevel model
-# model <- lmer(predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom ~ 1 + (1|country), data = predictions %>% filter(hdi_bin == 1) , REML = TRUE)
-# summary(model)
-```

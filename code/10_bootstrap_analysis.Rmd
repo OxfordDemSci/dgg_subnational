@@ -74,7 +74,7 @@ for (folder in selected_folders) {
     data_list_men[[file]] <- read_dta(file, col_select = c("mv000", "mv001", "mv101", "mv005", "mv169a", "mv171a")) %>% 
       mutate(mv101 = as.numeric(mv101))
   }
-  cat(file) 5
+  cat(file) 
 }
 
 # Combine all women's and men's data into single data frames
@@ -166,8 +166,8 @@ internet_usage_men <- function(data, gender_var) {
 }
 
 # Perform the bootstrap for both women and men
-bootstrap_results_women <- map_dfr(1:1000, ~internet_usage_women(dhs_surveys_wom, "women"), .id = "iteration", .progress = T)
-bootstrap_results_men <- map_dfr(1:1000, ~internet_usage_men(dhs_surveys_men, "men"), .id = "iteration",  .progress = T)
+bootstrap_results_women <- map_dfr(1:10000, ~internet_usage_women(dhs_surveys_wom, "women"), .id = "iteration", .progress = T)
+bootstrap_results_men <- map_dfr(1:10000, ~internet_usage_men(dhs_surveys_men, "men"), .id = "iteration",  .progress = T)
 
 # Combine results and calculate gender ratios
 combined_internet_usage <- bind_rows(bootstrap_results_women, bootstrap_results_men)
@@ -279,8 +279,8 @@ bootstrap_iteration_mobile_men <- function(data, gender_var) {
 }
 
 # Perform the bootstrap for women and men, focusing on mobile usage
-bootstrap_women <- map_dfr(1:1000, ~bootstrap_iteration_mobile_wom(dhs_surveys_wom, "women"), .id = "iteration", .progress = T)
-bootstrap_men <- map_dfr(1:1000, ~bootstrap_iteration_mobile_men(dhs_surveys_men, "men"), .id = "iteration", .progress = T)
+bootstrap_women <- map_dfr(1:10000, ~bootstrap_iteration_mobile_wom(dhs_surveys_wom, "women"), .id = "iteration", .progress = T)
+bootstrap_men <- map_dfr(1:10000, ~bootstrap_iteration_mobile_men(dhs_surveys_men, "men"), .id = "iteration", .progress = T)
 
 # Combine results from both genders and calculate mobile usage ratios
 bootstrap_combined <- bind_rows(bootstrap_women, bootstrap_men)

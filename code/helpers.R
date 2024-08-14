@@ -34,7 +34,8 @@ pacman::p_load(
   xtable,       # package for making latex tables
   haven,        # read stata files
   tidyverse,    # data manipulation and visualization
-  conflicted    # custom functions
+  conflicted,    # custom functions
+  caret         # machine learning 
 )
 
 ## custom functions 
@@ -66,6 +67,8 @@ execute_source <- function(file) {
 ## custom color schemes
 cudb <- c("#49b7fc", "#ff7b00", "#17d898", "#ff0083", "#0015ff", "#e5d200", "#999999")
 cud <- c("#D55E00", "#56B4E9", "#009E73", "#CC79A7", "#0072B2", "#E69F00", "#F0E442", "#999999")
+cbp1 <- c("#E69F00", "#56B4E9", "#009E73",
+          "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
 
 ## white background instead of transparent
 ggsave <- function(filename, plot = last_plot(), ..., bg = "white") {
@@ -412,7 +415,7 @@ dhs_vars <- tolower(c(
   "perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio"
 ))
 
-fb_feats <- c(
+fb_feats_current <- c(
   "fb_pntr_13p_male_2024",
   "fb_pntr_13p_female_2024",
   "all_devices_age_13_plus_gg_2024",
@@ -422,41 +425,26 @@ fb_feats <- c(
   "wifi_age_13_plus_male_frac_2024",
   "x4g_age_13_plus_female_frac_2024",
   "x4g_age_13_plus_male_frac_2024",
-  "fb_pntr_13p_male_2020_national",
-  "fb_pntr_13p_female_2020_national",
-  "all_devices_age_13_plus_gg_2020_national"
+  "fb_pntr_13p_male_2024_national",
+  "fb_pntr_13p_female_2024_national",
+  "all_devices_age_13_plus_gg_2024_national"
 )
 
-fb_feats_2021 <- c(
-  "fb_pntr_13p_male_2021_impute",
-  "fb_pntr_13p_female_2021_impute",
-  "all_devices_age_13_plus_gg_2021_impute",
-  "ios_age_13_plus_female_frac_2021_impute",
-  "ios_age_13_plus_male_frac_2021_impute",
-  "wifi_age_13_plus_female_frac_2021_impute",
-  "wifi_age_13_plus_male_frac_2021_impute",
-  "x4g_age_13_plus_female_frac_2021_impute",
-  "x4g_age_13_plus_male_frac_2021_impute",
+fb_feats <- c(
+  "fb_pntr_13p_male_dhsyear_impute",
+  "fb_pntr_13p_female_dhsyear_impute",
+  "all_devices_age_13_plus_gg_dhsyear_impute",
+  "ios_age_13_plus_female_frac_2024",
+  "ios_age_13_plus_male_frac_2024",
+  "wifi_age_13_plus_female_frac_2024",
+  "wifi_age_13_plus_male_frac_2024",
+  "x4g_age_13_plus_female_frac_2024",
+  "x4g_age_13_plus_male_frac_2024",
   "fb_pntr_13p_male_dhsyear_national",
   "fb_pntr_13p_female_dhsyear_national",
-  "all_devices_age_13_dhsyear_gg_national",
-  "dhsyear"
+  "all_devices_age_13_plus_gg_dhsyear_national"
 )
 
-fb_feats_tess <- c(
-  "fb_pntr_13p_male_2024",
-  "fb_pntr_13p_female_2024",
-  "all_devices_age_13_plus_gg_2024_tess",
-  "ios_age_13_plus_female_frac_2024_tess",
-  "ios_age_13_plus_male_frac_2024_tess",
-  "wifi_age_13_plus_female_frac_2024_tess",
-  "wifi_age_13_plus_male_frac_2024_tess",
-  "x4g_age_13_plus_female_frac_2024_tess",
-  "x4g_age_13_plus_male_frac_2024_tess",
-  "fb_pntr_13p_male_2020_national",
-  "fb_pntr_13p_female_2020_national",
-  "all_devices_age_13_plus_gg_national"
-)
 
 off_feats <- tolower(c(
   "nl_mean_dhsyear",
@@ -477,7 +465,7 @@ off_feats <- tolower(c(
   "continent",
   "hdi_national_dhsyear",
   "gdi_national_dhsyear"
-)) # 'internet_speed'
+))
 
 off_feats_current <- tolower(c(
   "nl_mean_2021",
@@ -500,10 +488,6 @@ off_feats_current <- tolower(c(
 ))
 
 
-# 'fb_pntr_13p_2020_all', 'hdi',
-# 'hdi_f',
-# 'hdi_m',
-# 'wdi_acel'
 
 perform_cross_validation_loco <- function(data, dependent_var, features, country_col) {
   results_df <- data.frame(feature = character(), avg_r_squared = numeric(), stringsAsFactors = FALSE)
@@ -542,9 +526,6 @@ perform_cross_validation_loco <- function(data, dependent_var, features, country
   return(results_df)
 }
 
-
-library(caret)
-library(dplyr)
 
 perform_cross_validation <- function(data, dependent_var, features) {
   results_df <- data.frame(feature = character(), avg_r_squared = numeric(), stringsAsFactors = FALSE)

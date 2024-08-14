@@ -18,6 +18,8 @@ All computations were carried out on 2023 MacBook Pro with an Apple M2 Pro chip,
 
 Please download the open science framework repository. In the same directory as your /code/ folder, create a /data/ folder and place all data files in this folder.
 
+Note: Running script 12, which create a table with number of interviews per DHS survey, requires access to the underlying women and men's DHS microdata recodes. These files are available upon registration from the [DHS program](https://dhsprogram.com/)
+
 #### Code 
 
 After downloading the required data, researchers can run the following script to replicate all figures and tables: 
@@ -36,7 +38,8 @@ Alternatively, researchers can run the following files individually in order:
 - `08_residual_analysis.Rmd` - Calculate and plot model residuals 
 - `09_var_explained.Rmd` - Analysis of within vs. between country variance 
 - `10_bootstrap_analysis.Rmd` - Bootstrap analysis to estimate the uncertainty in the R-squared values
-
+- `11_national_comparison` - Compare our aggregated national predictions with external MICS surveys
+- `12_dhs_tables` - Construct appendix table of numbers of people sampled in each DHS survey (requires access to DHS surveys)
 
 ### Authors
 

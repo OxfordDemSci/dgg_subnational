@@ -33,7 +33,7 @@ predictions_combined <- read_csv(here("out", "combined_predictions_lmics_nationa
   ))
 
 ## read in training and test datasets 
-gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_july8.csv"), 
+gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_aug13.csv"), 
                   locale = locale(encoding = "ISO-8859-1")) %>%
   janitor::clean_names() %>% 
   mutate(pop_all_age_total_dhsyear = pop_all_age_female_dhsyear + pop_all_age_male_dhsyear) %>% 
@@ -76,8 +76,9 @@ model_performance_metrics <- model_performance_metrics %>%
 ## R-Squared Plot
 
 ```{r}
-cbp1 <- c("#E69F00", "#56B4E9", "#009E73",
-          "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+# Define the desired order of facets
+desired_order <- c("Internet (Men)", "Internet (Women)", "Internet (Ratio)",
+                   "Mobile (Men)", "Mobile (Women)", "Mobile (Ratio)")
 
 ## r2 plot -- algo X outcome
 r2_plot <- model_performance_metrics %>% 
@@ -86,17 +87,18 @@ r2_plot <- model_performance_metrics %>%
                          "perc_ever_used_internet_wght_age_15_to_49_men",
                          "perc_ever_used_internet_wght_age_15_to_49_wom")) %>% 
   mutate(value = round(value, 2)) %>% 
-  ggplot(aes(x = reorder(model, -value), y = value, fill = cv_method, label = scales::percent(value, accuracy = 1))) + 
+  mutate(outcome_clean = factor(outcome_clean, levels = desired_order)) %>%  # Set the factor levels
+  ggplot(aes(x = reorder(model, -value), y = value, fill = cv_method, label = value)) + 
   geom_col(position = "dodge", color = "black") + 
-  geom_text(position = position_dodge(width = .9), vjust = -0.5, size = 3) + 
-  scale_y_continuous(labels = scales::percent_format(accuracy = 1), limits = c(0, 1)) + 
+  geom_text(position = position_dodge(width = .9), vjust = -0.5, size = 4) + 
+  scale_y_continuous(limits = c(0, 1)) + 
   theme_cowplot() + 
   labs(
     x = "Algorithm",
-    y = "Variance Explained (%)",
+    y = expression(bold(R^2)),
     title = expression(bold("Algorithm Performance " (R^2))),
     fill = "Cross-Validation") + 
-  facet_grid(rows = vars(outcome_clean), cols = vars(feature_set)) + 
+  facet_wrap(~outcome_clean, ncol = 1) + 
   theme(legend.position = "bottom") + 
   scale_fill_manual(values=cbp1)
 
@@ -130,8 +132,8 @@ filtered_data <- model_performance_metrics %>%
 feature_comparison_plot <- filtered_data %>%
   filter(!outcome %in% c("perc_ever_used_internet_wght_age_15_to_49_fm_ratio", "perc_ever_used_internet_wght_age_15_to_49_men", "perc_ever_used_internet_wght_age_15_to_49_wom")) %>% 
   mutate(feature_set = case_when(
-    feature_set == "fb" ~ "FB",
-    feature_set == "fb_and_offline" ~ "FB and Offline",
+    feature_set == "fb" ~ "Facebook",
+    feature_set == "fb_and_offline" ~ "Facebook and Offline",
     feature_set == "offline" ~ "Offline"
   )) %>% 
   ggplot() + 
@@ -163,17 +165,17 @@ ggsave(plot = feature_comparison_plot, here("figures", "feature_comparison_plot.
 
 ```{r}
 ## read in training and test datasets 
-gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_july8.csv"), 
+gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_aug13.csv"), 
                   locale = locale(encoding = "ISO-8859-1")) %>%
   mutate(tesselation_2024 = ifelse(TRUE, 1, 0)) %>%
   janitor::clean_names() %>% 
-  dplyr::select(country, gid_1, all_of(c(dhs_vars, fb_feats_2021, off_feats))) %>% ## the vectors of vars are defined in helper function
+  dplyr::select(country, gid_1, all_of(c(dhs_vars, fb_feats, off_feats))) %>% ## the vectors of vars are defined in helper function
   filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% drop_na() %>% 
   mutate(continent = case_when(continent == "Africa" ~ 1,
                                TRUE ~ 0)) 
 
 # Define your features and dependent variable
-features <- tolower(c(fb_feats_2021, off_feats)) 
+features <- tolower(c(fb_feats, off_feats)) 
 dependent_vars <- c(
   "perc_used_internet_past12months_wght_age_15_to_49_wom",
   "perc_owns_mobile_telephone_wght_age_15_to_49_wom",
@@ -191,7 +193,7 @@ for (dependent_var in dependent_vars) {
   data_subset <- filter(gadm1, !is.na(!!sym(dependent_var)))
 
   # Perform cross-validation
-  cv_results <- perform_cross_validation_loco(data_subset, dependent_var, features, country_col = country_col)
+  cv_results <- perform_cross_validation_loco(data_subset, dependent_var, country_col = country_col, features) #
 
   # Store the results
   cv_results_list[[dependent_var]] <- cv_results %>% 
@@ -212,14 +214,14 @@ var_importance_data <- cv_results %>%
   arrange(desc(avg_r_squared)) %>%
   slice_head(n = 10) %>% 
   mutate(feature_recode = case_when(
-    grepl("fb_pntr_13p_male_2021_impute", feature) ~ "Facebook Penetration (Male)",
-    grepl("fb_pntr_13p_female_2021_impute", feature) ~ "Facebook Penetration (Female)",
+    feature == "fb_pntr_13p_female_dhsyear_impute" ~ "Facebook Penetration (Female)",
+    grepl("fb_pntr_13p_male_dhsyear_impute", feature) ~ "Facebook Penetration (Male)",
+    grepl("all_devices_age_13_plus_gg_dhsyear_impute", feature) ~ "Facebook Penetration Gender Gap",
     grepl("fb_pntr_13p_male_dhsyear_national", feature) ~ "Facebook Penetration National (Male)",
     grepl("fb_pntr_13p_female_dhsyear_national", feature) ~ "Facebook Penetration National (Female)",
     grepl("rwi_mean_wght", feature) ~ "Relative Wealth Index (Pop-weighted)",
     grepl("subnational_hdi_males", feature) ~ "Human Development Index (Male)",
     grepl("rwi_mean", feature) ~ "Relative Wealth Index (Mean)",
-    grepl("all_devices_age_13_plus_gg_2024_tess", feature) ~ "Facebook Penetration Gender Gap",
     grepl("subnational_hdi_females", feature) ~ "Human Development Index (Female)",
     grepl("ios_age_13_plus_female_frac_2021", feature) ~ "iOS FB Usage (Female)",
     grepl("income_index_males", feature) ~ "Income Index (Male)",
@@ -229,15 +231,15 @@ var_importance_data <- cv_results %>%
     grepl("wifi_age_13_plus_female_frac_2024_tess", feature) ~ "WiFi FB Usage (Female)",
     grepl("wifi_age_13_plus_male_frac_2024_tess", feature) ~ "WiFi FB Usage (Male)",
     grepl("hdi", feature) ~ "Human Development Index (National)",
-    feature == "gdi" ~ "Gender Development Index (National)",
+    feature == "gdi_national_dhsyear" ~ "Gender Development Index (National)",
     feature == "subnational_gdi_dhsyear" ~ "Gender Development Index",
     grepl("ios_age_13_plus_male_frac_2021", feature) ~ "iOS FB Usage (Male)",
     grepl("income_index_females", feature) ~ "Income Index (Female)",
     grepl("pop_density", feature) ~ "Population Density",
     grepl("wifi_age_13_plus_male_frac_2021", feature) ~ "WiFi FB Usage (Male)",
     grepl("wifi_age_13_plus_female_frac_2021", feature) ~ "WiFi FB Usage (Female)",
-    grepl("dhsyear", feature) ~ "DHS Survey Year",
-    grepl("gdi_nation", feature) ~ "Gender Development Index",
+    feature == "dhsyear" ~ "DHS Survey Year",
+    feature == "x4g_age_13_plus_female_frac_2024" ~ "4G+ Network FB Usage", 
     grepl("all_devices_age_13_dhsyear_gg_national", feature) ~ "Facebook National Gender Gap",
     grepl("all_devices_age_13_plus_gg_2021_impute", feature) ~ "Facebook Gender Gap",
     TRUE ~ feature  # Default case
@@ -303,12 +305,12 @@ var_importance_plot <- var_importance_data %>%
   geom_segment(aes(yend = feature_idea, x = 0, xend = max(avg_r_squared)), linetype = "dashed", size = 0.1) +
   labs(x = expression("R" ^ 2),
        y = "",
-       title = "Variable Importance") +
+       title = "Feature Importance") +
   facet_wrap(~outcome_clean_f, scales = "free_y", nrow = 3) +
   scale_y_discrete(breaks = var_importance_data$feature_idea,
                    labels = var_importance_data$feature_recode)
 
-ggsave(plot = var_importance_plot, filename = here( "figures", "variable_importance.png"), width = 13, height = 8, units = "in", dpi = 300)
+ggsave(plot = var_importance_plot, filename = here( "figures", "feature_importance.png"), width = 13, height = 8, units = "in", dpi = 300)
 ```
 
 ```{r}
@@ -316,10 +318,10 @@ ggsave(plot = var_importance_plot, filename = here( "figures", "variable_importa
 # 
 # for (outcome in outcomes){
 # ## sl predictions for internet women
-# sl_predictions_internet_wom <- superlearner_train_and_predict(data = gadm1, 
-#                                                  covar_list = c(fb_feats, off_feats_current),
+# sl_predictions_internet_wom <- superlearner_train_and_predict(data = gadm1,
+#                                                  covar_list = c(fb_feats, off_feats),
 #                                                  outcome = "perc_used_internet_past12months_wght_age_15_to_49_wom",
-#                                                  predict_data = gadm1_full,
+#                                                  predict_data = gadm1,
 #                                                  return_fit = TRUE)
 # 
 # sl_fit = sl_predictions_internet_wom[[1]]

@@ -13,7 +13,7 @@ source(here("code", "helpers.R"))
 
 ```{r}
 ## read in training and test datasets 
-gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_july8.csv"), 
+gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_aug13.csv"), 
                   locale = locale(encoding = "ISO-8859-1")) %>%
   janitor::clean_names() %>% 
     mutate(continent = case_when(continent == "Africa" ~ 1,
@@ -21,7 +21,7 @@ gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_july8.csv"),
   dplyr::select(country, all_of(c(dhs_vars, fb_feats, off_feats_current))) %>% 
   filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% drop_na() 
 
-gadm1_full <- read_csv(here("data", "aggregated_indicators_lmic_july8.csv"), 
+gadm1_full <- read_csv(here("data", "aggregated_indicators_lmic_aug13.csv"), 
                   locale = locale(encoding = "ISO-8859-1")) %>%
   janitor::clean_names() %>% 
   mutate(continent = case_when(continent == "Africa" ~ 1,
@@ -76,7 +76,6 @@ internet_women_observed <- ggplot() +
   labs(fill = "Internet Use",
        title = "Women, observed")
   
-
 # Women, Observed
 internet_women_predicted <- ggplot() +
   geom_sf(data = gadm1_map, fill = "grey70", color = "black", linewidth = 0.5) +
@@ -153,7 +152,8 @@ error_dist_nigeria <- shapefile_df_nigeria %>%
   ggplot(aes(x = observed, y = predicted_loco)) + 
   geom_point(aes(size = pop_all_age_total_dhsyear), alpha = 0.3) +
   # geom_smooth() +
-  stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..))) +  
+  stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..)), 
+           size = 5.5) +  
   labs(title = "", 
        x = "Observed", 
        y = "Predicted",
@@ -193,7 +193,7 @@ shapefile_df_zimbabwe <- shapefile_df_zimbabwe %>%
   mutate(error = observed-predicted_loco)
 
 # Determine the common range for fill scale
-fill_limits <- range(c(min(shapefile_df_zimbabwe$predicted_loco), max(shapefile_df_zimbabwe$observed)))
+fill_limits <- range(c(min(shapefile_df_zimbabwe$observed), max(shapefile_df_zimbabwe$observed + 0.01)))
 
 plot_truth_zimbabwe <- ggplot(shapefile_df_zimbabwe, aes(fill = observed)) + 
   geom_sf() +
@@ -215,7 +215,8 @@ plot_prediction_zimbabwe <- ggplot(shapefile_df_zimbabwe, aes(fill = predicted_l
 error_dist_zim <- shapefile_df_zimbabwe %>% 
   ggplot(aes(x = observed, y = predicted_loco)) + 
   geom_point(aes(size = pop_all_age_total_dhsyear), alpha = 0.3) +
-  stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..))) +  
+  stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..)),
+           size = 5.5) +  
   labs(title = "",
        x = "Observed",
        y = "Predicted",
@@ -226,7 +227,8 @@ error_dist_zim <- shapefile_df_zimbabwe %>%
   geom_abline(slope = 1, linetype = "dashed") + 
   scale_size_continuous(breaks = c( 1000000, 2000000), 
                         labels = c("1m", "2m")) +
-  guides(size=guide_legend(override.aes=list(alpha=1))) + 
+  guides(size=guide_legend(override.aes=list(alpha=1)),
+         size = 5.5) + 
   geom_abline(slope = 1, linetype = "dashed") + 
   theme(legend.position = "bottom")
 
@@ -277,7 +279,8 @@ plot_prediction_senegal <- ggplot(shapefile_df_senegal, aes(fill = predicted_loc
 error_dist_senegal <- shapefile_df_senegal %>% 
   ggplot(aes(x = observed, y = predicted_loco)) + 
   geom_point(aes(size = pop_all_age_total_dhsyear), alpha = 0.3) +
-  stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..))) +  
+  stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..)), 
+           size = 5.5) +  
   labs(title = "",
        x = "Observed",
        y = "Predicted",
@@ -288,7 +291,8 @@ error_dist_senegal <- shapefile_df_senegal %>%
     geom_abline(slope = 1, linetype = "dashed") + 
   scale_size_continuous(breaks = c( 1000000, 2000000), 
                         labels = c("1m", "2m")) +
-  guides(size=guide_legend(override.aes=list(alpha=1))) + 
+  guides(size=guide_legend(override.aes=list(alpha=1)),
+         size = 5.5) + 
   geom_abline(slope = 1, linetype = "dashed") + 
   theme(legend.position = "bottom")
 
@@ -313,9 +317,9 @@ country_error_viz <- cowplot::plot_grid(plot_truth_nigeria,
                                         plot_prediction_senegal, 
                                         error_dist_senegal, nrow = 3, labels = "AUTO")
 
-error_metrics <- cowplot::plot_grid(country_level_mae, country_level_corr, nrow = 2, labels = c("J", "K"))
+error_metrics <- cowplot::plot_grid(country_level_corr, country_level_mae, nrow = 2, labels = c("J", "K"))
 
-error_plot <- cowplot::plot_grid(error_metrics, spread_plot, labels = c("", "H")) 
+error_plot <- cowplot::plot_grid(error_metrics, spread_plot, labels = c("", "L")) 
 
 country_error_viz_final <- plot_grid(country_error_viz, error_plot, ncol = 1, rel_heights = c(1, 0.5))
 

@@ -43,13 +43,17 @@ predictions_combined <- read_csv(here("out", "combined_predictions_lmics_nationa
 
 
 ## read in training and test datasets
-gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_july8.csv"),
+gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_aug13.csv"),
   locale = locale(encoding = "ISO-8859-1")
 ) %>%
   janitor::clean_names() %>%
   mutate(pop_all_age_total_dhsyear = pop_all_age_female_dhsyear + pop_all_age_male_dhsyear) %>%
   dplyr::select(country, gid_1, dhsyear, pop_all_age_total_dhsyear, continent) %>%
-  filter(!(country == "India" & dhsyear == 2015)) 
+    filter(!(country == "Bangladesh" & dhsyear == "2014")) %>% 
+  filter(!(country == "India" & dhsyear == "2014")) %>% 
+  filter(!(country == "Cambodia" & dhsyear == "2014")) %>%
+  filter(!(country == "Nepal" & dhsyear == "2016")) %>%
+  filter(!(country == "Philippines" & dhsyear == "2017"))
 
 predictions_combined <- predictions_combined %>%
   left_join(gadm1, by = c("gid_1", "country")) 
@@ -526,4 +530,7 @@ write_rds(country_level_mae, file = here("figures", "country_level_mae.rds"))
 write_rds(country_level_corr, file = here("figures", "country_level_corr.rds"))
 
 ```
+
+
+
 

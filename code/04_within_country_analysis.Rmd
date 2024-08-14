@@ -38,7 +38,7 @@ spread_plot_df <- predictions_long %>%
     grepl("used_internet_past12months_wght_age_15_to_49_wom", outcome) ~ "Internet (Women)",
     TRUE ~ outcome
   )) %>% 
-  filter(!gid_1 %in% c("MRT.9_1", "UGA.32_1", "UGA.31_1", "MKD.1_1", "MKD.10_1")) %>% 
+  # filter(!gid_1 %in% c("MRT.9_1", "UGA.32_1", "UGA.31_1", "MKD.1_1", "MKD.10_1")) %>% 
   group_by(continent, gid_0, outcome_clean) %>% 
   summarize(diff = max(predicted) - min(predicted),
             mean = mean(predicted))
@@ -60,7 +60,7 @@ spread_plot <- spread_plot_df %>%
   scale_color_manual(values = cud) + 
   geom_smooth(se = F, method = "lm") + 
   theme(legend.position = "bottom") + 
-  stat_cor(method = "pearson", label.x = Inf, label.y = Inf, size = 3.5,  hjust=1.1, vjust = 5.4, p.accuracy = 0.01,
+  stat_cor(method = "pearson", label.x = Inf, label.y = Inf, size = 5.5,  hjust=1.1, vjust = 5.4, p.accuracy = 0.01,
             aes(label = paste0("italic(r)~`=`~", ..r..))) + 
   facet_wrap(~outcome_clean, scales = "free")
 
