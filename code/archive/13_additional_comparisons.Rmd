@@ -1,0 +1,311 @@
+---
+title: "MICs Comparison"
+author: Casey Breen
+---
+
+
+## Notebook and data 
+
+```{r}
+national_model_estimates <- read_csv("~/Downloads/best_models_pred_and_true.csv")
+```
+
+
+```{r}
+national_model_estimates <- national_model_estimates %>% 
+  filter(name == "internet combined") %>% 
+  distinct()
+
+final_predictions %>% 
+  distinct(country, internet_women_national, internet_men_national, internet_fm_ratio_national) %>% 
+  left_join(national_model_estimates, by = "country") %>% 
+  ggplot(aes(x = internet_fm_ratio_national, y = pred, label = country)) +
+  geom_point() + 
+  theme_cowplot() + 
+  ylim(0, 1) + 
+  xlim(0, 1) + 
+  geom_abline(color = "grey", linetype = "dashed")  + 
+  stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..)), parse = TRUE)  + 
+  labs(y = "National new",
+       x = "Subnational")
+
+national_predictions_comparison_df %>% 
+  left_join(national_model_estimates, by = c("country.x" = "country")) %>% 
+  ggplot(aes(y = true, x = pred)) + 
+  geom_point() + 
+  theme_cowplot() + 
+  ylim(0, 1) +  
+  xlim(0, 1) + 
+  geom_abline(color = "grey", linetype = "dashed")  + 
+  stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..)), parse = TRUE) 
+  
+``` 
+
+
+```{r}
+website_estimates <- read_csv("~/Downloads/Digital_Gender_Gaps_202406_202407.csv")
+```
+
+
+```{r}
+fig1 <- website_estimates %>% 
+  filter(Date == 202407) %>% 
+  mutate(internet_gg_combined = as.numeric(`Internet GG - Combined`)) %>% 
+  left_join(national_model_estimates, by = "country") %>% 
+  mutate(pred = case_when(
+    pred > 1 ~ 1,
+    TRUE ~ pred
+  )) %>% 
+  ggplot(aes(x = pred, y = true)) + 
+  geom_point() + 
+  xlim(0, 1.2) + 
+  ylim(0, 1.2) + 
+  stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..)), parse = TRUE) + 
+  geom_abline(color = "grey", linetype = "dashed") + 
+  theme_cowplot() + 
+  labs(x = "Predicted New", 
+       y = "True",
+              title = "New national predictions")
+
+fig2 <- website_estimates %>% 
+  filter(Date == 202407) %>% 
+  mutate(internet_gg_combined = as.numeric(`Internet GG - Combined`)) %>% 
+  left_join(national_model_estimates, by = "country") %>% 
+    filter(!is.na(internet_gg_combined)) %>% 
+  ggplot(aes(x = internet_gg_combined, y = true, color = )) + 
+  geom_point() + 
+  xlim(0, 1.2) + 
+  ylim(0, 1.2) + 
+  stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..)), parse = TRUE) + 
+  geom_abline(color = "grey", linetype = "dashed") + 
+  theme_cowplot() + 
+  labs(x = "Predicted Old", 
+       y = "True",
+       title = "Old national predictions") 
+
+
+fig3 <- website_estimates %>% 
+  filter(Date == 202407) %>% 
+  mutate(internet_gg_combined = as.numeric(`Internet GG - Combined`)) %>% 
+  left_join(national_model_estimates, by = "country") %>% 
+    filter(!is.na(internet_gg_combined)) %>% 
+  ggplot(aes(x = internet_gg_combined, y = pred)) + 
+  geom_point() + 
+  xlim(0, 1.2) + 
+  ylim(0, 1.2) + 
+  stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..)), parse = TRUE) + 
+  geom_abline(color = "grey", linetype = "dashed") + 
+  theme_cowplot() + 
+  labs(x = "Predicted Old", 
+       y = "Predicted New",
+       title = "Old Vs. New predictions") 
+
+plot_grid(fig1, fig2, fig3, cols = 3)
+```
+
+
+
+```{r}
+ground_truth <- fread(here("data", "internet_mobile_indicator_clean.csv"))
+
+
+plot1 <- final_predictions %>% 
+  distinct(country, internet_fm_ratio_national) %>% 
+  left_join(ground_truth) %>% 
+  filter(survey_type != "itu") %>% 
+  filter(survey_start > 2018) %>%
+   ggplot(aes(x = used_internet_past12months_fm_perc_ratio, y = internet_fm_ratio_national, color = survey_start, label = iso3)) + 
+  geom_text() + 
+  xlim(0, 1.2) + 
+  ylim(0, 1.2) + 
+  stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..)), parse = TRUE) + 
+  geom_abline(color = "grey", linetype = "dashed") + 
+  theme_cowplot() + 
+  labs(x = "observed",
+       y = "predicted",
+       title = "Subnational Upweighted") + 
+  theme(legend.position = "none")
+
+
+plot2 <- national_model_estimates %>% 
+  left_join(ground_truth) %>% 
+   filter(survey_type != "itu") %>% 
+  filter(survey_start > 2018) %>%
+  mutate(pred = case_when(
+    pred > 1 ~ 1,
+    TRUE ~ pred)) %>% 
+   ggplot(aes(x = used_internet_past12months_fm_perc_ratio, y = pred, color = survey_start, label = iso3)) + 
+  geom_text() + 
+  xlim(0, 1.2) + 
+  ylim(0, 1.2) + 
+  stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..)), parse = TRUE) + 
+  geom_abline(color = "grey", linetype = "dashed") + 
+  theme_cowplot() + 
+  labs(x = "observed",
+       y = "predicted",
+       title = "National new") + 
+  theme(legend.position = "none")
+
+
+plot3 <- website_estimates %>% 
+  filter(Date == 202407) %>% 
+    mutate(internet_gg_combined = as.numeric(`Internet GG - Combined`)) %>% 
+  left_join(ground_truth) %>% 
+  filter(survey_type != "itu") %>% 
+  filter(survey_start > 2018) %>%
+  ggplot(aes(x = used_internet_past12months_fm_perc_ratio, y = internet_gg_combined, color = survey_start, label = iso3)) + 
+  geom_text() + 
+  xlim(0, 1.2) + 
+  ylim(0, 1.2) + 
+  stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..)), parse = TRUE) + 
+  geom_abline(color = "grey", linetype = "dashed") + 
+  theme_cowplot() + 
+  labs(x = "observed",
+       y = "predicted",
+       title = "National old") + 
+  theme(legend.position = "none")
+
+
+plot_grid(plot1, plot2, plot3, rows = 1)
+
+
+
+# Extract the legend
+legend <- cowplot::get_legend(
+  plot1 +
+  theme(
+    legend.position = "bottom",
+    legend.title = element_text(size = 12, hjust = 0.5),  # Center the title
+    legend.text = element_text(size = 10),
+    legend.key.width = unit(2, "cm"),
+    legend.spacing.x = unit(1, "cm"),
+    legend.box = "vertical",  # Arrange title and legend items vertically
+    legend.box.just = "center",  # Center the legend box
+    legend.justification = "center"  # Center the entire legend
+  ) +
+  guides(color = guide_colorbar(title.position = "top", title.hjust = 0.5)) +  # Move title to the top and center it
+  scale_color_continuous(name = "MICS/DHS Survey Year")  # Use continuous color scale
+)
+
+# Combine plots and legend
+external_comparison <- plot_grid(plot1, plot2, plot3, rows = 1)
+
+mics_comparison_legend <- plot_grid(
+  mics_comparison,
+  legend,
+  ncol = 1,
+  rel_heights = c(1, 0.1),  # Adjust the legend height as needed
+  align = "v",  # Align plots vertically
+  axis = "t"    # Center alignment for the legend
+)
+
+
+mics_comparison_legend <- plot_grid(
+  external_comparison,
+  legend,
+  ncol = 1,
+  rel_heights = c(1, 0.2),  # Adjust the legend height as needed
+  align = "v",  # Align plots vertically
+  axis = "t"    # Center alignment for the legend
+)
+  
+```
+
+
+
+```{r}
+
+plot1 <- final_predictions %>% 
+  distinct(country, internet_fm_ratio_national) %>% 
+  left_join(ground_truth) %>% 
+  filter(survey_type == "itu") %>% 
+  filter(survey_start > 2018) %>%
+ # filter(!iso3 %in% c("ETH", "UZB")) %>% 
+   ggplot(aes(x = used_internet_past12months_fm_perc_ratio, y = internet_fm_ratio_national, color = survey_start, label = iso3)) + 
+  geom_text() + 
+  xlim(0, 1.2) + 
+  ylim(0, 1.2) + 
+  stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..)), parse = TRUE) + 
+  geom_abline(color = "grey", linetype = "dashed") + 
+  theme_cowplot() + 
+  labs(x = "observed",
+       y = "predicted",
+       title = "Subnational Upweighted") + 
+  theme(legend.position = "none")
+
+
+plot2 <- national_model_estimates %>% 
+  left_join(ground_truth) %>% 
+   filter(survey_type == "itu") %>% 
+  filter(survey_start > 2018) %>%
+  mutate(pred = case_when(
+    pred > 1 ~ 1,
+    TRUE ~ pred)) %>% 
+   ggplot(aes(x = used_internet_past12months_fm_perc_ratio, y = pred, color = survey_start, label = iso3)) + 
+  geom_text() + 
+  xlim(0, 1.2) + 
+  ylim(0, 1.2) + 
+  stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..)), parse = TRUE) + 
+  geom_abline(color = "grey", linetype = "dashed") + 
+  theme_cowplot() + 
+  labs(x = "observed",
+       y = "predicted",
+       title = "National new") + 
+  theme(legend.position = "none")
+
+
+plot3 <- website_estimates %>% 
+  filter(Date == 202407) %>% 
+    mutate(internet_gg_combined = as.numeric(`Internet GG - Combined`)) %>% 
+  left_join(ground_truth) %>% 
+  filter(survey_type == "itu") %>% 
+  filter(survey_start > 2018) %>%
+  ggplot(aes(x = used_internet_past12months_fm_perc_ratio, y = internet_gg_combined, color = survey_start, label = iso3)) + 
+  geom_text() + 
+  xlim(0, 1.2) + 
+  ylim(0, 1.2) + 
+  stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..)), parse = TRUE) + 
+  geom_abline(color = "grey", linetype = "dashed") + 
+  theme_cowplot() + 
+  labs(x = "observed",
+       y = "predicted",
+       title = "National old") + 
+  theme(legend.position = "none")
+
+
+plot_grid(plot1, plot2, plot3, rows = 1)
+
+
+
+# Extract the legend
+legend <- cowplot::get_legend(
+  plot1 +
+  theme(
+    legend.position = "bottom",
+    legend.title = element_text(size = 12, hjust = 0.5),  # Center the title
+    legend.text = element_text(size = 10),
+    legend.key.width = unit(2, "cm"),
+    legend.spacing.x = unit(1, "cm"),
+    legend.box = "vertical",  # Arrange title and legend items vertically
+    legend.box.just = "center",  # Center the legend box
+    legend.justification = "center"  # Center the entire legend
+  ) +
+  guides(color = guide_colorbar(title.position = "top", title.hjust = 0.5)) +  # Move title to the top and center it
+  scale_color_continuous(name = "ITU Survey Year")  # Use continuous color scale
+)
+
+# Combine plots and legend
+external_comparison <- plot_grid(plot1, plot2, plot3, rows = 1)
+
+mics_comparison_legend <- plot_grid(
+  external_comparison,
+  legend,
+  ncol = 1,
+  rel_heights = c(1, 0.2),  # Adjust the legend height as needed
+  align = "v",  # Align plots vertically
+  axis = "t"    # Center alignment for the legend
+)
+
+```
+
+

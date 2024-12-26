@@ -29,20 +29,19 @@ predictions_combined <- read_csv(here("out", "combined_predictions_lmics_nationa
                    "perc_owns_mobile_telephone_wght_age_15_to_49_wom") ~ "Mobile",
     outcome %in% c("perc_used_internet_past12months_wght_age_15_to_49_fm_ratio",
                    "perc_used_internet_past12months_wght_age_15_to_49_men",
-                   "perc_used_internet_past12months_wght_age_15_to_49_wom") ~ "Internet",
-  ))
+                   "perc_used_internet_past12months_wght_age_15_to_49_wom") ~ "Internet"))
 
 ## read in training and test datasets 
-gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_aug13.csv"), 
+master_file <- read_csv(here("data", "master_data_file_dec24_with_national.csv"), 
                   locale = locale(encoding = "ISO-8859-1")) %>%
   janitor::clean_names() %>% 
-  mutate(pop_all_age_total_dhsyear = pop_all_age_female_dhsyear + pop_all_age_male_dhsyear) %>% 
-  dplyr::select(country, gid_1, dhsyear, pop_all_age_total_dhsyear, continent) %>% 
+  mutate(pop_all_age_total = pop_all_age_female + pop_all_age_male) %>% 
+  dplyr::select(country, gid_1, dhsyear, pop_all_age_total, continent) %>% 
    filter(!(country == "India" & dhsyear == 2015)) 
 
 
 predictions_combined <- predictions_combined %>% 
-  left_join(gadm1, by = "gid_1")
+  left_join(master_file, by = "gid_1")
 
 ## estimate model performance metrics 
 ## r2, rmse, mae are fine 
@@ -61,9 +60,6 @@ model_performance_metrics <- predictions_combined %>%
 ## model metrics 
 model_performance_metrics <- model_performance_metrics %>% 
   mutate(outcome_clean = case_when(
-    grepl("internet_wght_age_15_to_49_fm_ratio", outcome) ~ "Internet, Ever (Ratio)",
-    grepl("internet_wght_age_15_to_49_men", outcome) ~ "Internet, Ever (Men)",
-    grepl("internet_wght_age_15_to_49_wom", outcome) ~ "Internet, Ever (Women)",
     grepl("mobile_telephone_wght_age_15_to_49_fm_ratio", outcome) ~ "Mobile (Ratio)",
     grepl("mobile_telephone_wght_age_15_to_49_men", outcome) ~ "Mobile (Men)",
     grepl("mobile_telephone_wght_age_15_to_49_wom", outcome) ~ "Mobile (Women)",
@@ -165,7 +161,7 @@ ggsave(plot = feature_comparison_plot, here("figures", "feature_comparison_plot.
 
 ```{r}
 ## read in training and test datasets 
-gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_aug13.csv"), 
+master_file <- read_csv(here("data", "master_data_file_dec24_with_national.csv"), 
                   locale = locale(encoding = "ISO-8859-1")) %>%
   mutate(tesselation_2024 = ifelse(TRUE, 1, 0)) %>%
   janitor::clean_names() %>% 
@@ -190,7 +186,7 @@ country_col <- "country" # Adjust this to match the country identifier in your d
 cv_results_list <- list()
 for (dependent_var in dependent_vars) {
   # Ensure the data subset does not include missing values for the current dependent variable
-  data_subset <- filter(gadm1, !is.na(!!sym(dependent_var)))
+  data_subset <- filter(master_file, !is.na(!!sym(dependent_var)))
 
   # Perform cross-validation
   cv_results <- perform_cross_validation_loco(data_subset, dependent_var, country_col = country_col, features) #
@@ -214,34 +210,34 @@ var_importance_data <- cv_results %>%
   arrange(desc(avg_r_squared)) %>%
   slice_head(n = 10) %>% 
   mutate(feature_recode = case_when(
-    feature == "fb_pntr_13p_female_dhsyear_impute" ~ "Facebook Penetration (Female)",
-    grepl("fb_pntr_13p_male_dhsyear_impute", feature) ~ "Facebook Penetration (Male)",
-    grepl("all_devices_age_13_plus_gg_dhsyear_impute", feature) ~ "Facebook Penetration Gender Gap",
-    grepl("fb_pntr_13p_male_dhsyear_national", feature) ~ "Facebook Penetration National (Male)",
-    grepl("fb_pntr_13p_female_dhsyear_national", feature) ~ "Facebook Penetration National (Female)",
+    feature == "fb_pntr_18p_female" ~ "Facebook Penetration (Female)",
+    feature == "fb_pntr_18p_male" ~ "Facebook Penetration (Male)",
+    grepl("all_devices_age_18_plus_gg", feature) ~ "Facebook Penetration Gender Gap",
+    grepl("fb_pntr_18p_male_national", feature) ~ "Facebook Penetration National (Male)",
+    grepl("fb_pntr_18p_female_national", feature) ~ "Facebook Penetration National (Female)",
     grepl("rwi_mean_wght", feature) ~ "Relative Wealth Index (Pop-weighted)",
     grepl("subnational_hdi_males", feature) ~ "Human Development Index (Male)",
     grepl("rwi_mean", feature) ~ "Relative Wealth Index (Mean)",
     grepl("subnational_hdi_females", feature) ~ "Human Development Index (Female)",
-    grepl("ios_age_13_plus_female_frac_2021", feature) ~ "iOS FB Usage (Female)",
+    grepl("ios_age_18_plus_female_frac_2021", feature) ~ "iOS FB Usage (Female)",
     grepl("income_index_males", feature) ~ "Income Index (Male)",
     grepl("educational_index_females", feature) ~ "Educational Index (Female)",
     grepl("educational_index_males", feature) ~ "Educational Index (Male)",
     grepl("nl_mean", feature) ~ "Night Light Mean",
-    grepl("wifi_age_13_plus_female_frac_2024_tess", feature) ~ "WiFi FB Usage (Female)",
-    grepl("wifi_age_13_plus_male_frac_2024_tess", feature) ~ "WiFi FB Usage (Male)",
+    grepl("wifi_age_18_plus_female_frac_2024_tess", feature) ~ "WiFi FB Usage (Female)",
+    grepl("wifi_age_18_plus_male_frac_2024_tess", feature) ~ "WiFi FB Usage (Male)",
     grepl("hdi", feature) ~ "Human Development Index (National)",
-    feature == "gdi_national_dhsyear" ~ "Gender Development Index (National)",
-    feature == "subnational_gdi_dhsyear" ~ "Gender Development Index",
-    grepl("ios_age_13_plus_male_frac_2021", feature) ~ "iOS FB Usage (Male)",
+    feature == "gdi" ~ "Gender Development Index (National)",
+    feature == "subnational_gdi" ~ "Gender Development Index",
+    grepl("ios_age_18_plus_male_frac_2021", feature) ~ "iOS FB Usage (Male)",
     grepl("income_index_females", feature) ~ "Income Index (Female)",
     grepl("pop_density", feature) ~ "Population Density",
-    grepl("wifi_age_13_plus_male_frac_2021", feature) ~ "WiFi FB Usage (Male)",
-    grepl("wifi_age_13_plus_female_frac_2021", feature) ~ "WiFi FB Usage (Female)",
+    grepl("wifi_age_18_plus_male_frac_2021", feature) ~ "WiFi FB Usage (Male)",
+    grepl("wifi_age_18_plus_female_frac_2021", feature) ~ "WiFi FB Usage (Female)",
     feature == "dhsyear" ~ "DHS Survey Year",
-    feature == "x4g_age_13_plus_female_frac_2024" ~ "4G+ Network FB Usage", 
-    grepl("all_devices_age_13_dhsyear_gg_national", feature) ~ "Facebook National Gender Gap",
-    grepl("all_devices_age_13_plus_gg_2021_impute", feature) ~ "Facebook Gender Gap",
+    feature == "x4g_age_18_plus_female_frac_2024" ~ "4G+ Network FB Usage", 
+    grepl("all_devices_age_18_dhsyear_gg_national", feature) ~ "Facebook National Gender Gap",
+    grepl("all_devices_age_18_plus_gg_2021_impute", feature) ~ "Facebook Gender Gap",
     TRUE ~ feature  # Default case
   )) %>% 
   group_by(outcome) %>%
@@ -313,23 +309,7 @@ var_importance_plot <- var_importance_data %>%
 ggsave(plot = var_importance_plot, filename = here( "figures", "feature_importance.png"), width = 13, height = 8, units = "in", dpi = 300)
 ```
 
-```{r}
-# var_importance_list <- list()
-# 
-# for (outcome in outcomes){
-# ## sl predictions for internet women
-# sl_predictions_internet_wom <- superlearner_train_and_predict(data = gadm1,
-#                                                  covar_list = c(fb_feats, off_feats),
-#                                                  outcome = "perc_used_internet_past12months_wght_age_15_to_49_wom",
-#                                                  predict_data = gadm1,
-#                                                  return_fit = TRUE)
-# 
-# sl_fit = sl_predictions_internet_wom[[1]]
-# 
-# washb_varimp <- sl3::importance(
-#   fit = sl_fit, eval_fun = loss_squared_error, type = "remove")
-# }
-```
+
 
 
 

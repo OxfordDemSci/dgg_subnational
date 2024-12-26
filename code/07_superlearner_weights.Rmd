@@ -12,12 +12,12 @@ library(here)
 source(here("code", "helpers.R"))
 
 ## read in training and test datasets 
-gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_aug13.csv"), 
+master_file <- read_csv(here("data", "master_data_file_dec24_with_national.csv"), 
                   locale = locale(encoding = "ISO-8859-1")) %>%
   janitor::clean_names() %>% 
     mutate(continent = case_when(continent == "Africa" ~ 1,
                                TRUE ~ 0)) %>% 
-  dplyr::select(country, all_of(c(dhs_vars, fb_feats, off_feats_current))) %>% 
+  dplyr::select(country, all_of(c(dhs_vars, fb_feats, off_feats))) %>% 
   filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% drop_na() 
 ```
 
@@ -25,7 +25,7 @@ gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_aug13.csv"),
 
 ```{r}
 ## define covariate list 
-covar_list <- c(fb_feats, off_feats_current)
+covar_list <- c(fb_feats, off_feats)
 outcomes <- c(
   "perc_used_internet_past12months_wght_age_15_to_49_wom",
   "perc_owns_mobile_telephone_wght_age_15_to_49_wom",
@@ -55,10 +55,10 @@ names(learners) <- learner_names
 stack <- make_learner(Stack, learners)
 
 # Extract covariates from training data
-covars <- colnames(gadm1 %>% dplyr::select(all_of(covar_list)))
+covars <- colnames(master_file %>% dplyr::select(all_of(covar_list)))
 
 # Create k-fold CV with countries as clusters
-folds <- make_folds(cluster_ids = gadm1$country)
+folds <- make_folds(cluster_ids = master_file$country)
 
 # Initialize a list to store results
 results_list <- list()
@@ -66,7 +66,7 @@ results_list <- list()
 for (outcome in outcomes) {
   # Define SL3 task for training data
   superlearner_task <- make_sl3_Task(
-    data = gadm1,
+    data = master_file,
     folds = folds,
     covariates = covars,
     outcome = outcome,

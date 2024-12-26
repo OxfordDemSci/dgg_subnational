@@ -22,20 +22,19 @@ predictions$continent <- countrycode(predictions$gid_0, origin = 'iso3c', destin
 
 ## predictions continent 
 predictions_long$continent <- countrycode(predictions_long$gid_0, origin = 'iso3c', destination = 'continent')
-
-## filter outlier in Macedonia 
 ```
 
 
 ```{r}
 spread_plot_df <- predictions_long %>% 
+  filter(date == "2024-11") %>% 
   mutate(outcome_clean = case_when(
-    grepl("mobile_telephone_wght_age_15_to_49_fm_ratio", outcome) ~ "Mobile (Ratio)",
-    grepl("mobile_telephone_wght_age_15_to_49_men", outcome) ~ "Mobile (Men)",
-    grepl("mobile_telephone_wght_age_15_to_49_wom", outcome) ~ "Mobile (Women)",
-    grepl("used_internet_past12months_wght_age_15_to_49_fm_ratio", outcome) ~ "Internet (Ratio)",
-    grepl("used_internet_past12months_wght_age_15_to_49_men", outcome) ~ "Internet (Men)",
-    grepl("used_internet_past12months_wght_age_15_to_49_wom", outcome) ~ "Internet (Women)",
+    grepl("mobile_fm_ratio", outcome) ~ "Mobile (Ratio)",
+    grepl("mobile_men", outcome) ~ "Mobile (Men)",
+    grepl("mobile_women", outcome) ~ "Mobile (Women)",
+    grepl("internet_fm_ratio", outcome) ~ "Internet (Ratio)",
+    grepl("internet_men", outcome) ~ "Internet (Men)",
+    grepl("internet_women", outcome) ~ "Internet (Women)",
     TRUE ~ outcome
   )) %>% 
   # filter(!gid_1 %in% c("MRT.9_1", "UGA.32_1", "UGA.31_1", "MKD.1_1", "MKD.10_1")) %>% 
@@ -85,7 +84,7 @@ spread_plot <- predictions %>%
   scale_color_manual(values = cud) + 
   geom_smooth(se = F, method = "lm") + 
   theme(legend.position = "bottom") + 
-  stat_cor(label.x = 55, label.y = 45, size = 6, p.accuracy = 0.01, aes(label = paste0("italic(r)~`=`~", ..r..)))
+  stat_cor(label.x = .55, label.y = .45, size = 6, p.accuracy = 0.01, aes(label = paste0("italic(r)~`=`~", ..r..)))
 
 ## write rds 
 write_rds(spread_plot, file = here("figures", "spread_plot.rds"))
@@ -96,6 +95,9 @@ write_rds(spread_plot, file = here("figures", "spread_plot.rds"))
 
 
 ```{r}
+predictions <- predictions %>% 
+  filter(year == 2024 & month == 11)
+
 internet_vs_mobile_predictions_women <- predictions %>% 
   ggplot(aes(x = predicted_perc_used_internet_past12months_wght_age_15_to_49_wom, y =predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom )) + 
   geom_point(aes(color = continent), alpha = 0.4) + 
@@ -104,8 +106,8 @@ internet_vs_mobile_predictions_women <- predictions %>%
   labs(x = "Predicted Internet (Women)",
        y = "Predicted Mobile Ownership (Women)",
        fill = "Gender Ratio") + 
-    ylim(0, 100) + 
-  xlim(0, 100) + 
+    ylim(0, 1.2) + 
+  xlim(0, 1.2) + 
   theme(legend.position = "none")
 
 internet_vs_mobile_predictions_men <- predictions %>% 
@@ -116,8 +118,8 @@ internet_vs_mobile_predictions_men <- predictions %>%
   labs(x = "Predicted Internet (Men)",
        y = "Predicted Mobile Ownership (Men)",
        fill = "Gender Ratio") + 
-  ylim(0, 100) + 
-  xlim(0, 100) + 
+  ylim(0, 1.2) + 
+  xlim(0, 1.2) + 
   theme(legend.position = "none")
 
 internet_vs_mobile_predictions_fm_ratio <- predictions %>% 

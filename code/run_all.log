@@ -1,673 +1,148 @@
 ================================
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::select over any other package.
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::filter over any other package.
-Running  02_make_predictions.Rmd 
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::select over any other package.
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::filter over any other package.
-Warning: Using an external vector in selections was deprecated in tidyselect 1.1.0.
-ℹ Please use `all_of()` or `any_of()` instead.
-  # Was:
-  data %>% select(fb_feats_current)
-
-  # Now:
-  data %>% select(all_of(fb_feats_current))
-
-See <https://tidyselect.r-lib.org/reference/faq-external-vector.html>.
-This warning is displayed once every 8 hours.
-Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.
-Warning: Using an external vector in selections was deprecated in tidyselect 1.1.0.
-ℹ Please use `all_of()` or `any_of()` instead.
-  # Was:
-  data %>% select(off_feats)
-
-  # Now:
-  data %>% select(all_of(off_feats))
-
-See <https://tidyselect.r-lib.org/reference/faq-external-vector.html>.
-This warning is displayed once every 8 hours.
-Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.
-Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
-  Missing covariate data detected: imputing covariates.
-Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
-  Missing outcome data detected. This is okay for prediction, but will likely break training. 
- You can drop observations with missing outcomes by setting drop_missing_outcome=TRUE in make_sl3_Task.
-Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
-  Missing covariate data detected: imputing covariates.
-Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
-  Missing outcome data detected. This is okay for prediction, but will likely break training. 
- You can drop observations with missing outcomes by setting drop_missing_outcome=TRUE in make_sl3_Task.
-Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
-  Missing covariate data detected: imputing covariates.
-Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
-  Missing outcome data detected. This is okay for prediction, but will likely break training. 
- You can drop observations with missing outcomes by setting drop_missing_outcome=TRUE in make_sl3_Task.
-Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
-  Missing covariate data detected: imputing covariates.
-Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
-  Missing outcome data detected. This is okay for prediction, but will likely break training. 
- You can drop observations with missing outcomes by setting drop_missing_outcome=TRUE in make_sl3_Task.
-Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
-  Missing covariate data detected: imputing covariates.
-Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
-  Missing outcome data detected. This is okay for prediction, but will likely break training. 
- You can drop observations with missing outcomes by setting drop_missing_outcome=TRUE in make_sl3_Task.
-Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
-  Missing covariate data detected: imputing covariates.
-Warning in process_data(data, nodes, column_names = column_names, flag = flag,  :
-  Missing outcome data detected. This is okay for prediction, but will likely break training. 
- You can drop observations with missing outcomes by setting drop_missing_outcome=TRUE in make_sl3_Task.
-Rows: 126000 Columns: 9
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr (7): gid_1, country, model, outcome, feature_set, cv_method, outcome_clean
-dbl (2): observed, predicted
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Finished with 02_make_predictions.Rmd, time:: 147.23 sec elapsed
-================================
-================================
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::select over any other package.
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::filter over any other package.
-Running  03_model_performance.Rmd 
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::select over any other package.
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::filter over any other package.
-Rows: 126000 Columns: 9
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr (7): gid_1, country, model, outcome, feature_set, cv_method, outcome_clean
-dbl (2): observed, predicted
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 2616 Columns: 96
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr  (5): gid_1, gid_0, country, name_1, continent
-dbl (91): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subnational_hdi_females_2021, subnational_hdi_males_2021, health_index_females_2021, health_index_males_2021, educational_ind...
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-`summarise()` has grouped output by 'cv_method', 'model', 'outcome'. You can override using the `.groups` argument.
-`summarise()` has grouped output by 'cv_method', 'model', 'outcome', 'feature_set'. You can override using the `.groups` argument.
-Finished with 03_model_performance.Rmd, time:: 9.72 sec elapsed
-================================
-================================
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::select over any other package.
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::filter over any other package.
-Running  04_within_country_analysis.Rmd 
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::select over any other package.
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::filter over any other package.
-Rows: 2157 Columns: 15
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr  (3): gid_0, gid_1, country
-dbl (12): observed_perc_owns_mobile_telephone_wght_age_15_to_49_wom, observed_perc_owns_mobile_telephone_wght_age_15_to_49_men, observed_perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio, predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom, predicted_perc_o...
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 12942 Columns: 6
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr (4): gid_0, gid_1, country, outcome
-dbl (2): predicted, predicted_error
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-`summarise()` has grouped output by 'continent', 'gid_0'. You can override using the `.groups` argument.
-`geom_smooth()` using formula = 'y ~ x'
-`summarise()` has grouped output by 'continent'. You can override using the `.groups` argument.
-Finished with 04_within_country_analysis.Rmd, time:: 1.343 sec elapsed
-================================
-================================
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::select over any other package.
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::filter over any other package.
-Running  05_geo_map.Rmd 
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::select over any other package.
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::filter over any other package.
-Rows: 2616 Columns: 96
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr  (5): gid_1, gid_0, country, name_1, continent
-dbl (91): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subnational_hdi_females_2021, subnational_hdi_males_2021, health_index_females_2021, health_index_males_2021, educational_ind...
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 2616 Columns: 96
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr  (5): gid_1, gid_0, country, name_1, continent
-dbl (91): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subnational_hdi_females_2021, subnational_hdi_males_2021, health_index_females_2021, health_index_males_2021, educational_ind...
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 2157 Columns: 15
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr  (3): gid_0, gid_1, country
-dbl (12): observed_perc_owns_mobile_telephone_wght_age_15_to_49_wom, observed_perc_owns_mobile_telephone_wght_age_15_to_49_men, observed_perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio, predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom, predicted_perc_o...
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 12942 Columns: 6
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr (4): gid_0, gid_1, country, outcome
-dbl (2): predicted, predicted_error
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 126000 Columns: 9
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr (7): gid_1, country, model, outcome, feature_set, cv_method, outcome_clean
-dbl (2): observed, predicted
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 126000 Columns: 9
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr (7): gid_1, country, model, outcome, feature_set, cv_method, outcome_clean
-dbl (2): observed, predicted
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Warning: Duplicated aesthetics after name standardisation: size
-Rows: 126000 Columns: 9
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr (7): gid_1, country, model, outcome, feature_set, cv_method, outcome_clean
-dbl (2): observed, predicted
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Warning: Duplicated aesthetics after name standardisation: size
-`geom_smooth()` using formula = 'y ~ x'
-Finished with 05_geo_map.Rmd, time:: 60.448 sec elapsed
-================================
-================================
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::select over any other package.
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::filter over any other package.
-Running  06_feature_importance.Rmd 
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::select over any other package.
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::filter over any other package.
-Rows: 126000 Columns: 9
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr (7): gid_1, country, model, outcome, feature_set, cv_method, outcome_clean
-dbl (2): observed, predicted
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 2616 Columns: 96
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr  (5): gid_1, gid_0, country, name_1, continent
-dbl (91): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subnational_hdi_females_2021, subnational_hdi_males_2021, health_index_females_2021, health_index_males_2021, educational_ind...
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Warning in left_join(., gadm1, by = "gid_1") :
-  Detected an unexpected many-to-many relationship between `x` and `y`.
-ℹ Row 148 of `x` matches multiple rows in `y`.
-ℹ Row 71 of `y` matches multiple rows in `x`.
-ℹ If a many-to-many relationship is expected, set `relationship = "many-to-many"` to silence this warning.
-`summarise()` has grouped output by 'cv_method', 'model', 'outcome'. You can override using the `.groups` argument.
-Warning: The `size` argument of `element_rect()` is deprecated as of ggplot2 3.4.0.
-ℹ Please use the `linewidth` argument instead.
-This warning is displayed once every 8 hours.
-Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.
-Rows: 2616 Columns: 96
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr  (5): gid_1, gid_0, country, name_1, continent
-dbl (91): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subnational_hdi_females_2021, subnational_hdi_males_2021, health_index_females_2021, health_index_males_2021, educational_ind...
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-ℹ Please use `linewidth` instead.
-This warning is displayed once every 8 hours.
-Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.
-Finished with 06_feature_importance.Rmd, time:: 5.127 sec elapsed
-================================
-================================
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::select over any other package.
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::filter over any other package.
-Running  07_superlearner_weights.Rmd 
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::select over any other package.
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::filter over any other package.
-Rows: 2616 Columns: 96
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr  (5): gid_1, gid_0, country, name_1, continent
-dbl (91): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subnational_hdi_females_2021, subnational_hdi_males_2021, health_index_females_2021, health_index_males_2021, educational_ind...
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-perc_used_internet_past12months_wght_age_15_to_49_wom 
-perc_owns_mobile_telephone_wght_age_15_to_49_wom 
-perc_owns_mobile_telephone_wght_age_15_to_49_men 
-perc_used_internet_past12months_wght_age_15_to_49_men 
-perc_used_internet_past12months_wght_age_15_to_49_fm_ratio 
-perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio 
-Finished with 07_superlearner_weights.Rmd, time:: 142.506 sec elapsed
-================================
-================================
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::select over any other package.
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::filter over any other package.
-Running  08_residual_analysis.Rmd 
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::select over any other package.
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::filter over any other package.
-Rows: 126000 Columns: 9
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr (7): gid_1, country, model, outcome, feature_set, cv_method, outcome_clean
-dbl (2): observed, predicted
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 2616 Columns: 96
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr  (5): gid_1, gid_0, country, name_1, continent
-dbl (91): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subnational_hdi_females_2021, subnational_hdi_males_2021, health_index_females_2021, health_index_males_2021, educational_ind...
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Finished with 08_residual_analysis.Rmd, time:: 0.835 sec elapsed
-================================
-================================
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::select over any other package.
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::filter over any other package.
-Running  09_var_explained.Rmd 
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::select over any other package.
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::filter over any other package.
-Rows: 2157 Columns: 15
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr  (3): gid_0, gid_1, country
-dbl (12): observed_perc_owns_mobile_telephone_wght_age_15_to_49_wom, observed_perc_owns_mobile_telephone_wght_age_15_to_49_men, observed_perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio, predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom, predicted_perc_o...
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Within-country MLD (MLD_W): 0.01179327 
-Between-country MLD (MLD_B): 0.03072572 
-Total MLD: 0.04251899 
-Ratio of Within-country to Between-country MLD: 0.3838239 
-Within-country MLD (MLD_W): 0.004601927 
-Between-country MLD (MLD_B): 0.01406597 
-Total MLD: 0.0186679 
-Ratio of Within-country to Between-country MLD: 0.3271674 
-Within-country MLD (MLD_W): 0.06456126 
-Between-country MLD (MLD_B): 0.13687 
-Total MLD: 0.2014313 
-Ratio of Within-country to Between-country MLD: 0.4716975 
-Within-country MLD (MLD_W): 0.02559735 
-Between-country MLD (MLD_B): 0.04556587 
-Total MLD: 0.07116322 
-Ratio of Within-country to Between-country MLD: 0.5617659 
-Within-country MLD (MLD_W): 0.003539921 
-Between-country MLD (MLD_B): 0.006669429 
-Total MLD: 0.01020935 
-Ratio of Within-country to Between-country MLD: 0.5307682 
-Within-country MLD (MLD_W): 0.001092738 
-Between-country MLD (MLD_B): 0.00253876 
-Total MLD: 0.003631498 
-Ratio of Within-country to Between-country MLD: 0.4304221 
-Within-country MLD (MLD_W): 0.01222595 
-Between-country MLD (MLD_B): 0.04897574 
-Total MLD: 0.06120169 
-Ratio of Within-country to Between-country MLD: 0.2496329 
-Within-country MLD (MLD_W): 0.006713845 
-Between-country MLD (MLD_B): 0.02255418 
-Total MLD: 0.02926802 
-Ratio of Within-country to Between-country MLD: 0.2976763 
-Within-country MLD (MLD_W): 0.0006406693 
-Between-country MLD (MLD_B): 0.001569669 
-Total MLD: 0.002210338 
-Ratio of Within-country to Between-country MLD: 0.4081556 
-Within-country MLD (MLD_W): 0.0001915325 
-Between-country MLD (MLD_B): 0.0009459299 
-Total MLD: 0.001137462 
-Ratio of Within-country to Between-country MLD: 0.2024806 
-Within-country MLD (MLD_W): 0.002433605 
-Between-country MLD (MLD_B): 0.01544492 
-Total MLD: 0.01787853 
-Ratio of Within-country to Between-country MLD: 0.1575667 
-Within-country MLD (MLD_W): 0.001215465 
-Between-country MLD (MLD_B): 0.006589123 
-Total MLD: 0.007804588 
-Ratio of Within-country to Between-country MLD: 0.1844654 
-Within-country MLD (MLD_W): 0.0006751584 
-Between-country MLD (MLD_B): 0.00101117 
-Total MLD: 0.001686328 
-Ratio of Within-country to Between-country MLD: 0.6677002 
-Within-country MLD (MLD_W): 8.602735e-05 
-Between-country MLD (MLD_B): 0.0006099389 
-Total MLD: 0.0006959662 
-Ratio of Within-country to Between-country MLD: 0.1410426 
-Within-country MLD (MLD_W): 0.001714231 
-Between-country MLD (MLD_B): 0.008014101 
-Total MLD: 0.009728332 
-Ratio of Within-country to Between-country MLD: 0.2139018 
-Within-country MLD (MLD_W): 0.0007089112 
-Between-country MLD (MLD_B): 0.003798296 
-Total MLD: 0.004507207 
-Ratio of Within-country to Between-country MLD: 0.1866393 
-Within-country MLD (MLD_W): 0.004172431 
-Between-country MLD (MLD_B): 0.031189 
-Total MLD: 0.03536143 
-Ratio of Within-country to Between-country MLD: 0.133779 
-Within-country MLD (MLD_W): 0.001495219 
-Between-country MLD (MLD_B): 0.01136338 
-Total MLD: 0.0128586 
-Ratio of Within-country to Between-country MLD: 0.1315822 
-Within-country MLD (MLD_W): 0.02025948 
-Between-country MLD (MLD_B): 0.168264 
-Total MLD: 0.1885235 
-Ratio of Within-country to Between-country MLD: 0.1204029 
-Within-country MLD (MLD_W): 0.008569243 
-Between-country MLD (MLD_B): 0.07833008 
-Total MLD: 0.08689932 
-Ratio of Within-country to Between-country MLD: 0.1093991 
-Finished with 09_var_explained.Rmd, time:: 0.85 sec elapsed
-================================
-================================
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::select over any other package.
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::filter over any other package.
-Running  11_national_comparison.Rmd 
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::select over any other package.
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::filter over any other package.
-Rows: 2616 Columns: 96
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr  (5): gid_1, gid_0, country, name_1, continent
-dbl (91): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subnational_hdi_females_2021, subnational_hdi_males_2021, health_index_females_2021, health_index_males_2021, educational_ind...
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 2616 Columns: 96
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr  (5): gid_1, gid_0, country, name_1, continent
-dbl (91): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subnational_hdi_females_2021, subnational_hdi_males_2021, health_index_females_2021, health_index_males_2021, educational_ind...
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Rows: 2157 Columns: 15
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr  (3): gid_0, gid_1, country
-dbl (12): observed_perc_owns_mobile_telephone_wght_age_15_to_49_wom, observed_perc_owns_mobile_telephone_wght_age_15_to_49_men, observed_perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio, predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom, predicted_perc_o...
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-Warning in left_join(., ground_truth, by = c(gid_0 = "iso3")) :
-  Detected an unexpected many-to-many relationship between `x` and `y`.
-ℹ Row 35 of `x` matches multiple rows in `y`.
-ℹ Row 42 of `y` matches multiple rows in `x`.
-ℹ If a many-to-many relationship is expected, set `relationship = "many-to-many"` to silence this warning.
-Warning: Duplicated aesthetics after name standardisation: parse
-Warning: Duplicated aesthetics after name standardisation: parse
-Warning: Duplicated aesthetics after name standardisation: parse
-Warning: Duplicated aesthetics after name standardisation: parse
-Warning: Duplicated aesthetics after name standardisation: parse
-Warning: Duplicated aesthetics after name standardisation: parse
-Warning: The following aesthetics were dropped during statistical transformation: colour
-ℹ This can happen when ggplot fails to infer the correct grouping structure in the data.
-ℹ Did you forget to specify a `group` aesthetic or to convert a numerical variable into a factor?
-Warning: The following aesthetics were dropped during statistical transformation: colour
-ℹ This can happen when ggplot fails to infer the correct grouping structure in the data.
-ℹ Did you forget to specify a `group` aesthetic or to convert a numerical variable into a factor?
-Warning: The following aesthetics were dropped during statistical transformation: colour
-ℹ This can happen when ggplot fails to infer the correct grouping structure in the data.
-ℹ Did you forget to specify a `group` aesthetic or to convert a numerical variable into a factor?
-Warning: The following aesthetics were dropped during statistical transformation: colour
-ℹ This can happen when ggplot fails to infer the correct grouping structure in the data.
-ℹ Did you forget to specify a `group` aesthetic or to convert a numerical variable into a factor?
-Warning: The following aesthetics were dropped during statistical transformation: colour
-ℹ This can happen when ggplot fails to infer the correct grouping structure in the data.
-ℹ Did you forget to specify a `group` aesthetic or to convert a numerical variable into a factor?
-Warning: The following aesthetics were dropped during statistical transformation: colour
-ℹ This can happen when ggplot fails to infer the correct grouping structure in the data.
-ℹ Did you forget to specify a `group` aesthetic or to convert a numerical variable into a factor?
-Warning: The following aesthetics were dropped during statistical transformation: colour
-ℹ This can happen when ggplot fails to infer the correct grouping structure in the data.
-ℹ Did you forget to specify a `group` aesthetic or to convert a numerical variable into a factor?
-Finished with 11_national_comparison.Rmd, time:: 1.58 sec elapsed
-================================
-================================
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::select over any other package.
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::filter over any other package.
-Running  12_dhs_table.Rmd 
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::select over any other package.
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::filter over any other package.
-Rows: 2616 Columns: 96
-── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr  (5): gid_1, gid_0, country, name_1, continent
-dbl (91): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subnational_hdi_females_2021, subnational_hdi_males_2021, health_index_females_2021, health_index_males_2021, educational_ind...
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//angola_2015-16/AOMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//armenia_2015-16/AMMR72FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//benin_2017-18/BJMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//burundi_2016-17/BUMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//cameroon_2018/CMMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//ethiopia_2016/ETMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//gabon_2019-21/GAMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//guinea_2018/GNMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//haiti_2016-17/HTMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//india_2019-21/IAMR7EFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//liberia_2019-20/LBMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//malawi_2015-16/MWMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//mali_2018/MLMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//mauritania_2019-21/MRMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//nigeria_2018/NGMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//pakistan_2017-18/PKMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//papua_new_guinea_2016-18/PGMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//sierra_leone_2019/SLMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//south_africa_2016/ZAMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//tanzania_2015-16/TZMR7BFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//timor-leste_2016/TLMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//uganda_2016/UGMR7BFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//zambia_2018/ZMMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//zimbabwe_2015/ZWMR72FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//burkina_faso_2021/BFMR81FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//cambodia_2021-22/KHMR82FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//gambia_2019-20/GMMR81FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//kenya_2022/KEMR8BFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//madagascar_2021/MDMR81FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//nepal_2022/NPMR82FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//rwanda_2019-20/RWMR81FL.DTAWarning: There was 1 warning in `mutate()`.
-ℹ In argument: `country = countrycode::countrycode(country_code, origin = "iso2c", destination = "country.name")`.
-Caused by warning:
-! Some values were not matched unambiguously: BU, IA
-Warning: Using an external vector in selections was deprecated in tidyselect 1.1.0.
-ℹ Please use `all_of()` or `any_of()` instead.
-  # Was:
-  data %>% select(dhs_vars)
-
-  # Now:
-  data %>% select(all_of(dhs_vars))
-
-See <https://tidyselect.r-lib.org/reference/faq-external-vector.html>.
-This warning is displayed once every 8 hours.
-Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.
-Warning: Using an external vector in selections was deprecated in tidyselect 1.1.0.
-ℹ Please use `all_of()` or `any_of()` instead.
-  # Was:
-  data %>% select(fb_feats)
-
-  # Now:
-  data %>% select(all_of(fb_feats))
-
-See <https://tidyselect.r-lib.org/reference/faq-external-vector.html>.
-This warning is displayed once every 8 hours.
-Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.
-Finished with 12_dhs_table.Rmd, time:: 32.159 sec elapsed
-================================
-================================
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::select over any other package.
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::filter over any other package.
 Running  NA 
 Error in file(con, "r") : invalid 'description' argument
-[1mindexing[0m [34maggregated_indicators_lmic_aug13.csv[0m [==================================================================================================================================================================================================================] [32m667.48GB/s[0m, eta: [36m 0s[0m                                                                                                                                                                                                                                                                                                                          [1mindexing[0m [34maggregated_indicators_lmic_aug13.csv[0m [==================================================================================================================================================================================================================] [32m709.19GB/s[0m, eta: [36m 0s[0m                                                                                                                                                                                                                                                                                                                          Rows: 2616 Columns: 96
-── Column specification ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: ","
-chr  (5): gid_1, gid_0, country, name_1, continent
-dbl (91): dhsyear, pop_all_age_female_dhsyear, pop_all_age_male_dhsyear, pop_all_age_female_2020, pop_all_age_male_2020, subnational_gdi_2021, subnational_hdi_females_2021, subnational_hdi_males_2021, health_index_females_2021, health_index_males_2021, educational_in...
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::select over any other package.
-[conflicted] Removing existing preference.
-[conflicted] Will prefer dplyr::filter over any other package.
-# A tibble: 496 × 57
-   country perc_ever_used_internet_wght_age_15_…¹ perc_used_internet_p…² perc_owns_mobile_tel…³ perc_ever_used_inter…⁴ perc_used_internet_p…⁵ perc_owns_mobile_tel…⁶ perc_ever_used_inter…⁷ perc_used_internet_p…⁸ perc_owns_mobile_tel…⁹ fb_pntr_13p_male_dhs…˟ fb_pntr_13p_female_d…˟
-   <chr>                                    <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>
- 1 Armenia                                   81.5                   75.6                   99.6                   77.8                   77.1                   98.7                  1.05                   0.981                  1.01                   0.254                  0.265
- 2 Armenia                                   76.7                   75.7                   94.9                   90.2                   90.2                  100                    0.851                  0.840                  0.949                  0.315                  0.339
- 3 Armenia                                   88.4                   87.9                   97.2                   75.8                   75.4                   98.2                  1.17                   1.17                   0.989                  0.292                  0.328
- 4 Armenia                                   77.4                   76.7                   97.0                   87.9                   77.4                   99.0                  0.881                  0.991                  0.980                  0.187                  0.206
- 5 Armenia                                   73.9                   71.5                   89.8                   76.4                   76.4                   95.9                  0.967                  0.936                  0.936                  0.129                  0.149
- 6 Armenia                                   95.9                   95.0                   99.8                   95.7                   95.2                   99.5                  1.00                   0.998                  1.00                   0.691                  0.643
- 7 Armenia                                   83.5                   82.6                   91.2                   94.4                   92.8                   97.6                  0.884                  0.890                  0.935                  0.255                  0.224
- 8 Armenia                                   85.7                   83.8                   96.5                   94.0                   94.0                  100                    0.911                  0.892                  0.965                  0.345                  0.381
- 9 Armenia                                   84.3                   83.6                   99.2                   91.7                   88.7                   98.2                  0.919                  0.942                  1.01                   0.369                  0.395
-10 Armenia                                   86.7                   85.0                   98.3                   98.2                   98.2                  100                    0.883                  0.866                  0.983                  0.309                  0.325
-# ℹ 486 more rows
-# ℹ abbreviated names: ¹​perc_ever_used_internet_wght_age_15_to_49_wom, ²​perc_used_internet_past12months_wght_age_15_to_49_wom, ³​perc_owns_mobile_telephone_wght_age_15_to_49_wom, ⁴​perc_ever_used_internet_wght_age_15_to_49_men,
-#   ⁵​perc_used_internet_past12months_wght_age_15_to_49_men, ⁶​perc_owns_mobile_telephone_wght_age_15_to_49_men, ⁷​perc_ever_used_internet_wght_age_15_to_49_fm_ratio, ⁸​perc_used_internet_past12months_wght_age_15_to_49_fm_ratio,
-#   ⁹​perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio, ˟​fb_pntr_13p_male_dhsyear_impute, ˟​fb_pntr_13p_female_dhsyear_impute
-# ℹ 45 more variables: all_devices_age_13_plus_gg_dhsyear_impute <dbl>, ios_age_13_plus_female_frac_2024 <dbl>, ios_age_13_plus_male_frac_2024 <dbl>, wifi_age_13_plus_female_frac_2024 <dbl>, wifi_age_13_plus_male_frac_2024 <dbl>, x4g_age_13_plus_female_frac_2024 <dbl>,
-#   x4g_age_13_plus_male_frac_2024 <dbl>, fb_pntr_13p_male_dhsyear_national <dbl>, fb_pntr_13p_female_dhsyear_national <dbl>, all_devices_age_13_plus_gg_dhsyear_national <dbl>, nl_mean_2021 <dbl>, pop_density_2020 <dbl>, pop_all_age_female_2020 <dbl>,
-#   pop_all_age_male_2020 <dbl>, subnational_gdi_2021 <dbl>, subnational_hdi_males_2021 <dbl>, subnational_hdi_females_2021 <dbl>, educational_index_females_2021 <dbl>, educational_index_males_2021 <dbl>, income_index_females_2021 <dbl>, income_index_males_2021 <dbl>, …
+ [1] "03_model_performance.Rmd"       "04_within_country_analysis.Rmd" "05_geo_map.Rmd"                 "06_feature_importance.Rmd"     
+ [5] "07_superlearner_weights.Rmd"    "08_residual_analysis.Rmd"       "09_var_explained.Rmd"           "11_national_comparison.Rmd"    
+ [9] "12_dhs_table.Rmd"               "14_trends.Rmd"                 
+================================
+Running  NA 
+Error in file(con, "r") : invalid 'description' argument
+[1] NA
+[1] "14_trends.Rmd"
+# A tibble: 40,213 × 105
+   gid_0  year month fb_pntr_18p_male_national fb_pntr_18p_female_natio…¹ all_devices_age_18_p…²    x7 gid_1    area country pop_0_to_12months_male pop_1_to_4_male
+   <chr> <dbl> <dbl>                     <dbl>                      <dbl>                  <dbl> <dbl> <chr>   <dbl> <chr>                    <dbl>           <dbl>
+ 1 AFG    2015   1                       0.339                     0.0632                  0.187     1 AFG.… 4.37e10 Afghan…                 15792.          51868.
+ 2 AFG    2016   1                       0.336                     0.0627                  0.187     2 AFG.… 4.37e10 Afghan…                 16076.          52132.
+ 3 AFG    2017   1                       0.331                     0.0620                  0.187     3 AFG.… 4.37e10 Afghan…                 16692.          52878.
+ 4 AFG    2018   1                       0.327                     0.0612                  0.187     4 AFG.… 4.37e10 Afghan…                 17389.          54012.
+ 5 AFG    2019   6.5                     0.312                     0.0551                  0.176     5 AFG.… 4.37e10 Afghan…                 18040.          55254.
+ 6 AFG    2020   6.5                     0.330                     0.0627                  0.190     6 AFG.… 4.37e10 Afghan…                 18557.          56453.
+ 7 AFG    2021   6.5                     0.341                     0.0658                  0.193     7 AFG.… 4.37e10 Afghan…                 18557.          56453.
+ 8 AFG    2022   6.5                     0.301                     0.0576                  0.191     8 AFG.… 4.37e10 Afghan…                 18557.          56453.
+ 9 AFG    2023   6.5                     0.268                     0.0504                  0.188     9 AFG.… 4.37e10 Afghan…                 18557.          56453.
+10 AFG    2024   1                       0.336                     0.0610                  0.182    10 AFG.… 4.37e10 Afghan…                 18557.          56453.
+# ℹ 40,203 more rows
+# ℹ abbreviated names: ¹​fb_pntr_18p_female_national, ²​all_devices_age_18_plus_gg_national
+# ℹ 93 more variables: pop_5_to_9_male <dbl>, pop_10_to_14_male <dbl>, pop_15_to_19_male <dbl>, pop_20_to_24_male <dbl>, pop_25_to_29_male <dbl>,
+#   pop_30_to_34_male <dbl>, pop_35_to_39_male <dbl>, pop_40_to_44_male <dbl>, pop_45_to_49_male <dbl>, pop_50_to_54_male <dbl>, pop_55_to_59_male <dbl>,
+#   pop_60_to_64_male <dbl>, pop_65_to_69_male <dbl>, pop_70_to_74_male <dbl>, pop_75_to_79_male <dbl>, pop_80plus_male <dbl>, pop_0_to_12months_female <dbl>,
+#   pop_1_to_4_female <dbl>, pop_5_to_9_female <dbl>, pop_10_to_14_female <dbl>, pop_15_to_19_female <dbl>, pop_20_to_24_female <dbl>, pop_25_to_29_female <dbl>,
+#   pop_30_to_34_female <dbl>, pop_35_to_39_female <dbl>, pop_40_to_44_female <dbl>, pop_45_to_49_female <dbl>, pop_50_to_54_female <dbl>, …
 # ℹ Use `print(n = ...)` to see more rows
-# A tibble: 679 × 57
-   country perc_ever_used_internet_wght_age_15_…¹ perc_used_internet_p…² perc_owns_mobile_tel…³ perc_ever_used_inter…⁴ perc_used_internet_p…⁵ perc_owns_mobile_tel…⁶ perc_ever_used_inter…⁷ perc_used_internet_p…⁸ perc_owns_mobile_tel…⁹ fb_pntr_13p_male_dhs…˟ fb_pntr_13p_female_d…˟
-   <chr>                                    <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>
- 1 Armenia                                   81.5                   75.6                   99.6                   77.8                   77.1                   98.7                  1.05                   0.981                  1.01                   0.254                  0.265
- 2 Armenia                                   76.7                   75.7                   94.9                   90.2                   90.2                  100                    0.851                  0.840                  0.949                  0.315                  0.339
- 3 Armenia                                   88.4                   87.9                   97.2                   75.8                   75.4                   98.2                  1.17                   1.17                   0.989                  0.292                  0.328
- 4 Armenia                                   77.4                   76.7                   97.0                   87.9                   77.4                   99.0                  0.881                  0.991                  0.980                  0.187                  0.206
- 5 Armenia                                   73.9                   71.5                   89.8                   76.4                   76.4                   95.9                  0.967                  0.936                  0.936                  0.129                  0.149
- 6 Armenia                                   95.9                   95.0                   99.8                   95.7                   95.2                   99.5                  1.00                   0.998                  1.00                   0.691                  0.643
- 7 Armenia                                   83.5                   82.6                   91.2                   94.4                   92.8                   97.6                  0.884                  0.890                  0.935                  0.255                  0.224
- 8 Armenia                                   85.7                   83.8                   96.5                   94.0                   94.0                  100                    0.911                  0.892                  0.965                  0.345                  0.381
- 9 Armenia                                   84.3                   83.6                   99.2                   91.7                   88.7                   98.2                  0.919                  0.942                  1.01                   0.369                  0.395
-10 Armenia                                   86.7                   85.0                   98.3                   98.2                   98.2                  100                    0.883                  0.866                  0.983                  0.309                  0.325
-# ℹ 669 more rows
-# ℹ abbreviated names: ¹​perc_ever_used_internet_wght_age_15_to_49_wom, ²​perc_used_internet_past12months_wght_age_15_to_49_wom, ³​perc_owns_mobile_telephone_wght_age_15_to_49_wom, ⁴​perc_ever_used_internet_wght_age_15_to_49_men,
-#   ⁵​perc_used_internet_past12months_wght_age_15_to_49_men, ⁶​perc_owns_mobile_telephone_wght_age_15_to_49_men, ⁷​perc_ever_used_internet_wght_age_15_to_49_fm_ratio, ⁸​perc_used_internet_past12months_wght_age_15_to_49_fm_ratio,
-#   ⁹​perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio, ˟​fb_pntr_13p_male_dhsyear_impute, ˟​fb_pntr_13p_female_dhsyear_impute
-# ℹ 45 more variables: all_devices_age_13_plus_gg_dhsyear_impute <dbl>, ios_age_13_plus_female_frac_2024 <dbl>, ios_age_13_plus_male_frac_2024 <dbl>, wifi_age_13_plus_female_frac_2024 <dbl>, wifi_age_13_plus_male_frac_2024 <dbl>, x4g_age_13_plus_female_frac_2024 <dbl>,
-#   x4g_age_13_plus_male_frac_2024 <dbl>, fb_pntr_13p_male_dhsyear_national <dbl>, fb_pntr_13p_female_dhsyear_national <dbl>, all_devices_age_13_plus_gg_dhsyear_national <dbl>, nl_mean_2021 <dbl>, pop_density_2020 <dbl>, pop_all_age_female_2020 <dbl>,
-#   pop_all_age_male_2020 <dbl>, subnational_gdi_2021 <dbl>, subnational_hdi_males_2021 <dbl>, subnational_hdi_females_2021 <dbl>, educational_index_females_2021 <dbl>, educational_index_males_2021 <dbl>, income_index_females_2021 <dbl>, income_index_males_2021 <dbl>, …
+/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//angola_2015-16/AOMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//armenia_2015-16/AMMR72FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//benin_2017-18/BJMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//burundi_2016-17/BUMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//cameroon_2018/CMMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//ethiopia_2016/ETMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//gabon_2019-21/GAMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//guinea_2018/GNMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//haiti_2016-17/HTMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//india_2019-21/IAMR7EFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//liberia_2019-20/LBMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//malawi_2015-16/MWMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//mali_2018/MLMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//mauritania_2019-21/MRMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//nigeria_2018/NGMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//pakistan_2017-18/PKMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//papua_new_guinea_2016-18/PGMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//sierra_leone_2019/SLMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//south_africa_2016/ZAMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//tanzania_2015-16/TZMR7BFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//timor-leste_2016/TLMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//uganda_2016/UGMR7BFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//zambia_2018/ZMMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//zimbabwe_2015/ZWMR72FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//burkina_faso_2021/BFMR81FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//cambodia_2021-22/KHMR82FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//gambia_2019-20/GMMR81FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//kenya_2022/KEMR8BFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//madagascar_2021/MDMR81FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//nepal_2022/NPMR82FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//rwanda_2019-20/RWMR81FL.DTA[1] 43120
+# A tibble: 1 × 4
+     min median  mean   max
+   <dbl>  <dbl> <dbl> <dbl>
+1 0.0136  0.381 0.413     1
+Error in `distinct()`:
+! Must use existing variables.
+✖ `gid_1` not found in `.data`.
+Backtrace:
+ 1. ... %>% pull()
+ 5. dplyr:::distinct.data.frame(., gid_1)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ================================
+Running  NA 
+ [1] "03_model_performance.Rmd"       "04_within_country_analysis.Rmd" "05_geo_map.Rmd"                 "06_feature_importance.Rmd"     
+ [5] "07_superlearner_weights.Rmd"    "08_residual_analysis.Rmd"       "09_var_explained.Rmd"           "11_national_comparison.Rmd"    
+ [9] "12_dhs_table.Rmd"               "14_trends.Rmd"                 
+================================
+Running  NA 
+[1] NA
+[1] "14_trends.Rmd"
+# A tibble: 40,213 × 105
+   gid_0  year month fb_pntr_18p_male_national fb_pntr_18p_female_natio…¹ all_devices_age_18_p…²    x7 gid_1    area country pop_0_to_12months_male pop_1_to_4_male
+   <chr> <dbl> <dbl>                     <dbl>                      <dbl>                  <dbl> <dbl> <chr>   <dbl> <chr>                    <dbl>           <dbl>
+ 1 AFG    2015   1                       0.339                     0.0632                  0.187     1 AFG.… 4.37e10 Afghan…                 15792.          51868.
+ 2 AFG    2016   1                       0.336                     0.0627                  0.187     2 AFG.… 4.37e10 Afghan…                 16076.          52132.
+ 3 AFG    2017   1                       0.331                     0.0620                  0.187     3 AFG.… 4.37e10 Afghan…                 16692.          52878.
+ 4 AFG    2018   1                       0.327                     0.0612                  0.187     4 AFG.… 4.37e10 Afghan…                 17389.          54012.
+ 5 AFG    2019   6.5                     0.312                     0.0551                  0.176     5 AFG.… 4.37e10 Afghan…                 18040.          55254.
+ 6 AFG    2020   6.5                     0.330                     0.0627                  0.190     6 AFG.… 4.37e10 Afghan…                 18557.          56453.
+ 7 AFG    2021   6.5                     0.341                     0.0658                  0.193     7 AFG.… 4.37e10 Afghan…                 18557.          56453.
+ 8 AFG    2022   6.5                     0.301                     0.0576                  0.191     8 AFG.… 4.37e10 Afghan…                 18557.          56453.
+ 9 AFG    2023   6.5                     0.268                     0.0504                  0.188     9 AFG.… 4.37e10 Afghan…                 18557.          56453.
+10 AFG    2024   1                       0.336                     0.0610                  0.182    10 AFG.… 4.37e10 Afghan…                 18557.          56453.
+# ℹ 40,203 more rows
+# ℹ abbreviated names: ¹​fb_pntr_18p_female_national, ²​all_devices_age_18_plus_gg_national
+# ℹ 93 more variables: pop_5_to_9_male <dbl>, pop_10_to_14_male <dbl>, pop_15_to_19_male <dbl>, pop_20_to_24_male <dbl>, pop_25_to_29_male <dbl>,
+#   pop_30_to_34_male <dbl>, pop_35_to_39_male <dbl>, pop_40_to_44_male <dbl>, pop_45_to_49_male <dbl>, pop_50_to_54_male <dbl>, pop_55_to_59_male <dbl>,
+#   pop_60_to_64_male <dbl>, pop_65_to_69_male <dbl>, pop_70_to_74_male <dbl>, pop_75_to_79_male <dbl>, pop_80plus_male <dbl>, pop_0_to_12months_female <dbl>,
+#   pop_1_to_4_female <dbl>, pop_5_to_9_female <dbl>, pop_10_to_14_female <dbl>, pop_15_to_19_female <dbl>, pop_20_to_24_female <dbl>, pop_25_to_29_female <dbl>,
+#   pop_30_to_34_female <dbl>, pop_35_to_39_female <dbl>, pop_40_to_44_female <dbl>, pop_45_to_49_female <dbl>, pop_50_to_54_female <dbl>, …
 # ℹ Use `print(n = ...)` to see more rows
-# A tibble: 505 × 57
-   country perc_ever_used_internet_wght_age_15_…¹ perc_used_internet_p…² perc_owns_mobile_tel…³ perc_ever_used_inter…⁴ perc_used_internet_p…⁵ perc_owns_mobile_tel…⁶ perc_ever_used_inter…⁷ perc_used_internet_p…⁸ perc_owns_mobile_tel…⁹ fb_pntr_13p_male_dhs…˟ fb_pntr_13p_female_d…˟
-   <chr>                                    <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>
- 1 Armenia                                   81.5                   75.6                   99.6                   77.8                   77.1                   98.7                  1.05                   0.981                  1.01                   0.254                  0.265
- 2 Armenia                                   76.7                   75.7                   94.9                   90.2                   90.2                  100                    0.851                  0.840                  0.949                  0.315                  0.339
- 3 Armenia                                   88.4                   87.9                   97.2                   75.8                   75.4                   98.2                  1.17                   1.17                   0.989                  0.292                  0.328
- 4 Armenia                                   77.4                   76.7                   97.0                   87.9                   77.4                   99.0                  0.881                  0.991                  0.980                  0.187                  0.206
- 5 Armenia                                   73.9                   71.5                   89.8                   76.4                   76.4                   95.9                  0.967                  0.936                  0.936                  0.129                  0.149
- 6 Armenia                                   95.9                   95.0                   99.8                   95.7                   95.2                   99.5                  1.00                   0.998                  1.00                   0.691                  0.643
- 7 Armenia                                   83.5                   82.6                   91.2                   94.4                   92.8                   97.6                  0.884                  0.890                  0.935                  0.255                  0.224
- 8 Armenia                                   85.7                   83.8                   96.5                   94.0                   94.0                  100                    0.911                  0.892                  0.965                  0.345                  0.381
- 9 Armenia                                   84.3                   83.6                   99.2                   91.7                   88.7                   98.2                  0.919                  0.942                  1.01                   0.369                  0.395
-10 Armenia                                   86.7                   85.0                   98.3                   98.2                   98.2                  100                    0.883                  0.866                  0.983                  0.309                  0.325
-# ℹ 495 more rows
-# ℹ abbreviated names: ¹​perc_ever_used_internet_wght_age_15_to_49_wom, ²​perc_used_internet_past12months_wght_age_15_to_49_wom, ³​perc_owns_mobile_telephone_wght_age_15_to_49_wom, ⁴​perc_ever_used_internet_wght_age_15_to_49_men,
-#   ⁵​perc_used_internet_past12months_wght_age_15_to_49_men, ⁶​perc_owns_mobile_telephone_wght_age_15_to_49_men, ⁷​perc_ever_used_internet_wght_age_15_to_49_fm_ratio, ⁸​perc_used_internet_past12months_wght_age_15_to_49_fm_ratio,
-#   ⁹​perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio, ˟​fb_pntr_13p_male_dhsyear_impute, ˟​fb_pntr_13p_female_dhsyear_impute
-# ℹ 45 more variables: all_devices_age_13_plus_gg_dhsyear_impute <dbl>, ios_age_13_plus_female_frac_2024 <dbl>, ios_age_13_plus_male_frac_2024 <dbl>, wifi_age_13_plus_female_frac_2024 <dbl>, wifi_age_13_plus_male_frac_2024 <dbl>, x4g_age_13_plus_female_frac_2024 <dbl>,
-#   x4g_age_13_plus_male_frac_2024 <dbl>, fb_pntr_13p_male_dhsyear_national <dbl>, fb_pntr_13p_female_dhsyear_national <dbl>, all_devices_age_13_plus_gg_dhsyear_national <dbl>, nl_mean_2021 <dbl>, pop_density_2020 <dbl>, pop_all_age_female_2020 <dbl>,
-#   pop_all_age_male_2020 <dbl>, subnational_gdi_2021 <dbl>, subnational_hdi_males_2021 <dbl>, subnational_hdi_females_2021 <dbl>, educational_index_females_2021 <dbl>, educational_index_males_2021 <dbl>, income_index_females_2021 <dbl>, income_index_males_2021 <dbl>, …
+/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//angola_2015-16/AOMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//armenia_2015-16/AMMR72FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//benin_2017-18/BJMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//burundi_2016-17/BUMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//cameroon_2018/CMMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//ethiopia_2016/ETMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//gabon_2019-21/GAMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//guinea_2018/GNMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//haiti_2016-17/HTMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//india_2019-21/IAMR7EFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//liberia_2019-20/LBMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//malawi_2015-16/MWMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//mali_2018/MLMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//mauritania_2019-21/MRMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//nigeria_2018/NGMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//pakistan_2017-18/PKMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//papua_new_guinea_2016-18/PGMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//sierra_leone_2019/SLMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//south_africa_2016/ZAMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//tanzania_2015-16/TZMR7BFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//timor-leste_2016/TLMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//uganda_2016/UGMR7BFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//zambia_2018/ZMMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//zimbabwe_2015/ZWMR72FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//burkina_faso_2021/BFMR81FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//cambodia_2021-22/KHMR82FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//gambia_2019-20/GMMR81FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//kenya_2022/KEMR8BFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//madagascar_2021/MDMR81FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//nepal_2022/NPMR82FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//rwanda_2019-20/RWMR81FL.DTA[1] 43120
+# A tibble: 1 × 4
+     min median  mean   max
+   <dbl>  <dbl> <dbl> <dbl>
+1 0.0136  0.381 0.413     1
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ================================
+Running  NA 
+ [1] "03_model_performance.Rmd"       "04_within_country_analysis.Rmd" "05_geo_map.Rmd"                 "06_feature_importance.Rmd"     
+ [5] "07_superlearner_weights.Rmd"    "08_residual_analysis.Rmd"       "09_var_explained.Rmd"           "11_national_comparison.Rmd"    
+ [9] "12_dhs_table.Rmd"               "14_trends.Rmd"                 
+================================
+Running  NA 
+[1] NA
+[1] "14_trends.Rmd"
+# A tibble: 40,213 × 105
+   gid_0  year month fb_pntr_18p_male_national fb_pntr_18p_female_natio…¹ all_devices_age_18_p…²    x7 gid_1    area country pop_0_to_12months_male pop_1_to_4_male
+   <chr> <dbl> <dbl>                     <dbl>                      <dbl>                  <dbl> <dbl> <chr>   <dbl> <chr>                    <dbl>           <dbl>
+ 1 AFG    2015   1                       0.339                     0.0632                  0.187     1 AFG.… 4.37e10 Afghan…                 15792.          51868.
+ 2 AFG    2016   1                       0.336                     0.0627                  0.187     2 AFG.… 4.37e10 Afghan…                 16076.          52132.
+ 3 AFG    2017   1                       0.331                     0.0620                  0.187     3 AFG.… 4.37e10 Afghan…                 16692.          52878.
+ 4 AFG    2018   1                       0.327                     0.0612                  0.187     4 AFG.… 4.37e10 Afghan…                 17389.          54012.
+ 5 AFG    2019   6.5                     0.312                     0.0551                  0.176     5 AFG.… 4.37e10 Afghan…                 18040.          55254.
+ 6 AFG    2020   6.5                     0.330                     0.0627                  0.190     6 AFG.… 4.37e10 Afghan…                 18557.          56453.
+ 7 AFG    2021   6.5                     0.341                     0.0658                  0.193     7 AFG.… 4.37e10 Afghan…                 18557.          56453.
+ 8 AFG    2022   6.5                     0.301                     0.0576                  0.191     8 AFG.… 4.37e10 Afghan…                 18557.          56453.
+ 9 AFG    2023   6.5                     0.268                     0.0504                  0.188     9 AFG.… 4.37e10 Afghan…                 18557.          56453.
+10 AFG    2024   1                       0.336                     0.0610                  0.182    10 AFG.… 4.37e10 Afghan…                 18557.          56453.
+# ℹ 40,203 more rows
+# ℹ abbreviated names: ¹​fb_pntr_18p_female_national, ²​all_devices_age_18_plus_gg_national
+# ℹ 93 more variables: pop_5_to_9_male <dbl>, pop_10_to_14_male <dbl>, pop_15_to_19_male <dbl>, pop_20_to_24_male <dbl>, pop_25_to_29_male <dbl>,
+#   pop_30_to_34_male <dbl>, pop_35_to_39_male <dbl>, pop_40_to_44_male <dbl>, pop_45_to_49_male <dbl>, pop_50_to_54_male <dbl>, pop_55_to_59_male <dbl>,
+#   pop_60_to_64_male <dbl>, pop_65_to_69_male <dbl>, pop_70_to_74_male <dbl>, pop_75_to_79_male <dbl>, pop_80plus_male <dbl>, pop_0_to_12months_female <dbl>,
+#   pop_1_to_4_female <dbl>, pop_5_to_9_female <dbl>, pop_10_to_14_female <dbl>, pop_15_to_19_female <dbl>, pop_20_to_24_female <dbl>, pop_25_to_29_female <dbl>,
+#   pop_30_to_34_female <dbl>, pop_35_to_39_female <dbl>, pop_40_to_44_female <dbl>, pop_45_to_49_female <dbl>, pop_50_to_54_female <dbl>, …
 # ℹ Use `print(n = ...)` to see more rows
-# A tibble: 8 × 57
-  country perc_ever_used_internet_wght_age_15_t…¹ perc_used_internet_p…² perc_owns_mobile_tel…³ perc_ever_used_inter…⁴ perc_used_internet_p…⁵ perc_owns_mobile_tel…⁶ perc_ever_used_inter…⁷ perc_used_internet_p…⁸ perc_owns_mobile_tel…⁹ fb_pntr_13p_male_dhs…˟ fb_pntr_13p_female_d…˟
-  <chr>                                     <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>                  <dbl>
-1 Guinea                                    14.5                   12.6                    60.2                   31.7                  30.1                    86.2                  0.457                  0.418                  0.699                 0.0547                 0.0287
-2 Guinea                                    47.5                   45.6                    90.0                   65.8                  62.5                    93.0                  0.723                  0.729                  0.968                 1.15                   0.765 
-3 Guinea                                     6.02                   5.11                   63.9                   26.0                  22.3                    85.2                  0.231                  0.229                  0.750                 0.0586                 0.0253
-4 Guinea                                     8.88                   7.97                   68.6                   23.3                  22.2                    90.2                  0.380                  0.360                  0.761                 0.182                  0.0638
-5 Guinea                                    13.7                   13.0                    68.2                   30.7                  29.3                    86.3                  0.444                  0.442                  0.790                 0.0520                 0.0255
-6 Guinea                                    13.7                   12.5                    63.0                   40.2                  36.0                    84.1                  0.341                  0.347                  0.749                 0.0989                 0.0586
-7 Guinea                                     9.47                   8.68                   76.4                   41.5                  38.1                    86.3                  0.228                  0.228                  0.886                 0.130                  0.0751
-8 Guinea                                     4.19                   4.05                   55.3                   10.5                   9.77                   74.1                  0.397                  0.414                  0.746                 0.0834                 0.0431
-# ℹ abbreviated names: ¹​perc_ever_used_internet_wght_age_15_to_49_wom, ²​perc_used_internet_past12months_wght_age_15_to_49_wom, ³​perc_owns_mobile_telephone_wght_age_15_to_49_wom, ⁴​perc_ever_used_internet_wght_age_15_to_49_men,
-#   ⁵​perc_used_internet_past12months_wght_age_15_to_49_men, ⁶​perc_owns_mobile_telephone_wght_age_15_to_49_men, ⁷​perc_ever_used_internet_wght_age_15_to_49_fm_ratio, ⁸​perc_used_internet_past12months_wght_age_15_to_49_fm_ratio,
-#   ⁹​perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio, ˟​fb_pntr_13p_male_dhsyear_impute, ˟​fb_pntr_13p_female_dhsyear_impute
-# ℹ 45 more variables: all_devices_age_13_plus_gg_dhsyear_impute <dbl>, ios_age_13_plus_female_frac_2024 <dbl>, ios_age_13_plus_male_frac_2024 <dbl>, wifi_age_13_plus_female_frac_2024 <dbl>, wifi_age_13_plus_male_frac_2024 <dbl>, x4g_age_13_plus_female_frac_2024 <dbl>,
-#   x4g_age_13_plus_male_frac_2024 <dbl>, fb_pntr_13p_male_dhsyear_national <dbl>, fb_pntr_13p_female_dhsyear_national <dbl>, all_devices_age_13_plus_gg_dhsyear_national <dbl>, nl_mean_2021 <dbl>, pop_density_2020 <dbl>, pop_all_age_female_2020 <dbl>,
-#   pop_all_age_male_2020 <dbl>, subnational_gdi_2021 <dbl>, subnational_hdi_males_2021 <dbl>, subnational_hdi_females_2021 <dbl>, educational_index_females_2021 <dbl>, educational_index_males_2021 <dbl>, income_index_females_2021 <dbl>, income_index_males_2021 <dbl>,
-#   internet_speed <dbl>, continent <dbl>, hdi_national_2022 <dbl>, gdi_national_2022 <dbl>, fb_pntr_13p_male_2024 <dbl>, fb_pntr_13p_female_2024 <dbl>, all_devices_age_13_plus_gg_2024 <dbl>, fb_pntr_13p_male_2024_national <dbl>, fb_pntr_13p_female_2024_national <dbl>, …
-# A tibble: 23 × 2
-   country               n
-   <chr>             <int>
- 1 Azerbaijan            2
- 2 Cabo Verde            6
- 3 Djibouti              5
- 4 Dominica             10
- 5 Ecuador               1
- 6 Equatorial Guinea     6
- 7 Eritrea               6
- 8 Georgia               1
- 9 Grenada               7
-10 Malawi                1
-# ℹ 13 more rows
+/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//angola_2015-16/AOMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//armenia_2015-16/AMMR72FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//benin_2017-18/BJMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//burundi_2016-17/BUMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//cameroon_2018/CMMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//ethiopia_2016/ETMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//gabon_2019-21/GAMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//guinea_2018/GNMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//haiti_2016-17/HTMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//india_2019-21/IAMR7EFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//liberia_2019-20/LBMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//malawi_2015-16/MWMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//mali_2018/MLMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//mauritania_2019-21/MRMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//nigeria_2018/NGMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//pakistan_2017-18/PKMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//papua_new_guinea_2016-18/PGMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//sierra_leone_2019/SLMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//south_africa_2016/ZAMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//tanzania_2015-16/TZMR7BFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//timor-leste_2016/TLMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//uganda_2016/UGMR7BFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//zambia_2018/ZMMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//zimbabwe_2015/ZWMR72FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//burkina_faso_2021/BFMR81FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//cambodia_2021-22/KHMR82FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//gambia_2019-20/GMMR81FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//kenya_2022/KEMR8BFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//madagascar_2021/MDMR81FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//nepal_2022/NPMR82FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//rwanda_2019-20/RWMR81FL.DTA[1] 43120
+# A tibble: 1 × 4
+     min median  mean   max
+   <dbl>  <dbl> <dbl> <dbl>
+1 0.0136  0.381 0.413     1
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       ================================
+Running  NA 
+ [1] "03_model_performance.Rmd"       "04_within_country_analysis.Rmd" "05_geo_map.Rmd"                 "06_feature_importance.Rmd"     
+ [5] "07_superlearner_weights.Rmd"    "08_residual_analysis.Rmd"       "09_var_explained.Rmd"           "11_national_comparison.Rmd"    
+ [9] "12_dhs_table.Rmd"               "14_trends.Rmd"                 
+================================
+Running  NA 
+[1] NA
+[1] "14_trends.Rmd"
+# A tibble: 40,213 × 105
+   gid_0  year month fb_pntr_18p_male_national fb_pntr_18p_female_natio…¹ all_devices_age_18_p…²    x7 gid_1    area country pop_0_to_12months_male pop_1_to_4_male
+   <chr> <dbl> <dbl>                     <dbl>                      <dbl>                  <dbl> <dbl> <chr>   <dbl> <chr>                    <dbl>           <dbl>
+ 1 AFG    2015   1                       0.339                     0.0632                  0.187     1 AFG.… 4.37e10 Afghan…                 15792.          51868.
+ 2 AFG    2016   1                       0.336                     0.0627                  0.187     2 AFG.… 4.37e10 Afghan…                 16076.          52132.
+ 3 AFG    2017   1                       0.331                     0.0620                  0.187     3 AFG.… 4.37e10 Afghan…                 16692.          52878.
+ 4 AFG    2018   1                       0.327                     0.0612                  0.187     4 AFG.… 4.37e10 Afghan…                 17389.          54012.
+ 5 AFG    2019   6.5                     0.312                     0.0551                  0.176     5 AFG.… 4.37e10 Afghan…                 18040.          55254.
+ 6 AFG    2020   6.5                     0.330                     0.0627                  0.190     6 AFG.… 4.37e10 Afghan…                 18557.          56453.
+ 7 AFG    2021   6.5                     0.341                     0.0658                  0.193     7 AFG.… 4.37e10 Afghan…                 18557.          56453.
+ 8 AFG    2022   6.5                     0.301                     0.0576                  0.191     8 AFG.… 4.37e10 Afghan…                 18557.          56453.
+ 9 AFG    2023   6.5                     0.268                     0.0504                  0.188     9 AFG.… 4.37e10 Afghan…                 18557.          56453.
+10 AFG    2024   1                       0.336                     0.0610                  0.182    10 AFG.… 4.37e10 Afghan…                 18557.          56453.
+# ℹ 40,203 more rows
+# ℹ abbreviated names: ¹​fb_pntr_18p_female_national, ²​all_devices_age_18_plus_gg_national
+# ℹ 93 more variables: pop_5_to_9_male <dbl>, pop_10_to_14_male <dbl>, pop_15_to_19_male <dbl>, pop_20_to_24_male <dbl>, pop_25_to_29_male <dbl>,
+#   pop_30_to_34_male <dbl>, pop_35_to_39_male <dbl>, pop_40_to_44_male <dbl>, pop_45_to_49_male <dbl>, pop_50_to_54_male <dbl>, pop_55_to_59_male <dbl>,
+#   pop_60_to_64_male <dbl>, pop_65_to_69_male <dbl>, pop_70_to_74_male <dbl>, pop_75_to_79_male <dbl>, pop_80plus_male <dbl>, pop_0_to_12months_female <dbl>,
+#   pop_1_to_4_female <dbl>, pop_5_to_9_female <dbl>, pop_10_to_14_female <dbl>, pop_15_to_19_female <dbl>, pop_20_to_24_female <dbl>, pop_25_to_29_female <dbl>,
+#   pop_30_to_34_female <dbl>, pop_35_to_39_female <dbl>, pop_40_to_44_female <dbl>, pop_45_to_49_female <dbl>, pop_50_to_54_female <dbl>, …
 # ℹ Use `print(n = ...)` to see more rows
-Error: unexpected ',' in "2,"
-[1] 0.07136237
-[1] 233
-Error in `count()`:
-! Must group by variables found in `.data`.
-✖ Column `country` is not found.
-Run `rlang::last_trace()` to see where the error occurred.
-Error in `count()`:
-! Must group by variables found in `.data`.
-✖ Column `country` is not found.
-Run `rlang::last_trace()` to see where the error occurred.
-Error in `count()`:
-! Must group by variables found in `.data`.
-✖ Column `gid_0` is not found.
-Run `rlang::last_trace()` to see where the error occurred.
-# A tibble: 2,157 × 97
-   gid_1    dhsyear gid_0 country     pop_all_age_female_dhsyear pop_all_age_male_dhsyear pop_all_age_female_2020 pop_all_age_male_2020 subnational_gdi_2021 subnational_hdi_females_2021 subnational_hdi_males_…¹ health_index_females…² health_index_males_2…³ educational_index_fe…⁴
-   <chr>      <dbl> <chr> <chr>                            <dbl>                    <dbl>                   <dbl>                 <dbl>                <dbl>                        <dbl>                    <dbl>                  <dbl>                  <dbl>                  <dbl>
- 1 AFG.1_1     2024 AFG   Afghanistan                    552359.                  684246.                 552359.               684246.                0.667                        0.332                    0.498                  0.629                  0.615                  0.249
- 2 AFG.10_1    2024 AFG   Afghanistan                    360722.                  444014.                 360722.               444014.                0.692                        0.344                    0.497                  0.646                  0.628                  0.261
- 3 AFG.11_1    2024 AFG   Afghanistan                    443782.                  577337.                 443782.               577337.                0.563                        0.269                    0.478                  0.655                  0.635                  0.12 
- 4 AFG.12_1    2024 AFG   Afghanistan                   1142763.                 1285469.                1142763.              1285469.                0.692                        0.344                    0.497                  0.646                  0.628                  0.261
- 5 AFG.13_1    2024 AFG   Afghanistan                    248284.                  311459.                 248284.               311459.                0.749                        0.405                    0.541                  0.636                  0.62                   0.382
- 6 AFG.14_1    2024 AFG   Afghanistan                   2130224.                 2679334.                2130224.              2679334.                0.734                        0.444                    0.605                  0.694                  0.664                  0.451
- 7 AFG.15_1    2024 AFG   Afghanistan                    631838.                  769365.                 631838.               769365.                0.563                        0.269                    0.478                  0.655                  0.635                  0.12 
- 8 AFG.16_1    2024 AFG   Afghanistan                    213590.                  271536.                 213590.               271536.                0.734                        0.444                    0.605                  0.694                  0.664                  0.451
- 9 AFG.17_1    2024 AFG   Afghanistan                    311727.                  497400.                 311727.               497400.                0.567                        0.315                    0.556                  0.706                  0.673                  0.184
-10 AFG.18_1    2024 AFG   Afghanistan                    225130.                  304176.                 225130.               304176.                0.583                        0.31                     0.532                  0.648                  0.63                   0.214
-# ℹ 2,147 more rows
-# ℹ abbreviated names: ¹​subnational_hdi_males_2021, ²​health_index_females_2021, ³​health_index_males_2021, ⁴​educational_index_females_2021
-# ℹ 83 more variables: educational_index_males_2021 <dbl>, income_index_females_2021 <dbl>, income_index_males_2021 <dbl>, subnational_gdi_dhsyear <dbl>, subnational_hdi_females_dhsyear <dbl>, subnational_hdi_males_dhsyear <dbl>, health_index_females_dhsyear <dbl>,
-#   health_index_males_dhsyear <dbl>, educational_index_females_dhsyear <dbl>, educational_index_males_dhsyear <dbl>, income_index_females_dhsyear <dbl>, income_index_males_dhsyear <dbl>, rwi_mean <dbl>, rwi_mean_wght <dbl>, nl_mean_2021 <dbl>, nl_mean_wght_2021 <dbl>,
-#   nl_mean_dhsyear <dbl>, nl_mean_wght_dhsyear <dbl>, perc_ever_used_internet_wght_age_15_to_49_wom <dbl>, perc_used_internet_past12months_wght_age_15_to_49_wom <dbl>, perc_owns_mobile_telephone_wght_age_15_to_49_wom <dbl>, perc_ever_used_internet_wght_age_15_to_49_men <dbl>,
-#   perc_used_internet_past12months_wght_age_15_to_49_men <dbl>, perc_owns_mobile_telephone_wght_age_15_to_49_men <dbl>, perc_ever_used_internet_wght_age_15_to_49_fm_ratio <dbl>, perc_used_internet_past12months_wght_age_15_to_49_fm_ratio <dbl>,
-#   perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio <dbl>, fb_pntr_13p_male_2024_key <dbl>, fb_pntr_13p_female_2024_key <dbl>, all_devices_age_13_plus_gg_2024_key <dbl>, ios_age_13_plus_female_frac_2024_key <dbl>, ios_age_13_plus_male_frac_2024_key <dbl>, …
-# ℹ Use `print(n = ...)` to see more rows
+/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//angola_2015-16/AOMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//armenia_2015-16/AMMR72FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//benin_2017-18/BJMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//burundi_2016-17/BUMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//cameroon_2018/CMMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//ethiopia_2016/ETMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//gabon_2019-21/GAMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//guinea_2018/GNMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//haiti_2016-17/HTMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//india_2019-21/IAMR7EFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//liberia_2019-20/LBMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//malawi_2015-16/MWMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//mali_2018/MLMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//mauritania_2019-21/MRMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//nigeria_2018/NGMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//pakistan_2017-18/PKMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//papua_new_guinea_2016-18/PGMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//sierra_leone_2019/SLMR7AFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//south_africa_2016/ZAMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//tanzania_2015-16/TZMR7BFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//timor-leste_2016/TLMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//uganda_2016/UGMR7BFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//zambia_2018/ZMMR71FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave7//zimbabwe_2015/ZWMR72FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//burkina_faso_2021/BFMR81FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//cambodia_2021-22/KHMR82FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//gambia_2019-20/GMMR81FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//kenya_2022/KEMR8BFL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//madagascar_2021/MDMR81FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//nepal_2022/NPMR82FL.DTA/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/national/data_refresh/dhs/wave8//rwanda_2019-20/RWMR81FL.DTA[1] 43120
+# A tibble: 1 × 4
+     min median  mean   max
+   <dbl>  <dbl> <dbl> <dbl>
+1 0.0136  0.381 0.413     1

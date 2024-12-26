@@ -13,11 +13,8 @@ source(here("code", "helpers.R"))
 
 
 ```{r}
-gamd1 <- read_csv(here("data", "aggregated_indicators_lmic_aug13.csv"))
+master_file <- read_csv(here("data", "master_data_file_dec24_with_national.csv")) 
 ```
-
-
-
 
 ```{r}
 # Define the list of country names in lowercase
@@ -116,7 +113,7 @@ print(xtable(table, digits = 0), include.rownames=FALSE, file = here("figures", 
 
 
 ```{r}
-gadm1_full <- read_csv(here("data", "aggregated_indicators_lmic_aug13.csv"), 
+master_file_full <- read_csv(here("data", "master_data_file_dec24_with_national.csv"), 
                        locale = locale(encoding = "ISO-8859-1"),
                        show_col_types = FALSE) %>%
   janitor::clean_names() %>% 
@@ -127,63 +124,48 @@ gadm1_full <- read_csv(here("data", "aggregated_indicators_lmic_aug13.csv"),
   filter(!(country == "Cambodia" & dhsyear == "2014")) %>%
   filter(!(country == "Nepal" & dhsyear == "2016")) %>%
   filter(!(country == "Philippines" & dhsyear == "2017")) %>%
-  mutate(pop_all_age_total_dhsyear = pop_all_age_female_dhsyear + pop_all_age_male_dhsyear) %>%
-  filter(!is.na(fb_pntr_13p_female_2024_tess)) %>% 
-  # mutate(
-  #   fb_pntr_13p_male_2021_impute = fb_pntr_13p_male_2024,
-  #   fb_pntr_13p_female_2021_impute = fb_pntr_13p_female_2024,
-  #   all_devices_age_13_plus_gg_2021_impute = all_devices_age_13_plus_gg_2024,
-  #   ios_age_13_plus_female_frac_2021_impute = ios_age_13_plus_female_frac_2024,
-  #   ios_age_13_plus_male_frac_2021_impute = ios_age_13_plus_male_frac_2024,
-  #   wifi_age_13_plus_female_frac_2021_impute = wifi_age_13_plus_female_frac_2024,
-  #   wifi_age_13_plus_male_frac_2021_impute = wifi_age_13_plus_male_frac_2024,
-  #   x4g_age_13_plus_female_frac_2021_impute = x4g_age_13_plus_female_frac_2024,
-  #   x4g_age_13_plus_male_frac_2021_impute = x4g_age_13_plus_male_frac_2024,
-  #   fb_pntr_13p_male_dhsyear_national = fb_pntr_13p_male_2020_national,
-  #   fb_pntr_13p_female_dhsyear_national = fb_pntr_13p_female_2020_national,
-  #   all_devices_age_13_dhsyear_gg_national = all_devices_age_13_plus_gg_2020_national,
-  #   dhsyear = 2024)
+  mutate(pop_all_age_total = pop_all_age_female + pop_all_age_male) %>%
+  filter(!is.na(fb_pntr_18p_female)) %>% 
   mutate(
-    nl_mean_dhsyear = nl_mean_2021,
-    pop_density_dhsyear = pop_density_2020,
-    pop_all_age_female_dhsyear = pop_all_age_female_2020,
-    pop_all_age_male_dhsyear = pop_all_age_male_2020,
-    subnational_gdi_dhsyear = subnational_gdi_2021,
-    subnational_hdi_males_dhsyear = subnational_hdi_males_2021,
-    subnational_hdi_females_dhsyear = subnational_hdi_females_2021,
-    educational_index_females_dhsyear = educational_index_females_2021,
-    educational_index_males_dhsyear = educational_index_males_2021,
-    income_index_females_dhsyear = income_index_females_2021,
-    income_index_males_dhsyear = income_index_males_2021,
-    internet_speed = internet_speed,
-    continent = continent,
-    hdi_national_dhsyear = hdi_national_2022,
-    gdi_national_dhsyear = gdi_national_2022,
-    dhsyear = 2024)
+    nl_mean_zscore,
+    pop_density,
+    pop_all_age_female,
+    pop_all_age_male,
+    subnational_gdi,
+    subnational_hdi_males,
+    subnational_hdi_females,
+    educational_index_females,
+    educational_index_males,
+    income_index_females,
+    income_index_males,
+    internet_speed,
+    continent ,
+    hdi,
+    gdi)
 ```
 
 
 ```{r}
 ## columns 
-gadm1_full_select <- gadm1_full %>% 
-  dplyr::select(country, dhs_vars, off_feats, fb_feats)
+master_file_select <- master_file %>% 
+  dplyr::select(gid_0, country, dhs_vars, off_feats, fb_feats)
 
 result_list <- list()
 i = 1
-for (col in colnames(gadm1_full_select %>% dplyr::select(-country)) ) {
+for (col in colnames(master_file_select %>% dplyr::select(-country)) ) {
   
-  total_country <- gadm1_full_select %>% 
+  total_country <- master_file_select %>% 
     filter(!is.na(!!sym(col))) %>% 
     distinct(country) %>% 
     count() %>% 
     pull()
   
-  total_subnational <- gadm1_full_select %>% 
+  total_subnational <- master_file_select %>% 
     filter(!is.na(!!sym(col))) %>% 
     count() %>% 
     pull()
   
-  total_subnational_metrics <- gadm1_full_select %>% 
+  total_subnational_metrics <- master_file_select %>% 
     filter(!is.na(!!sym(col))) %>% 
     summarize(min = min(!!sym(col)),
               median = median(!!sym(col)), 

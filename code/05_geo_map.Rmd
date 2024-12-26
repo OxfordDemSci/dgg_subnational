@@ -13,15 +13,15 @@ source(here("code", "helpers.R"))
 
 ```{r}
 ## read in training and test datasets 
-gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_aug13.csv"), 
+master_file <- read_csv(here("data", "master_data_file_dec24_with_national.csv"), 
                   locale = locale(encoding = "ISO-8859-1")) %>%
   janitor::clean_names() %>% 
     mutate(continent = case_when(continent == "Africa" ~ 1,
                                TRUE ~ 0)) %>% 
-  dplyr::select(country, all_of(c(dhs_vars, fb_feats, off_feats_current))) %>% 
+  dplyr::select(country, all_of(c(dhs_vars, fb_feats))) %>% 
   filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% drop_na() 
 
-gadm1_full <- read_csv(here("data", "aggregated_indicators_lmic_aug13.csv"), 
+master_file_full <- read_csv(here("data", "master_data_file_dec24_with_national.csv"), 
                   locale = locale(encoding = "ISO-8859-1")) %>%
   janitor::clean_names() %>% 
   mutate(continent = case_when(continent == "Africa" ~ 1,
@@ -31,16 +31,17 @@ gadm1_full <- read_csv(here("data", "aggregated_indicators_lmic_aug13.csv"),
   filter(!(country == "Cambodia" & dhsyear == "2014")) %>%
   filter(!(country == "Nepal" & dhsyear == "2016")) %>%
   filter(!(country == "Philippines" & dhsyear == "2017")) %>%
-      mutate(pop_all_age_total_dhsyear = pop_all_age_female_dhsyear + pop_all_age_male_dhsyear) %>%
-  filter(!is.na(fb_pntr_13p_female_2024_tess)) %>% 
+      mutate(pop_all_age_total = pop_all_age_female + pop_all_age_male) %>%
+  filter(!is.na(fb_pntr_18p_female)) %>% 
   mutate(dhsyear = 2024)
 
 ## read in predictions 
-predictions_wide <- read_csv(here("out", "full_predictions.csv"))
+predictions_wide <- read_csv(here("out", "full_predictions.csv")) %>% 
+  filter(year == 2024 & month == 11)
 
 predictions_uncertainty <- read_csv(here("out", "predictions_with_uncertainty.csv")) %>% 
-  filter(outcome == "perc_used_internet_past12months_wght_age_15_to_49_wom") %>% 
-  filter(predicted_error < 100)
+  filter(outcome == "internet_women") %>% 
+  filter(date == "2024-11")
 ```
 
 ```{r}
@@ -49,10 +50,10 @@ gadm1_map <- read_sf(here("data", "gadm_410-levels.gpkg"), layer = "ADM_1")
 gadm0_map <- read_sf(here("data", "gadm_410-levels.gpkg"), layer = "ADM_0")
 
 gadm0_map <- gadm0_map %>% 
-  filter(COUNTRY %in% gadm1_full$country | COUNTRY == "Côte d'Ivoire" | COUNTRY == "Sudan" | COUNTRY == "South Sudan")
+  filter(COUNTRY %in% master_file_full$country | COUNTRY == "Côte d'Ivoire" | COUNTRY == "Sudan" | COUNTRY == "South Sudan")
 
 gadm1_map <- gadm1_map %>% 
-  filter(COUNTRY %in% gadm1_full$country | COUNTRY == "Côte d'Ivoire" | COUNTRY == "Sudan"| COUNTRY == "South Sudan")
+  filter(COUNTRY %in% master_file_full$country | COUNTRY == "Côte d'Ivoire" | COUNTRY == "Sudan"| COUNTRY == "South Sudan")
 ```
 
 
@@ -106,7 +107,6 @@ ggsave(plot = internet_women_predicted_error, filename = here("figures", "intern
 ```
 
 
-
 ## Nigeria Plot
 
 ```{r}
@@ -123,14 +123,14 @@ nigeria_predictions <- read_csv(here("out", "combined_predictions_lmics_national
 
 
 nigeria_predictions <- nigeria_predictions %>% 
-  left_join(gadm1_full, by = "gid_1")
+  left_join(master_file_full, by = "gid_1")
 
 shapefile_df_nigeria <- shapefile_df_nigeria %>% 
   left_join(nigeria_predictions, by = c("GID_1" = "gid_1")) %>% 
   mutate(error = observed-predicted_loco)
 
 # Determine the common range for fill scale
-fill_limits <- range(c(-5, 55), na.rm = TRUE)
+fill_limits <- range(c(-.05, .55), na.rm = TRUE)
 
 plot_truth_nigeria <- ggplot(shapefile_df_nigeria, aes(fill = observed)) + 
   geom_sf() +
@@ -150,7 +150,7 @@ plot_prediction_nigeria <- ggplot(shapefile_df_nigeria, aes(fill = predicted_loc
 
 error_dist_nigeria <- shapefile_df_nigeria %>% 
   ggplot(aes(x = observed, y = predicted_loco)) + 
-  geom_point(aes(size = pop_all_age_total_dhsyear), alpha = 0.3) +
+  geom_point(aes(size = pop_all_age_total), alpha = 0.3) +
   # geom_smooth() +
   stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..)), 
            size = 5.5) +  
@@ -159,8 +159,8 @@ error_dist_nigeria <- shapefile_df_nigeria %>%
        y = "Predicted",
        size = "Population size") + 
   theme_cowplot() + 
-  xlim(0.3, 100) + 
- ylim(0.3, 100) + 
+  xlim(0, 1) + 
+  ylim(0, 1) + 
   geom_abline(slope = 1, linetype = "dashed") + 
   scale_size_continuous(breaks = c(2000000, 3000000, 10000000), 
                         labels = c("2m", "3m", "10m")) +
@@ -186,14 +186,14 @@ zimbabwe_predictions <- read_csv(here("out", "combined_predictions_lmics_nationa
 
 ## read in training and test datasets 
 zimbabwe_predictions <- zimbabwe_predictions %>% 
-  left_join(gadm1_full, by = "gid_1")
+  left_join(master_file_full, by = "gid_1")
 
 shapefile_df_zimbabwe <- shapefile_df_zimbabwe %>% 
   left_join(zimbabwe_predictions, by = c("GID_1" = "gid_1")) %>% 
   mutate(error = observed-predicted_loco)
 
 # Determine the common range for fill scale
-fill_limits <- range(c(min(shapefile_df_zimbabwe$observed), max(shapefile_df_zimbabwe$observed + 0.01)))
+fill_limits <- range(c(min(shapefile_df_zimbabwe$observed)-0.05, max(shapefile_df_zimbabwe$observed + 0.01)))
 
 plot_truth_zimbabwe <- ggplot(shapefile_df_zimbabwe, aes(fill = observed)) + 
   geom_sf() +
@@ -214,7 +214,7 @@ plot_prediction_zimbabwe <- ggplot(shapefile_df_zimbabwe, aes(fill = predicted_l
 
 error_dist_zim <- shapefile_df_zimbabwe %>% 
   ggplot(aes(x = observed, y = predicted_loco)) + 
-  geom_point(aes(size = pop_all_age_total_dhsyear), alpha = 0.3) +
+  geom_point(aes(size = pop_all_age_total), alpha = 0.3) +
   stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..)),
            size = 5.5) +  
   labs(title = "",
@@ -222,8 +222,8 @@ error_dist_zim <- shapefile_df_zimbabwe %>%
        y = "Predicted",
        size = "Population Size") +
   theme_cowplot() + 
-  xlim(0.3, 100) + 
-  ylim(0.3, 100) + 
+  xlim(0.03, 1) + 
+  ylim(0.03, 1) + 
   geom_abline(slope = 1, linetype = "dashed") + 
   scale_size_continuous(breaks = c( 1000000, 2000000), 
                         labels = c("1m", "2m")) +
@@ -251,7 +251,7 @@ senegal_predictions <- read_csv(here("out", "combined_predictions_lmics_national
 
 ## read in training and test datasets 
 senegal_predictions <- senegal_predictions %>% 
-  left_join(gadm1_full, by = "gid_1")
+  left_join(master_file_full, by = "gid_1")
 
 shapefile_df_senegal <- shapefile_df_senegal %>% 
   inner_join(senegal_predictions, by = c("GID_1" = "gid_1")) %>% 
@@ -278,7 +278,7 @@ plot_prediction_senegal <- ggplot(shapefile_df_senegal, aes(fill = predicted_loc
 
 error_dist_senegal <- shapefile_df_senegal %>% 
   ggplot(aes(x = observed, y = predicted_loco)) + 
-  geom_point(aes(size = pop_all_age_total_dhsyear), alpha = 0.3) +
+  geom_point(aes(size = pop_all_age_total), alpha = 0.3) +
   stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..)), 
            size = 5.5) +  
   labs(title = "",
@@ -286,8 +286,8 @@ error_dist_senegal <- shapefile_df_senegal %>%
        y = "Predicted",
        size = "Population Size") +
   theme_cowplot() + 
-  xlim(0.3, 100) + 
-  ylim(0.3, 100) + 
+  xlim(0.03, 1) + 
+  ylim(0.03, 1) + 
     geom_abline(slope = 1, linetype = "dashed") + 
   scale_size_continuous(breaks = c( 1000000, 2000000), 
                         labels = c("1m", "2m")) +

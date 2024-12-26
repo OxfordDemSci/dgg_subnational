@@ -16,7 +16,7 @@ source(here("code", "helpers.R"))
 
 ## list of Rmd files excluding '00_run_all.Rmd'
 rmd_files <- list.files(path = here("code"), pattern = "\\.Rmd$")
-rmd_files <- rmd_files[!rmd_files %in% c("00_run_all.Rmd", "10_bootstrap_analysis.Rmd", "11_dhs_tables.Rmd")]
+rmd_files <- rmd_files[!rmd_files %in% c("00_run_all.Rmd",  "10_bootstrap_analysis.Rmd", "11_dhs_tables.Rmd")]
 
 ## set seed for reproducibility
 set.seed(1)
@@ -28,7 +28,7 @@ sink(con, append=TRUE, type = "message")
 
 
 ## Loop to process files
-for (cur_file in rmd_files[2:12]) { #rmd_files[2:10]
+for (cur_file in rmd_files[10:10]) { #rmd_files[2:10]
 
   cat("================================\n")
   source(here("code", "helpers.R"))

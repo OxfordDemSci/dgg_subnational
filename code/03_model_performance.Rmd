@@ -18,7 +18,7 @@ source(here("code", "helpers.R"))
 ```{r}
 ## read predictions
 predictions_combined <- read_csv(here("out", "combined_predictions_lmics_national_covars_full.csv")) %>%
-  mutate(predicted = case_when(
+mutate(predicted = case_when(
     predicted < 0 ~ 0,
     predicted > 100 ~ 100,
     TRUE ~ predicted
@@ -43,12 +43,12 @@ predictions_combined <- read_csv(here("out", "combined_predictions_lmics_nationa
 
 
 ## read in training and test datasets
-gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_aug13.csv"),
-  locale = locale(encoding = "ISO-8859-1")
-) %>%
+gadm1 <- read_csv(here("data", "master_data_file_dec24_with_national.csv"),
+  locale = locale(encoding = "ISO-8859-1")) %>%
   janitor::clean_names() %>%
-  mutate(pop_all_age_total_dhsyear = pop_all_age_female_dhsyear + pop_all_age_male_dhsyear) %>%
+  mutate(pop_all_age_total_dhsyear = pop_all_age_female + pop_all_age_male) %>%
   dplyr::select(country, gid_1, dhsyear, pop_all_age_total_dhsyear, continent) %>%
+  filter(!is.na(dhsyear)) %>% 
     filter(!(country == "Bangladesh" & dhsyear == "2014")) %>% 
   filter(!(country == "India" & dhsyear == "2014")) %>% 
   filter(!(country == "Cambodia" & dhsyear == "2014")) %>%
@@ -195,6 +195,102 @@ combined_plot_observed_predicted_legend <- plot_grid(combined_plot_observed_pred
 ggsave(plot = combined_plot_observed_predicted_legend, here("figures", "observed_predicted_loco_complete_fig.png"), width = 10, height = 6)
 ```
 
+## observed vs. predicted by outcome 
+
+```{r}
+# Plot for "perc_ever_used_internet_wght_age_15_to_49_men"
+plot1_observed_predicted <- predictions_combined %>%
+  filter(
+    model == "superlearner",
+    outcome %in% c("perc_owns_mobile_telephone_wght_age_15_to_49_wom", "perc_used_internet_past12months_wght_age_15_to_49_wom"),
+    feature_set == "fb_and_offline",
+    cv_method == "LOCO-CV"
+  ) %>%
+  ggplot(aes(x = observed, y = predicted, size = pop_all_age_total_dhsyear)) +
+  geom_point(alpha = 0.1) +
+  geom_abline(slope = 1, linetype = "dashed", color = "grey") +
+  theme_cowplot() +
+  labs(title = "Women") +
+  geom_text(
+    aes(label = paste("atop(italic(R)^2 == ", round(r2, 2), ", italic(r) == ", round(r, 2), ")")),
+    x = .10, 
+    y = .90, 
+    parse = TRUE,
+    size = 3.5) +
+    scale_y_continuous(limits = c(0, 1.1), labels = scales::label_percent()) +
+    scale_x_continuous(limits = c(0, 1.1), labels = scales::label_percent()) +
+  facet_wrap(~outcome_categorical, nrow = 2) +
+  theme(legend.position = "none") 
+
+# Plot for "perc_ever_used_internet_wght_age_15_to_49_"
+plot2_observed_predicted <- predictions_combined %>%
+  filter(
+    model == "superlearner",
+    outcome %in% c("perc_owns_mobile_telephone_wght_age_15_to_49_men", "perc_used_internet_past12months_wght_age_15_to_49_men"),
+    feature_set == "fb_and_offline",
+    cv_method == "LOCO-CV"
+  ) %>%
+  ggplot(aes(x = observed, y = predicted, size = pop_all_age_total_dhsyear)) +
+  geom_point(alpha = 0.1) +
+    scale_y_continuous(limits = c(0, 1.1), labels = scales::label_percent()) +
+    scale_x_continuous(limits = c(0, 1.1), labels = scales::label_percent()) +
+  geom_abline(slope = 1, linetype = "dashed", color = "grey") +
+  theme_cowplot() +
+  labs(title = "Men") +
+  geom_text(
+    aes(label = paste("atop(italic(R)^2 == ", round(r2, 2), ", italic(r) == ", round(r, 2), ")")),
+    x = .10, 
+    y = .90, 
+    parse = TRUE,
+    size = 3.5) +
+  facet_wrap(~outcome_categorical, nrow = 2) +
+  theme(legend.position = "none")
+
+
+# Plot for "perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio"
+plot3_observed_predicted <- predictions_combined %>%
+  # mutate(r2 = paste0("italic(R)^2~`=`~", round(r2, 2))) %>%
+  filter(
+    model == "superlearner",
+    outcome %in% c("perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio", "perc_used_internet_past12months_wght_age_15_to_49_fm_ratio"),
+    feature_set == "fb_and_offline",
+    cv_method == "LOCO-CV"
+  ) %>%
+  ggplot(aes(x = observed, y = predicted, size = pop_all_age_total_dhsyear)) +
+  geom_point(alpha = 0.1) +
+  ylim(0, 1.5) +
+  xlim(0, 1.5) +
+  geom_abline(slope = 1, linetype = "dashed", color = "grey") +
+  theme_cowplot() +
+  labs(title = "Gender Gap", size = "Population Size") +
+  geom_text(
+    aes(label = paste("atop(italic(R)^2 == ", round(r2, 2), ", italic(r) == ", round(r, 2), ")")),
+    x = .2, 
+    y = 1.35, 
+    parse = TRUE,
+    size = 3.5) +
+  facet_wrap(~outcome_categorical, nrow = 2) +
+  theme(legend.position = "none") +
+  scale_size_continuous(
+    breaks = c(300000, 1000000, 3000000, 10000000),
+    labels = c("300k", "1m", "3m", "10m")
+  ) +
+  guides(size = guide_legend(override.aes = list(alpha = 1)))
+
+# Combine plots using cowplot's plot_grid
+combined_plot_observed_predicted <- plot_grid(plot1_observed_predicted, plot2_observed_predicted, plot3_observed_predicted, ncol = 3, labels = "AUTO")
+
+# Extract the legend from plot3_internet12m (or from whichever plot you prefer)
+legend <- cowplot::get_legend(
+  plot3_observed_predicted + theme(legend.position = "bottom", legend.direction = "horizontal")
+)
+
+# Combine the combined_plots with the extracted legend and place it at the bottom
+combined_plot_observed_predicted_legend <- plot_grid(combined_plot_observed_predicted, legend, ncol = 1, rel_heights = c(1, .1))
+
+ggsave(plot = combined_plot_observed_predicted_legend, here("figures", "observed_predicted_loco_complete_fig.png"), width = 10, height = 6)
+```
+
 ```{r}
 # Plot for "perc_ever_used_internet_wght_age_15_to_49_men"
 plot1_combined <- predictions_combined %>%
@@ -205,15 +301,15 @@ plot1_combined <- predictions_combined %>%
   ) %>%
   ggplot(aes(x = observed, y = predicted, size = pop_all_age_total_dhsyear)) +
   geom_point(alpha = 0.1) +
-  ylim(0, 110) +
-  xlim(0, 110) +
+    scale_y_continuous(limits = c(0, 1.1), labels = scales::label_percent()) +
+    scale_x_continuous(limits = c(0, 1.1), labels = scales::label_percent()) +
   geom_abline(slope = 1, linetype = "dashed", color = "grey") +
   theme_cowplot() +
   labs(title = "Women") +
   geom_text(
     aes(label = paste("atop(italic(R)^2 == ", round(r2, 2), ", italic(r) == ", round(r, 2), ")")),
-    x = 20, 
-    y = 90, 
+    x = .20, 
+    y = .90, 
     parse = TRUE,
     size = 4) +
   facet_grid(rows = vars(outcome_categorical), cols = vars(cv_method)) +
@@ -230,15 +326,15 @@ plot2_combined <- predictions_combined %>%
   ggplot(aes(x = observed, y = predicted)) +
   geom_point(aes(size = pop_all_age_total_dhsyear), alpha = 0.1) +
   # geom_smooth() +
-  ylim(0, 110) +
-  xlim(0, 110) +
+    scale_y_continuous(limits = c(0, 1.1), labels = scales::label_percent()) +
+    scale_x_continuous(limits = c(0, 1.1), labels = scales::label_percent()) +
   geom_abline(slope = 1, linetype = "dashed", color = "grey") +
   theme_cowplot() +
   labs(title = "Men") +
   geom_text(
     aes(label = paste("atop(italic(R)^2 == ", round(r2, 2), ", italic(r) == ", round(r, 2), ")")),
-    x = 20, 
-    y = 90, 
+    x = .20, 
+    y = .90, 
     parse = TRUE,
     size = 4) +
   facet_grid(rows = vars(outcome_categorical), cols = vars(cv_method)) +
@@ -308,8 +404,8 @@ observed_predicted_plot_country_mobile_wom <- predictions_combined %>%
     size = "Population Size"
   ) +
   theme_cowplot() +
-  xlim(0, 100) +
-  ylim(0, 100) +
+  xlim(0, 1) +
+  ylim(0, 1) +
     facet_wrap(~country) +
   geom_abline(slope = 1, linetype = "dashed") +
   # facet_wrap(~country) +
@@ -340,8 +436,8 @@ observed_predicted_plot_country_mobile_men <- predictions_combined %>%
     size = "Population Size"
   ) +
   theme_cowplot() +
-  xlim(0, 100) +
-  ylim(0, 100) +
+  xlim(0, 1) +
+  ylim(0, 1) +
   geom_abline(slope = 1, linetype = "dashed") +
   facet_wrap(~country) +
   scale_size_continuous(
@@ -409,8 +505,8 @@ observed_predicted_plot_country_internet_wom <- predictions_combined %>%
     size = "Population Size"
   ) +
   theme_cowplot() +
-  xlim(0, 100) +
-  ylim(0, 100) +
+  xlim(0, 1) +
+  ylim(0, 1) +
   geom_abline(slope = 1, linetype = "dashed") +
   facet_wrap(~country) +
   scale_size_continuous(
@@ -438,8 +534,8 @@ observed_predicted_plot_country_internet_men <- predictions_combined %>%
     size = "Population Size"
   ) +
   theme_cowplot() +
-  xlim(0, 100) +
-  ylim(0, 100) +
+  xlim(0, 1) +
+  ylim(0, 1) +
   geom_abline(slope = 1, linetype = "dashed") +
   facet_wrap(~country) +
   scale_size_continuous(
@@ -530,6 +626,32 @@ write_rds(country_level_mae, file = here("figures", "country_level_mae.rds"))
 write_rds(country_level_corr, file = here("figures", "country_level_corr.rds"))
 
 ```
+
+```{r}
+# Plot for "perc_ever_used_internet_wght_age_15_to_49_men"
+plot1_observed_predicted <- predictions_combined %>%
+  filter(
+    model == "superlearner",
+    outcome %in% c( "perc_used_internet_past12months_wght_age_15_to_49_wom"),
+    feature_set == "fb_and_offline",
+    cv_method == "LOCO-CV"
+  ) %>%
+  ggplot(aes(x = observed, y = predicted, size = pop_all_age_total_dhsyear, group = pop_all_age_total_dhsyear)) +
+  geom_point(alpha = 0.2) +
+  geom_abline(slope = 1, linetype = "dashed", color = "grey") +
+  theme_cowplot() +
+  labs(title = "Women") +
+  ggpubr::stat_cor() + 
+  scale_y_continuous(limits = c(0, 1.1), labels = scales::label_percent()) +
+  scale_x_continuous(limits = c(0, 1.1), labels = scales::label_percent()) +
+  facet_wrap(~outcome_categorical, nrow = 2) +
+  theme(legend.position = "none") + 
+  facet_wrap(~dhsyear)
+```
+
+
+
+
 
 
 

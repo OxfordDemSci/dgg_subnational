@@ -1,0 +1,166 @@
+---
+title: "Make trends figure"
+author: Casey Breen
+---
+
+Summary: create trend figure 
+
+```{r}
+## libary packages + custom functions 
+library(here)
+source(here("code", "helpers.R"))
+```
+
+
+```{r}
+predictions <- read_csv(here("out", "predictions_with_uncertainty.csv"))
+
+predictions <- predictions %>% 
+  mutate(date = as.Date(paste0(date, "-01")))
+```
+
+
+
+
+```{r}
+# Filter for Guatemala
+data_filter <- predictions %>%
+    filter(outcome == "internet_fm_ratio") %>% 
+  filter(gid_0 == "AFG")
+
+# Calculate median line
+median_data <- data_filter %>%
+  group_by(date) %>%
+  summarize(median_predicted = median(predicted, na.rm = TRUE))
+
+# Plot with median as dark line and others as clear grey
+afghanistan_plot <- ggplot() +
+  geom_line(data = data_filter, aes(x = date, y = predicted, group = gid_1),
+            color = "grey80", size = 0.5) +
+  geom_line(data = median_data, aes(x = date, y = median_predicted),
+            color = "black", size = 1) +
+  theme_cowplot() +
+  labs(
+    title = "Afghanistan",
+    x = "Date",
+    y = "Gender Gap (Internet)"
+  ) + 
+    background_grid() + 
+  ylim(0, max(data_filter$predicted)) + 
+  ylim(0, .8)
+```
+
+
+```{r}
+# Filter for Guatemala
+data_filter <- predictions %>%
+    filter(outcome == "internet_fm_ratio") %>% 
+  filter(gid_0 == "NGA")
+
+# Calculate median line
+median_data <- data_filter %>%
+  group_by(date) %>%
+  summarize(median_predicted = median(predicted, na.rm = TRUE))
+
+# Plot with median as dark line and others as clear grey
+nigeria_plot <- ggplot() +
+  geom_line(data = data_filter, aes(x = date, y = predicted, group = gid_1),
+            color = "grey80", size = 0.5) +
+  geom_line(data = median_data, aes(x = date, y = median_predicted),
+            color = "black", size = 1) +
+  theme_cowplot() +
+      background_grid() + 
+  labs(
+    title = "Nigeria",
+    x = "Date",
+    y = "Gender Gap (Internet)"
+  ) + 
+  ylim(0, max(data_filter$predicted)) + 
+  ylim(0, 1)
+```
+
+
+```{r}
+# Filter for Guatemala
+data_filter <- predictions %>%
+    filter(outcome == "internet_fm_ratio") %>% 
+  filter(gid_0 == "IND")
+
+# Calculate median line
+median_data <- data_filter %>%
+  group_by(date) %>%
+  summarize(median_predicted = median(predicted, na.rm = TRUE))
+
+# Plot with median as dark line and others as clear grey
+india_plot <- ggplot() +
+  geom_line(data = data_filter, aes(x = date, y = predicted, group = gid_1),
+            color = "grey80", size = 0.5) +
+  geom_line(data = median_data, aes(x = date, y = median_predicted),
+            color = "black", size = 1) +
+  theme_cowplot() +
+    background_grid() + 
+  labs(
+    title = "India",
+    x = "Date",
+    y = "Gender Gap (Internet)"
+  ) + 
+  ylim(0, max(data_filter$predicted)) + 
+  ylim(0, 1)
+```
+
+```{r}
+trend_plot <- plot_grid(india_plot, nigeria_plot, afghanistan_plot, nrow = 1, labels = "AUTO")
+```
+
+
+## internet figure 
+
+
+```{r}
+# Filter for the outcome of interest (e.g., "internet_women")
+filtered_data <- predictions %>%
+  filter(outcome == "internet_women")
+
+# Calculate Gini coefficient for each country and year
+gini_results <- filtered_data %>%
+  group_by(gid_0, year) %>%
+  summarise(
+    gini = ineq(predicted, type = "Gini"),  # Compute Gini coefficient for 'predicted' values
+    .groups = "drop"
+  )
+```
+
+
+
+```{r}
+gini_results <- gini_results %>%
+  mutate(continent = countrycode(sourcevar = gid_0, origin = "iso3c", destination = "continent"))
+
+gini_plot <- gini_results %>% 
+  filter(continent %in% c("Africa", "Americas", "Asia")) %>% 
+  group_by(year, continent) %>% 
+  filter(!is.na(gini)) %>% 
+  summarize(gini = median(gini, na.rm = TRUE))  %>% 
+  ggplot(aes(x = year, y = gini, color = continent)) + 
+  geom_line() + 
+  geom_point(size = 4, shape = 21, fill = "white", stroke = 1.5) +  # Bigger points with white fill
+  theme_cowplot() + 
+  ylim(0, 0.4) + 
+  theme(legend.position = "bottom") + 
+  scale_x_continuous(breaks = seq(min(gini_results$year, na.rm = TRUE), 
+                                  max(gini_results$year, na.rm = TRUE), by = 1)) +  # Year intervals
+  scale_color_manual(values = cud) + 
+  background_grid() + 
+  labs(x = "Date", y = "Gini Index")
+```
+
+```{r}
+trend_plot_combined <- cowplot::plot_grid(trend_plot, gini_plot, ncol = 1, labels = c("", "D"))
+
+ggsave(plot = trend_plot_combined, filename = here("figures", "trend_plot_combined.png"), height = 8, width = 10)
+
+```
+
+
+
+

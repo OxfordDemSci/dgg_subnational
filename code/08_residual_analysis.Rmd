@@ -24,7 +24,7 @@ predictions_combined <- read_csv(here("out", "combined_predictions_lmics_nationa
   filter(feature_set == "fb_and_offline") 
 
 ## read in training and test datasets 
-gadm1 <- read_csv(here("data", "aggregated_indicators_lmic_aug13.csv"), 
+master_file <- read_csv(here("data", "master_data_file_dec24_with_national.csv"), 
                   locale = locale(encoding = "ISO-8859-1")) %>%
   janitor::clean_names() %>% 
   dplyr::select(country, gid_1, all_of(c(dhs_vars, fb_feats, off_feats))) %>% ## the vectors of vars are defined in helper function 
@@ -45,7 +45,7 @@ predictions_filter <- predictions_combined %>%
 
 ```{r}
 predictions_filter <- predictions_filter %>% 
-  left_join(gadm1, by = "gid_1")
+  left_join(master_file, by = "gid_1")
 
 predictions_filter <- predictions_filter %>% 
   mutate(residual = observed-predicted)
@@ -73,7 +73,7 @@ plot1_residuals <- predictions_filter %>%
   theme_cowplot() + 
   facet_wrap(~outcome_clean, scales = "free", nrow = 1) + 
     labs(x = "") + 
-  xlim(-100, 100)
+  xlim(-1, 1)
 
 
 # Plot for "perc_ever_used_internet_wght_age_15_to_49_men"
@@ -88,7 +88,7 @@ plot2_residuals <- predictions_filter %>%
   labs(x = "") + 
   labs(x = "Residual", y = "Count") + 
   facet_wrap(~outcome_clean, scales = "free", nrow = 1) + 
-  xlim(-100, 100)
+  xlim(-1, 1)
 
 
 # Plot for "perc_ever_used_internet_wght_age_15_to_49_men"
