@@ -13,41 +13,14 @@ source(here("code", "helpers.R"))
 
 
 ```{r}
-master_file <- read_csv(here("data", "master_data_file_dec24_with_national.csv")) 
+master_file <- read_csv(here("data", "master_data_file_dec27_with_national.csv")) 
 ```
 
 
 
 ```{r}
-master_file_full <- read_csv(here("data", "master_data_file_dec24_with_national.csv"), 
-                       locale = locale(encoding = "ISO-8859-1"),
-                       show_col_types = FALSE) %>%
-  janitor::clean_names() %>% 
-  mutate(continent = case_when(continent == "Africa" ~ 1,
-                               TRUE ~ 0)) %>% 
-  filter(!(country == "Bangladesh" & dhsyear == "2014")) %>% 
-  filter(!(country == "India" & dhsyear == "2014")) %>% 
-  filter(!(country == "Cambodia" & dhsyear == "2014")) %>%
-  filter(!(country == "Nepal" & dhsyear == "2016")) %>%
-  filter(!(country == "Philippines" & dhsyear == "2017")) %>%
-  mutate(pop_all_age_total = pop_all_age_female + pop_all_age_male) %>%
-  filter(!is.na(fb_pntr_18p_female)) %>% 
-  mutate(
-    nl_mean_zscore,
-    pop_density,
-    pop_all_age_female,
-    pop_all_age_male,
-    subnational_gdi,
-    subnational_hdi_males,
-    subnational_hdi_females,
-    educational_index_females,
-    educational_index_males,
-    income_index_females,
-    income_index_males,
-    internet_speed,
-    continent ,
-    hdi,
-    gdi)
+master_file_full <- read_csv(here("data", "master_data_file_dec24_with_national.csv")) %>% 
+  filter(!is.na(fb_pntr_18p_female))
 ```
 
 
@@ -90,3 +63,4 @@ variable_table <- table_variables %>%
 
 print(xtable(variable_table, digits = 0), include.rownames=FALSE, file = here("figures", "variable_table.tex"))
 ```
+

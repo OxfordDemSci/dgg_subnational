@@ -34,9 +34,10 @@ pacman::p_load(
   xtable,       # package for making latex tables
   haven,        # read stata files
   tidyverse,    # data manipulation and visualization
-  conflicted,    # custom functions
-  caret,
-  ineq # machine learning 
+  conflicted,   # custom functions
+  caret,        # modeling functions
+  ineq,           # machine learning 
+  ggalt
 )
 
 ## custom functions 
@@ -61,8 +62,6 @@ execute_source <- function(file) {
     }
   )
 }
-
-
 
 ## custom color schemes 
 ## custom color schemes
@@ -557,7 +556,8 @@ perform_cross_validation <- function(data, dependent_var, features) {
 
 ## calculate r squared 
 calculate_r_squared <- function(predicted, observed) {
-  correlation_coefficient <- cor(predicted, observed)
-  r_squared <- correlation_coefficient
+  ss_res <- sum((observed - predicted)^2) # Residual Sum of Squares
+  ss_tot <- sum((observed - mean(observed))^2) # Total Sum of Squares
+  r_squared <- 1 - (ss_res / ss_tot)
   return(r_squared)
 }

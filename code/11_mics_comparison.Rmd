@@ -1,0 +1,165 @@
+---
+title: "National comparison"
+author: Casey Breen
+---
+
+Summary: Make national-level comparison with 
+
+```{r}
+## libary packages + custom functions 
+library(here)
+source(here("code", "helpers.R"))
+```
+
+
+```{r}
+### read in training and test datasets 
+master_file <- fread(here("data", "master_data_file_dec27_with_national.csv")) %>%
+  filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% 
+  drop_na() %>% 
+  filter(year != 2024)
+
+master_file_full <- fread(here("data", "master_data_file_dec27_with_national.csv")) %>%
+  filter(!is.na(fb_pntr_18p_female))
+
+## read in predictions
+predictions <- fread(here("out", "predictions_with_uncertainty.csv")) %>% 
+  filter(year != 2024)
+
+## ground truth data 
+ground_truth <- fread(here("data", "national_ground_truth_sep17_2024.csv")) 
+```
+
+
+
+```{r}
+predictions <- predictions %>% 
+  left_join(master_file_full %>% mutate(date = paste0(year, "-", month)), by = c("gid_0", "gid_1", "year"))
+```
+
+
+```{r}
+national_estimates <- predictions %>% 
+  filter(year < 2023) %>% 
+  group_by(gid_0, year, outcome) %>% 
+  summarize(
+    predicted_national = case_when(
+      outcome %in% c("mobile_men", "internet_men") ~ sum(predicted * pop_all_age_male, na.rm = TRUE) / sum(pop_all_age_male, na.rm = TRUE),
+      outcome %in% c("mobile_women", "internet_women") ~ sum(predicted * pop_all_age_female, na.rm = TRUE) / sum(pop_all_age_female, na.rm = TRUE),
+      outcome %in% c("mobile_fm_ratio", "internet_fm_ratio") ~ sum(predicted * (pop_all_age_male + pop_all_age_female), na.rm = TRUE) / sum(pop_all_age_male + pop_all_age_female, na.rm = TRUE),
+      TRUE ~ NA_real_
+    ),
+    .groups = "drop"
+  ) %>% 
+  distinct(gid_0, year, outcome, predicted_national)
+
+```
+
+
+## Comparison with MICS
+
+```{r}
+## prepare df 
+national_predictions_comparison_df <- national_estimates %>% 
+  filter(year > 2018) %>%
+  inner_join(ground_truth, by = c("gid_0", "year" = "survey_year", "outcome")) %>% 
+  filter(source == "mics6") %>% 
+  distinct() %>% 
+   mutate(outcome_clean = case_when(
+    grepl("mobile_fm_ratio", outcome) ~ "Mobile (Ratio)",
+    grepl("mobile_men", outcome) ~ "Mobile (Men)",
+    grepl("mobile_women", outcome) ~ "Mobile (Women)",
+    grepl("internet_fm_ratio", outcome) ~ "Internet (Ratio)",
+    grepl("internet_men", outcome) ~ "Internet (Men)",
+    grepl("internet_women", outcome) ~ "Internet (Women)",
+    TRUE ~ outcome
+  ))
+
+
+# Define the order of the levels explicitly
+national_predictions_comparison_df <- national_predictions_comparison_df %>% 
+  mutate(outcome_clean = factor(outcome_clean, 
+                                levels = c("Internet (Women)", "Internet (Men)", "Internet (Ratio)",
+                                           "Mobile (Women)", "Mobile (Men)", "Mobile (Ratio)")))
+
+# Calculate R-squared and correlation (r) by outcome
+r_squared_results <- national_predictions_comparison_df %>%
+  group_by(outcome_clean) %>%
+  summarize(
+    r = cor(observed, predicted_national, use = "complete.obs"),  # Calculate correlation
+    r2 = compute_r2(observed, predicted_national),  # Calculate R-squared
+    mae = mean(abs(observed - predicted_national)), 
+    .groups = "drop"
+  )
+
+mics_comparison_fig <-  national_predictions_comparison_df %>% 
+  left_join(r_squared_results) %>% 
+  ggplot(aes(y = observed, x = predicted_national, label = gid_0, color = year)) + 
+  geom_text() +
+  theme_cowplot() + 
+  geom_abline(color = "grey", linetype = "dashed") + 
+  ylim(0, 1) + 
+  xlim(0, 1) + 
+  labs(x = "Ground Truth, MICS", 
+       y = "National Prediction",
+       color = "MICS Survey Year") + 
+  geom_text(
+      aes(label = paste("atop(italic(r) == ", round(r, 2), ", italic(mae) == ", round(mae, 2), ")")),
+   # aes(label = paste("italic(r) == ", round(r, 2))),
+    x = 0.2,  # Adjusted position for better visibility
+    y = 0.9, 
+    size = 3.5,
+    parse = TRUE,
+    inherit.aes = FALSE
+  ) +
+  theme(
+    legend.position = "bottom",
+    legend.key.width = unit(2, "cm"),
+    legend.text = element_text(size = 10) ) + 
+  facet_wrap(~outcome_clean)
+
+ggsave(plot = mics_comparison_fig, filename = here("figures", "mics_comparison.png"), height = 7, width = 10)
+```
+
+
+
+```{r}
+## read in predictions
+predictions_wide <- fread(here("out", "predictions_and_observed.csv")) 
+
+predictions_wide <- predictions_wide %>% 
+  left_join(master_file_full, by = c("gid_0", "gid_1", "year", "month"))
+```
+
+
+## national statistics for abstract 
+
+```{r}
+## internet sums and proportions 
+internet_sum <- predictions_wide %>% 
+  filter(year == 2024 & month == 11) %>%
+  summarize(total_female_internet_users = sum(predicted_perc_used_internet_past12months_wght_age_15_to_49_wom * pop_all_age_female) ,
+            total_male_internet_users = sum(predicted_perc_used_internet_past12months_wght_age_15_to_49_men * pop_all_age_male) ,
+            prop_women_internet = sum(predicted_perc_used_internet_past12months_wght_age_15_to_49_wom * pop_all_age_female) / sum(pop_all_age_female),
+            prop_men_internet = sum(predicted_perc_used_internet_past12months_wght_age_15_to_49_men * pop_all_age_male)  / sum(pop_all_age_male)) 
+
+## mobile sums and proportions 
+mobile_sum <- predictions_wide %>% 
+  filter(year == 2024 & month == 11) %>% 
+  summarize(total_women_mobile = sum(predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom * pop_all_age_female) ,
+            total_men_mobile = sum(predicted_perc_owns_mobile_telephone_wght_age_15_to_49_men * pop_all_age_male) ,
+            prop_women_mobile = sum(predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom * pop_all_age_female)  / sum(pop_all_age_female),
+            prop_men_mobile = sum(predicted_perc_owns_mobile_telephone_wght_age_15_to_49_men * pop_all_age_male)  / sum(pop_all_age_male))
+
+## how many more female than male internet users 
+glue::glue('More male than female internet users = {round(internet_sum$total_male_internet_users - internet_sum$total_female_internet_users, 0)}')
+
+## percentage less likely to use internet
+glue::glue('Women are {round((internet_sum$prop_men_internet - internet_sum$prop_women_internet) / internet_sum$prop_men_internet * 100, 2)}% less likely than men to use the internet')
+
+## how many more female than male mobile phone owners 
+glue::glue('More male than female mobile phone owners = {round(mobile_sum$total_men_mobile - mobile_sum$total_women_mobile, 0)}')
+
+## percentage less likely to own mobile phones
+glue::glue('Women are {round((mobile_sum$prop_men_mobile - mobile_sum$prop_women_mobile) / mobile_sum$prop_men_mobile * 100, 2)}% less likely than men to own mobile phones')
+```

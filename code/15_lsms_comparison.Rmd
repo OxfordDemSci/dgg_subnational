@@ -1,0 +1,202 @@
+---
+title: "LSMS Comparison"
+author: Casey Breen
+---
+
+## additional checks and analyses 
+
+```{r}
+## libary packages + custom functions 
+library(here)
+source(here("code", "helpers.R"))
+```
+
+```{r}
+## read in data 
+lsms_estimates <- read_csv(here("data", "lsms_ground_truth.csv")) %>% 
+  janitor::clean_names()
+
+predictions <- read_csv(here("out", "predictions_with_uncertainty.csv")) %>% 
+  mutate(predicted = case_when(
+    predicted > 1 ~ 1,
+    TRUE ~ predicted
+  ))
+
+gadm1 <- read_csv(here("data", "subnational_ground_truth_sep17_2024.csv"), locale = locale(encoding = "ISO-8859-1")) %>% 
+  mutate(observed = case_when(
+    outcome %in% c("internet_fm_ratio", "mobile_fm_ratio") ~ observed,
+    TRUE ~ observed / 100))
+```
+
+```{r}
+lsms_estimates_long <- lsms_estimates %>% 
+    # filter(!gid_1 %in% gadm1$gid_1) %>% 
+  filter(!(iso3 == "NER" & survey_year == 2021)) %>% 
+ filter(internet_n_sample_f > 1000) %>% 
+  select(iso3, gid_1, survey_year, internet_women = internet_f_weighted, internet_men =  internet_m_weighted, mobile_women = mobile_f_weighted, mobile_men = mobile_m_weighted) %>% 
+  mutate(mobile_fm_ratio = mobile_women/mobile_men) %>% 
+  mutate(internet_fm_ratio = internet_women/internet_men) %>% 
+  pivot_longer(-c(gid_1, iso3, survey_year)) %>% 
+  rename(lsms_estimate = value, outcome = name)
+
+lsms_estimates_long <- lsms_estimates_long %>% 
+  filter(!(iso3 == "NGA" & outcome %in% c("mobile_women", "mobile_men", "mobile_fm_ratio")))
+```
+
+
+```{r}
+# Joining Data
+lsms_data <- predictions %>% 
+  select(gid_1, predicted, outcome, year) %>% 
+  inner_join(lsms_estimates_long, by = c("year" = "survey_year", "gid_1", "outcome")) %>% 
+  filter(!is.na(lsms_estimate) & !is.na(predicted)) #%>%  filter(iso3 != "NER")
+
+# Calculate R-squared and correlation (r) by outcome
+r_squared_results <- lsms_data %>%
+  group_by(outcome) %>%
+  summarize(
+    r = cor(predicted, lsms_estimate, use = "complete.obs"),  # Calculate correlation
+    r2 = compute_r2(predicted, lsms_estimate),  # Calculate R-squared
+    mae = mean(abs(predicted - lsms_estimate)), 
+    .groups = "drop"
+  )
+
+lsms_data <-  lsms_data %>% 
+   mutate(outcome_clean = case_when(
+    grepl("mobile_fm_ratio", outcome) ~ "Mobile (Ratio)",
+    grepl("mobile_men", outcome) ~ "Mobile (Men)",
+    grepl("mobile_women", outcome) ~ "Mobile (Women)",
+    grepl("internet_fm_ratio", outcome) ~ "Internet (Ratio)",
+    grepl("internet_men", outcome) ~ "Internet (Men)",
+    grepl("internet_women", outcome) ~ "Internet (Women)",
+    TRUE ~ outcome
+  )) %>% mutate(outcome_clean = factor(outcome_clean, 
+                                levels = c("Internet (Women)", "Internet (Men)", "Internet (Ratio)",
+                                           "Mobile (Women)", "Mobile (Men)", "Mobile (Ratio)")))
+
+lsms_plot <- lsms_data %>%
+  left_join(r_squared_results, by = "outcome") %>%
+  ggplot(aes(x = lsms_estimate, y = predicted, color = year)) + 
+  geom_point(alpha = 0.7) + 
+  geom_abline(slope = 1, color = "red", linetype = "dashed") + 
+  theme_cowplot() + 
+  ylim(0, 1) + 
+  xlim(0, 1) + 
+  labs(
+    color = "LSMS Survey Year", 
+    x = "LSMS Observed", 
+    y = "Predicted",
+    legend = "MICS Survey Year"
+  ) +
+  geom_text(
+      aes(label = paste("atop(italic(r) == ", round(r, 2), ", italic(mae) == ", round(mae, 2), ")")),
+   # aes(label = paste("italic(r) == ", round(r, 2))),
+    x = 0.2,  # Adjusted position for better visibility
+    y = 0.9, 
+    size = 3.5,
+    parse = TRUE,
+    inherit.aes = FALSE
+  ) +
+  theme(
+    legend.position = "bottom",
+    legend.key.width = unit(2, "cm"),  
+    legend.text = element_text(size = 10)
+  ) + 
+  facet_wrap(~outcome_clean)
+
+## write 
+ggsave(plot = lsms_plot, filename = here("figures", "predicted_vs_lsms_with_legend.png"), width = 10, height = 7, bg = "white")
+```
+
+
+
+
+```{r}
+dhs_vs_lsms_df <- gadm1 %>% 
+  left_join(lsms_estimates_long, by = c("gid_1", "outcome")) %>% 
+  mutate(survey_diff = survey_year.x - survey_year.y) %>% 
+  filter(!is.na(lsms_estimate))
+
+# Calculate R-squared and correlation (r) by outcome
+r_squared_results <- dhs_vs_lsms_df %>%
+  group_by(outcome) %>%
+  summarize(
+    r = cor(observed, lsms_estimate, use = "complete.obs"),  # Calculate correlation
+    r2 = compute_r2(observed, lsms_estimate),  # Calculate R-squared
+    mae = mean(abs(observed - lsms_estimate)), 
+    .groups = "drop"
+  )
+
+dhs_vs_lsms_df <- dhs_vs_lsms_df %>% 
+   mutate(outcome_clean = case_when(
+    grepl("mobile_fm_ratio", outcome) ~ "Mobile (Ratio)",
+    grepl("mobile_men", outcome) ~ "Mobile (Men)",
+    grepl("mobile_women", outcome) ~ "Mobile (Women)",
+    grepl("internet_fm_ratio", outcome) ~ "Internet (Ratio)",
+    grepl("internet_men", outcome) ~ "Internet (Men)",
+    grepl("internet_women", outcome) ~ "Internet (Women)",
+    TRUE ~ outcome
+  )) %>% mutate(outcome_clean = factor(outcome_clean, 
+                                levels = c("Internet (Women)", "Internet (Men)", "Internet (Ratio)",
+                                           "Mobile (Women)", "Mobile (Men)", "Mobile (Ratio)")))
+
+lsms_vs_dhs <- dhs_vs_lsms_df %>% 
+    left_join(r_squared_results, by = "outcome") %>%
+  ggplot(aes(x = lsms_estimate, y = observed, color = survey_diff)) + 
+  geom_point() +
+  geom_abline(slope = 1, linetype = "dashed") +
+  xlim(0, 1) + 
+  ylim(0, 1) + 
+  facet_wrap(~outcome) + 
+  theme_cowplot() + 
+  labs(color  = "DHS - LSMS Survey Year",
+       x = "LSMS",
+       y = "DHS") + 
+  geom_text(
+      aes(label = paste("atop(italic(r) == ", round(r, 2), ", italic(mae) == ", round(mae, 2), ")")),
+   # aes(label = paste("italic(r) == ", round(r, 2))),
+    x = 0.2,  # Adjusted position for better visibility
+    y = 0.9, 
+    size = 3.5,
+    parse = TRUE,
+    inherit.aes = FALSE
+  ) +
+  theme(
+    legend.position = "bottom",
+    legend.key.width = unit(2, "cm"),  
+    legend.text = element_text(size = 10)
+  ) + 
+  facet_wrap(~outcome_clean)
+
+ggsave(plot = lsms_vs_dhs, filename = here("figures", "lsms_vs_dhs.png"), width = 10, height = 7, bg = "white")
+
+```
+
+
+```{r}
+mics_data <- read_csv(here("data", "mics_ground_truth.csv")) %>% janitor::clean_names()
+```
+
+
+```{r}
+mics_long <- mics_data %>% 
+  filter(internet_n_sample_f > 100) %>% 
+  select(iso3, gid_1, survey_year, internet_women = internet_f_weighted, internet_men =  internet_m_weighted, mobile_women = mobile_f_weighted, mobile_men = mobile_m_weighted) %>% 
+  mutate(mobile_fm_ratio = mobile_women/mobile_men) %>% 
+  mutate(internet_fm_ratio = internet_women/internet_men) %>% 
+  pivot_longer(-c(gid_1, iso3, survey_year)) %>% 
+  rename(mics_estimate = value, outcome = name) 
+
+
+predictions %>% 
+  inner_join(mics_long, by = c("year" = "survey_year", "gid_1", "outcome")) %>% 
+  ggplot(aes(x = mics_estimate, y = predicted)) + 
+  geom_point() + 
+  ggpubr::stat_cor() + 
+  facet_wrap(~outcome) + 
+  theme_cowplot() + 
+  geom_abline(slope = 1, linetype = "dashed", color = "red") + 
+  ylim(0, 1.3) + 
+  xlim(0, 1.3)
+```
+

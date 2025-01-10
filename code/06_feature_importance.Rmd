@@ -32,12 +32,8 @@ predictions_combined <- read_csv(here("out", "combined_predictions_lmics_nationa
                    "perc_used_internet_past12months_wght_age_15_to_49_wom") ~ "Internet"))
 
 ## read in training and test datasets 
-master_file <- read_csv(here("data", "master_data_file_dec24_with_national.csv"), 
-                  locale = locale(encoding = "ISO-8859-1")) %>%
-  janitor::clean_names() %>% 
-  mutate(pop_all_age_total = pop_all_age_female + pop_all_age_male) %>% 
-  dplyr::select(country, gid_1, dhsyear, pop_all_age_total, continent) %>% 
-   filter(!(country == "India" & dhsyear == 2015)) 
+master_file <- read_csv(here("data", "master_data_file_dec27_with_national.csv")) %>%
+  dplyr::select(country, gid_1, dhsyear, pop_all_age_total, continent) 
 
 
 predictions_combined <- predictions_combined %>% 
@@ -153,18 +149,13 @@ feature_comparison_plot <- filtered_data %>%
   ggsci::scale_color_lancet() + 
   xlim(0, 0.8) + 
   facet_grid(category ~ ., scales = "free_y", space = "free_y", switch = "y")
-
-ggsave(plot = feature_comparison_plot, here("figures", "feature_comparison_plot.png"), width = 5, height = 5)
 ```
 
 
 
 ```{r}
 ## read in training and test datasets 
-master_file <- read_csv(here("data", "master_data_file_dec24_with_national.csv"), 
-                  locale = locale(encoding = "ISO-8859-1")) %>%
-  mutate(tesselation_2024 = ifelse(TRUE, 1, 0)) %>%
-  janitor::clean_names() %>% 
+master_file <- read_csv(here("data", "master_data_file_dec27_with_national.csv")) %>%
   dplyr::select(country, gid_1, all_of(c(dhs_vars, fb_feats, off_feats))) %>% ## the vectors of vars are defined in helper function
   filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% drop_na() %>% 
   mutate(continent = case_when(continent == "Africa" ~ 1,
@@ -238,6 +229,7 @@ var_importance_data <- cv_results %>%
     feature == "x4g_age_18_plus_female_frac_2024" ~ "4G+ Network FB Usage", 
     grepl("all_devices_age_18_dhsyear_gg_national", feature) ~ "Facebook National Gender Gap",
     grepl("all_devices_age_18_plus_gg_2021_impute", feature) ~ "Facebook Gender Gap",
+        grepl("rel_date", feature) ~ "Year",
     TRUE ~ feature  # Default case
   )) %>% 
   group_by(outcome) %>%
