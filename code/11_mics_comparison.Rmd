@@ -103,8 +103,8 @@ mics_comparison_fig <-  national_predictions_comparison_df %>%
   labs(x = "Ground Truth, MICS", 
        y = "National Prediction",
        color = "MICS Survey Year") + 
-  geom_text(
-      aes(label = paste("atop(italic(r) == ", round(r, 2), ", italic(mae) == ", round(mae, 2), ")")),
+  geom_label(
+      aes(label = paste("atop(italic(r) == ", round(r, 2), ", italic(MAE) == ", round(mae, 2), ")")),
    # aes(label = paste("italic(r) == ", round(r, 2))),
     x = 0.2,  # Adjusted position for better visibility
     y = 0.9, 
@@ -135,6 +135,15 @@ predictions_wide <- predictions_wide %>%
 ## national statistics for abstract 
 
 ```{r}
+predictions_wide <- predictions_wide %>% 
+  mutate(across(c(predicted_perc_used_internet_past12months_wght_age_15_to_49_wom, 
+                  predicted_perc_used_internet_past12months_wght_age_15_to_49_men, 
+                  predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom, 
+                  predicted_perc_owns_mobile_telephone_wght_age_15_to_49_men), 
+                ~ pmin(.x, 1)))
+
+  
+
 ## internet sums and proportions 
 internet_sum <- predictions_wide %>% 
   filter(year == 2024 & month == 11) %>%

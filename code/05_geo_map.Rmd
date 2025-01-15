@@ -22,7 +22,7 @@ master_file_full <- read_csv(here("data", "master_data_file_dec27_with_national.
   filter(year == 2024 & month == 11)
 
 ## read in predictions 
-predictions_wide <- read_csv(here("out", "predictions_and_observed.csv")) 
+predictions_wide <- read_csv(here("out", "predictions_wide.csv")) 
 
 predictions_uncertainty <- read_csv(here("out", "predictions_with_uncertainty.csv")) %>% 
   filter(outcome == "internet_women") %>% 
@@ -32,8 +32,6 @@ loco_predictions <- read_csv(here("out", "combined_predictions_lmics_national_co
   filter(model == "superlearner" & feature_set == "fb_and_offline" & cv_method == "loco") %>% 
   filter()
 ```
-
-
 
 
 ```{r}
@@ -132,13 +130,13 @@ internet_women_predicted_error <- ggplot() +
 # Women, relative error 
 internet_women_predicted_error_relative <- ggplot() +
   geom_sf(data = gadm1_map, fill = "grey70", color = "black", linewidth = 0.5) +
-  geom_sf(data = shapefile_df, aes(fill = predicted_error / predicted_perc_used_internet_past12months_wght_age_15_to_49_wom), 
+  geom_sf(data = shapefile_df, aes(fill = pmin(predicted_error / predicted_perc_used_internet_past12months_wght_age_15_to_49_wom, 2)), 
           color = "white", size = 0.01, alpha = 0.8, linewidth = 0.05) +
   scale_fill_gradientn(
     colors = viridis::magma(10), 
-    values = scales::rescale(c(0, 0.1, 0.3, 0.6, 1.6)),
-    breaks = c(0, 0.2, 0.5, 1, 1.5),
-    labels = c("0", "0.2", "0.5", "1", "1.5"),
+    values = scales::rescale(c(0, 0.1, 0.3, 0.6, 2)),  # Top-coding at 2
+    breaks = c(0, 0.2, 0.5, 1, 1.5, 2),                     # Adjust breaks
+    labels = c("0", "0.2", "0.5", "1", "1.5", "2+"),           # Adjust labels
     na.value = "transparent",
     guide = guide_colorbar(
       barwidth = 20,
@@ -164,10 +162,9 @@ internet_women_predicted_error_relative <- ggplot() +
     ylim = c(-60, 60)     # Set latitude range
   )
 
-
+## internet women observed and predicted 
 ggsave(plot = internet_women_observed, filename = here("figures", "internet_lmic_observed.png"), height = 7, width = 10)
 ggsave(plot = internet_women_predicted, filename = here("figures", "internet_lmic_predicted.png"), height = 7, width = 10)
-
 
 ## create uncertainty visualization 
 uncertainty_error_plot <- cowplot::plot_grid(internet_women_predicted_error, internet_women_predicted_error_relative, ncol = 1, labels = "AUTO")
@@ -219,23 +216,40 @@ plot_prediction_nigeria <- ggplot(shapefile_df_nigeria, aes(fill = predicted_loc
   labs(fill = "Internet, women",
        title = "Predicted") 
 
-error_dist_nigeria <- shapefile_df_nigeria %>% 
-  ggplot(aes(x = observed, y = predicted_loco)) + 
+# Calculate r, R², and MAE
+error_stats <- shapefile_df_nigeria %>%
+  summarize(
+    r = cor(observed, predicted_loco, use = "complete.obs"),
+    mae = mean(abs(observed - predicted_loco)),
+    .groups = "drop"
+  )
+
+# Create the plot
+error_dist_nigeria <- ggplot(shapefile_df_nigeria, aes(x = observed, y = predicted_loco)) + 
   geom_point(aes(size = pop_all_age_total), alpha = 0.3) +
-  # geom_smooth() +
-  stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..)), 
-           size = 5.5) +  
-  labs(title = "", 
-       x = "Observed", 
-       y = "Predicted",
-       size = "Population size") + 
-  theme_cowplot() + 
+  geom_abline(slope = 1, linetype = "dashed") +
   xlim(0, 1) + 
   ylim(0, 1) + 
-  geom_abline(slope = 1, linetype = "dashed") + 
-  scale_size_continuous(breaks = c(2000000, 3000000, 10000000), 
-                        labels = c("2m", "3m", "10m")) +
-  guides(size=guide_legend(override.aes=list(alpha=1))) + 
+  theme_cowplot() + 
+  labs(
+    title = "",
+    x = "Observed",
+    y = "Predicted",
+    size = "Population size"
+  ) +
+  geom_label(
+    data = tibble(x = 0.2, y = 0.8, label = paste0("atop(italic(r) == ", round(error_stats$r, 2), 
+                                                   ", italic(MAE) == ", round(error_stats$mae, 2), ")")),
+    aes(x = x, y = y, label = label),
+    size = 5,
+    parse = TRUE,
+    inherit.aes = FALSE
+  ) +
+  scale_size_continuous(
+    breaks = c(2000000, 3000000, 10000000),
+    labels = c("2m", "3m", "10m")
+  ) +
+  guides(size = guide_legend(override.aes = list(alpha = 1))) +
   theme(legend.position = "bottom")
 ```
 
@@ -283,26 +297,46 @@ plot_prediction_zimbabwe <- ggplot(shapefile_df_zimbabwe, aes(fill = predicted_l
        title = "Predicted") 
 
 
+# Calculate r and MAE
+error_stats_zim <- shapefile_df_zimbabwe %>%
+  summarize(
+    r = cor(observed, predicted_loco, use = "complete.obs"),
+    mae = mean(abs(observed - predicted_loco)),
+    .groups = "drop"
+  )
+
+# Create the plot
 error_dist_zim <- shapefile_df_zimbabwe %>% 
   ggplot(aes(x = observed, y = predicted_loco)) + 
   geom_point(aes(size = pop_all_age_total), alpha = 0.3) +
-  stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..)),
-           size = 5.5) +  
-  labs(title = "",
-       x = "Observed",
-       y = "Predicted",
-       size = "Population Size") +
+  geom_label(
+    data = tibble(
+      x = 0.2, 
+      y = 0.9, 
+      label = paste0("atop(italic(r) == ", round(error_stats_zim$r, 2), 
+                     ", italic(MAE) == ", round(error_stats_zim$mae, 2), ")")
+    ),
+    aes(x = x, y = y, label = label),
+    size = 5.5,
+    parse = TRUE,
+    inherit.aes = FALSE
+  ) +
+  labs(
+    title = "",
+    x = "Observed",
+    y = "Predicted",
+    size = "Population Size"
+  ) +
   theme_cowplot() + 
   xlim(0.03, 1) + 
   ylim(0.03, 1) + 
   geom_abline(slope = 1, linetype = "dashed") + 
-  scale_size_continuous(breaks = c( 1000000, 2000000), 
-                        labels = c("1m", "2m")) +
-  guides(size=guide_legend(override.aes=list(alpha=1)),
-         size = 5.5) + 
-  geom_abline(slope = 1, linetype = "dashed") + 
+  scale_size_continuous(
+    breaks = c(1000000, 2000000),
+    labels = c("1m", "2m")
+  ) +
+  guides(size = guide_legend(override.aes = list(alpha = 1))) +
   theme(legend.position = "bottom")
-
 
 ```
 
@@ -347,25 +381,47 @@ plot_prediction_senegal <- ggplot(shapefile_df_senegal, aes(fill = predicted_loc
   labs(fill = "Internet, women",
        title = "Predicted") 
 
+# Calculate r and MAE
+error_stats_senegal <- shapefile_df_senegal %>%
+  summarize(
+    r = cor(observed, predicted_loco, use = "complete.obs"),
+    mae = mean(abs(observed - predicted_loco)),
+    .groups = "drop"
+  )
+
+# Create the plot
 error_dist_senegal <- shapefile_df_senegal %>% 
   ggplot(aes(x = observed, y = predicted_loco)) + 
   geom_point(aes(size = pop_all_age_total), alpha = 0.3) +
-  stat_cor(aes(label = paste0("italic(r)~`=`~", ..r..)), 
-           size = 5.5) +  
-  labs(title = "",
-       x = "Observed",
-       y = "Predicted",
-       size = "Population Size") +
+  geom_label(
+    data = tibble(
+      x = 0.2, 
+      y = 0.9, 
+      label = paste0("atop(italic(r) == ", round(error_stats_senegal$r, 2), 
+                     ", italic(MAE) == ", round(error_stats_senegal$mae, 2), ")")
+    ),
+    aes(x = x, y = y, label = label),
+    size = 5.5,
+    parse = TRUE,
+    inherit.aes = FALSE
+  ) +
+  labs(
+    title = "",
+    x = "Observed",
+    y = "Predicted",
+    size = "Population Size"
+  ) +
   theme_cowplot() + 
   xlim(0.03, 1) + 
   ylim(0.03, 1) + 
-    geom_abline(slope = 1, linetype = "dashed") + 
-  scale_size_continuous(breaks = c( 1000000, 2000000), 
-                        labels = c("1m", "2m")) +
-  guides(size=guide_legend(override.aes=list(alpha=1)),
-         size = 5.5) + 
   geom_abline(slope = 1, linetype = "dashed") + 
+  scale_size_continuous(
+    breaks = c(1000000, 2000000),
+    labels = c("1m", "2m")
+  ) +
+  guides(size = guide_legend(override.aes = list(alpha = 1))) +
   theme(legend.position = "bottom")
+
 
 ```
 

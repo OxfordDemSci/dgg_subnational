@@ -1,0 +1,311 @@
+---
+title: "Make Predictions"
+author: Casey Breen 
+---
+
+Summary: Make predictions 
+
+```{r}
+## libary packages + custom functions 
+library(here)
+source(here("code", "helpers.R"))
+
+## set seed (1)
+set.seed(1)
+```
+
+```{r}
+## read in training and test datasets 
+master_file <- read_csv(here("data", "master_data_file_dec27_with_national.csv"), 
+                  locale = locale(encoding = "ISO-8859-1")) %>%
+  janitor::clean_names() %>% 
+    mutate(continent = case_when(continent == "Africa" ~ 1,
+                               TRUE ~ 0)) %>% 
+  dplyr::select(gid_1, country, all_of(c(dhs_vars, fb_feats, off_feats))) %>% 
+  filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% drop_na() 
+
+master_file_full <- read_csv(here("data",  "master_data_file_dec27_with_national.csv"), 
+                  locale = locale(encoding = "ISO-8859-1")) %>%
+  janitor::clean_names() %>% 
+  mutate(continent = case_when(continent == "Africa" ~ 1,
+                               TRUE ~ 0)) %>% 
+    mutate(pop_all_age_total = pop_all_age_female + pop_all_age_male) %>%
+  filter(!is.na(fb_pntr_18p_female_national)) %>% 
+  mutate(dhsyear = year) 
+  # select(all_of(c(fb_feats, off_feats))) %>%
+  # drop_na(c(fb_feats, off_feats))
+```
+
+
+## predictions for internet 
+
+```{r}
+## sl predictions for internet women
+sl_predictions_internet_wom <- superlearner_train_and_predict(data = master_file, 
+                                                 covar_list = c(fb_feats, off_feats),
+                                                 outcome = "perc_used_internet_past12months_wght_age_15_to_49_wom",
+                                                 predict_data = master_file_full, return_fit = T
+                                                  ) 
+
+## sl predictions for internet men
+sl_predictions_internet_men <- superlearner_train_and_predict(data = master_file, 
+                                                 covar_list = c(fb_feats, off_feats),
+                                                 outcome = "perc_used_internet_past12months_wght_age_15_to_49_men",
+                                                 predict_data = master_file_full,
+                                                 return_fit = T) 
+
+## sl predictions for internet fm ratio  
+sl_predictions_internet_fm_ratio <- superlearner_train_and_predict(data = master_file, 
+                                                 covar_list = c(fb_feats, off_feats),
+                                                 outcome = "perc_used_internet_past12months_wght_age_15_to_49_fm_ratio",
+                                                 predict_data = master_file_full,
+                                                 return_fit = T) 
+
+predictions_internet <- bind_rows(sl_predictions_internet_wom[[2]], sl_predictions_internet_men[[2]], sl_predictions_internet_fm_ratio[[2]]) %>%
+  mutate(gid_0 = substring(gid_1, 1, 3)) %>% 
+  dplyr::select(predicted = superlearner, observed, country, gid_1, gid_0, outcome, year, month) %>%
+  pivot_wider(id_cols = c(gid_1, gid_0, country, year, month), names_from = outcome, values_from = c(observed, predicted)) %>% 
+  mutate(predicted_perc_used_internet_past12months_wght_age_15_to_49_wom = case_when(
+    predicted_perc_used_internet_past12months_wght_age_15_to_49_wom < 0 ~ 0, 
+    predicted_perc_used_internet_past12months_wght_age_15_to_49_wom > 100 ~ 100,
+    TRUE ~ predicted_perc_used_internet_past12months_wght_age_15_to_49_wom
+  )) %>% 
+  mutate(predicted_perc_used_internet_past12months_wght_age_15_to_49_men = case_when(
+    predicted_perc_used_internet_past12months_wght_age_15_to_49_men < 0 ~ 0,
+    predicted_perc_used_internet_past12months_wght_age_15_to_49_men > 100 ~ 100,
+    TRUE ~ predicted_perc_used_internet_past12months_wght_age_15_to_49_men)) %>% 
+  mutate(predicted_perc_used_internet_past12months_wght_age_15_to_49_fm_ratio = case_when(
+    predicted_perc_used_internet_past12months_wght_age_15_to_49_fm_ratio < 0 ~ 0,
+    predicted_perc_used_internet_past12months_wght_age_15_to_49_fm_ratio > 1.5 ~ 1.5,
+    TRUE ~ predicted_perc_used_internet_past12months_wght_age_15_to_49_fm_ratio))
+```
+
+## uncertainty predictions for mobile 
+
+```{r}
+## sl predictions 
+sl_predictions_mobile_wom <- superlearner_train_and_predict(data = master_file, 
+                                                 covar_list = c(fb_feats, off_feats),
+                                                 outcome = "perc_owns_mobile_telephone_wght_age_15_to_49_wom",
+                                                 predict_data = master_file_full,
+                                                 return_fit = T) 
+
+## sl prediction men 
+sl_predictions_mobile_men <- superlearner_train_and_predict(data = master_file, 
+                                                 covar_list = c(fb_feats, off_feats),
+                                                 outcome = "perc_owns_mobile_telephone_wght_age_15_to_49_men",
+                                                 predict_data = master_file_full,
+                                                 return_fit = T) 
+
+## sl prediction fm ratio  
+sl_predictions_mobile_fm_ratio <- superlearner_train_and_predict(data = master_file, 
+                                                 covar_list = c(fb_feats, off_feats),
+                                                 outcome = "perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio",
+                                                 predict_data = master_file_full,
+                                                 return_fit = T) 
+
+predictions_mobile <- bind_rows(sl_predictions_mobile_wom[[2]], sl_predictions_mobile_men[[2]], sl_predictions_mobile_fm_ratio[[2]]) %>% 
+  dplyr::select(predicted = superlearner, observed, country, gid_1, outcome, year, month) %>%
+  distinct(country, year, month, observed, predicted, gid_1, outcome) %>% 
+  mutate(gid_0 = substring(gid_1, 1, 3)) %>% 
+  ungroup() %>% 
+  pivot_wider(id_cols = c(gid_0, gid_1, country, year, month), names_from = outcome, values_from = c(observed, predicted)) %>% 
+  mutate(predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom = case_when(
+    predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom < 0 ~ 0, 
+    predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom > 100 ~ 100,
+    TRUE ~ predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom
+  )) %>% 
+  mutate(predicted_perc_owns_mobile_telephone_wght_age_15_to_49_men = case_when(
+    predicted_perc_owns_mobile_telephone_wght_age_15_to_49_men < 0 ~ 0,
+    predicted_perc_owns_mobile_telephone_wght_age_15_to_49_men > 100 ~ 100,
+    TRUE ~ predicted_perc_owns_mobile_telephone_wght_age_15_to_49_men)) %>% 
+  mutate(predicted_perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio = case_when(
+    predicted_perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio < 0 ~ 0,
+    predicted_perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio > 1.1 ~ 1.1,
+    TRUE ~ predicted_perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio))
+```
+
+
+## save file 
+
+```{r}
+## combine together 
+predictions <- predictions_mobile %>% 
+  left_join(predictions_internet, by = c("gid_1", "country", "gid_0", "year", "month"))
+
+# Write the LOCO predictions to a .csv file
+write_csv(predictions, here("out", "predictions_wide.csv"))
+```
+
+## Model uncertainty
+
+
+Read in predictions from cross-validation 
+
+```{r}
+## read in predictions 
+predictions_combined <- read_csv(here("out",  "combined_predictions_lmics_national_covars_full.csv")) %>% 
+  mutate(predicted = case_when(predicted < 0 ~ 0,
+                  TRUE ~ predicted)) %>% 
+  filter(cv_method == "loco") %>% 
+  filter(feature_set == "fb_and_offline") 
+
+
+## restrict to superlearner predictions 
+predictions_filter <- predictions_combined %>% 
+  dplyr::select(-country) %>%
+  filter(model == "superlearner") 
+
+## join on predictions 
+predictions_filter <- predictions_filter %>% 
+  left_join(master_file, by = c("gid_1"))
+
+## predictions filter
+predictions_filter <- predictions_filter %>%
+  mutate(residual = abs(observed-predicted))
+```
+
+
+```{r}
+# Remove rows with missing values
+predictions_filter_dropped <- predictions_filter %>% drop_na(any_of(c(dhs_vars, fb_feats, off_feats)))
+
+full_dataset <- master_file_full %>% 
+  select(any_of(c("gid_1", fb_feats, off_feats))) %>% 
+  mutate(across(where(is.numeric), ~ ifelse(is.na(.), median(., na.rm = TRUE), .))) %>% 
+  drop_na()
+
+month <- master_file_full %>% 
+  select(any_of(c("gid_1", fb_feats, off_feats)), month) %>% 
+  mutate(across(where(is.numeric), ~ ifelse(is.na(.), median(., na.rm = TRUE), .))) %>% 
+  drop_na() %>% 
+  pull(month)
+```
+
+
+```{r}
+# Define a function to perform the analysis for a given outcome
+calculate_uncertainty <- function(outcome, data = predictions_filter_dropped, data_full = full_dataset, predictors) {
+  
+  model_path <- file.path("subnational", "pipeline_v2", "models", paste0("nnls_resid_model_", outcome, ".rds"))
+  
+  # Filter the data for the specific outcome and remove rows with missing values
+  filtered_data <- data %>%
+    filter(outcome == !!outcome) 
+  
+  if (nrow(filtered_data) == 0) {
+    return(data.frame())  # Return an empty dataframe if no data is available for this outcome
+  }
+  
+  # Construct the model formula
+  formula_string <- paste("residual ~", paste(predictors, collapse = " + "))
+  model_formula <- as.formula(formula_string)
+  
+  # Extract the response variable (residuals) and predictor matrix from the formula
+  y <- filtered_data$residual
+  X <- model.matrix(model_formula, data = filtered_data)[, -1]  # Remove intercept column
+  
+  # Fit the NNLS model
+  nnls_model <- nnls(X, y)
+  
+  # Extract coefficients
+  coefficients <- coef(nnls_model)
+  
+  X_new <- as.matrix(x = full_dataset[, -1])
+  
+  # Make predictions
+  predictions <- as.vector(X_new %*% coefficients)
+  
+  # Calculate prediction intervals
+  pred_intervals <- full_dataset %>% 
+    mutate(predicted_error = predictions)
+  
+  
+  return(pred_intervals)
+  cat(outcome, "\n")
+}
+
+# Main block to apply the function using a for loop
+outcomes <- unique(predictions_filter$outcome)
+
+final_results <- list()
+
+predictors <- c(fb_feats, off_feats)
+
+for (outcome in outcomes) {
+  
+  result <- calculate_uncertainty(outcome, 
+                                  data = predictions_filter_dropped,
+                                  data_full = full_dataset, 
+                                  predictors = predictors)  # Add your predictors here
+  
+  final_results[[outcome]] <- result %>% 
+    mutate(outcome = outcome)
+}
+
+# Combine results from all outcomes
+final_results_df <- bind_rows(final_results)
+
+uncertainty <- final_results_df %>% 
+  dplyr::select(gid_1, predicted_error, outcome, dhsyear) %>% 
+  bind_cols(month = rep(month, 6))
+```
+
+
+```{r}
+predictions_long <- predictions %>% 
+  select(-starts_with("observed")) %>% 
+  pivot_longer(-c(gid_0, gid_1, country, year, month), names_to = "outcome", values_to = "predicted") %>% 
+  mutate(outcome = substring(outcome, 11, 100)) 
+```
+
+
+```{r}
+## predictions with uncertainty 
+predictions_with_uncertainty <- predictions_long %>% 
+  left_join(uncertainty %>% mutate(year = dhsyear), by = c("gid_1", "outcome", "year", "month")) 
+
+
+# clean up outcome values 
+predictions_with_uncertainty <- predictions_with_uncertainty %>% 
+  mutate(outcome = case_when(
+    outcome == "perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio" ~   "mobile_fm_ratio",
+    outcome == "perc_owns_mobile_telephone_wght_age_15_to_49_men"      ~    "mobile_men",
+    outcome == "perc_owns_mobile_telephone_wght_age_15_to_49_wom"      ~      "mobile_women",
+    outcome == "perc_used_internet_past12months_wght_age_15_to_49_fm_ratio" ~ "internet_fm_ratio", 
+    outcome == "perc_used_internet_past12months_wght_age_15_to_49_men" ~      "internet_men",
+    outcome == "perc_used_internet_past12months_wght_age_15_to_49_wom" ~       "internet_women"
+  ))
+
+predictions_with_uncertainty <- predictions_with_uncertainty %>% 
+  select(gid_0, gid_1, year, month, outcome, predicted, predicted_error)
+
+predictions_with_uncertainty <- predictions_with_uncertainty %>% 
+  mutate(month = case_when(
+    month == 6.5 ~ 6,
+    TRUE ~ month
+  )) %>% 
+  mutate(date = sprintf("%04d-%02d", year, month)) %>% 
+  select(-month)
+
+predictions_with_uncertainty <- predictions_with_uncertainty %>% 
+  mutate(predicted = round(predicted, 3),
+         predicted_error = round(predicted_error, 3))
+
+predictions_with_uncertainty <- predictions_with_uncertainty %>% 
+  mutate(predicted = case_when(
+    predicted > 1 ~ 1,
+    TRUE ~ predicted
+  ))
+```
+
+
+
+```{r}
+# Write the LOCO predictions to a .csv file
+write_csv(predictions_with_uncertainty, here("out", "predictions_with_uncertainty.csv"))
+```
+
+
+
+

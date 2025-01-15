@@ -88,11 +88,11 @@ lsms_plot <- lsms_data %>%
     y = "Predicted",
     legend = "MICS Survey Year"
   ) +
-  geom_text(
-      aes(label = paste("atop(italic(r) == ", round(r, 2), ", italic(mae) == ", round(mae, 2), ")")),
+  geom_label(
+      aes(label = paste("atop(italic(r) == ", round(r, 2), ", italic(MAE) == ", round(mae, 2), ")")),
    # aes(label = paste("italic(r) == ", round(r, 2))),
     x = 0.2,  # Adjusted position for better visibility
-    y = 0.9, 
+    y = 0.8, 
     size = 3.5,
     parse = TRUE,
     inherit.aes = FALSE
@@ -152,11 +152,11 @@ lsms_vs_dhs <- dhs_vs_lsms_df %>%
   labs(color  = "DHS - LSMS Survey Year",
        x = "LSMS",
        y = "DHS") + 
-  geom_text(
-      aes(label = paste("atop(italic(r) == ", round(r, 2), ", italic(mae) == ", round(mae, 2), ")")),
+  geom_label(
+      aes(label = paste("atop(italic(r) == ", round(r, 2), ", italic(MAE) == ", round(mae, 2), ")")),
    # aes(label = paste("italic(r) == ", round(r, 2))),
     x = 0.2,  # Adjusted position for better visibility
-    y = 0.9, 
+    y = 0.8, 
     size = 3.5,
     parse = TRUE,
     inherit.aes = FALSE

@@ -467,8 +467,8 @@ off_feats <- tolower(c(
   "continent",
   "hdi",
   "gdi",
-  "rel_date",
-  "rel_date_squared"
+  "rel_date"
+ #"rel_date_squared"
 ))
 
 
@@ -552,7 +552,6 @@ perform_cross_validation <- function(data, dependent_var, features) {
   
   return(results_df)
 }
-
 
 ## calculate r squared 
 calculate_r_squared <- function(predicted, observed) {

@@ -11,8 +11,6 @@ Summary: Create plots of within-country variation in internet adoption and mobil
 library(here)
 source(here("code", "helpers.R"))
 
-## read in prediction 
-predictions <- read_csv(here("out", "predictions_and_observed.csv"))
 
 ## read in prediction 
 predictions_long <- read_csv(here("out", "predictions_with_uncertainty.csv"))
@@ -70,11 +68,12 @@ ggsave(spread_plot, filename = here("figures", "spread_plot.png"), width = 12, h
 
 ```{r}
 ## create spread plot 
-spread_plot <- predictions %>% 
-  filter(!gid_1 %in% c("MRT.9_1", "UGA.32_1", "UGA.31_1")) %>% 
+spread_plot <- predictions_long %>% 
+    filter(date == "2024-11") %>% 
+  filter(outcome == "internet_women") %>% 
   group_by(continent, gid_0) %>% 
-  summarize(diff = max(predicted_perc_used_internet_past12months_wght_age_15_to_49_wom) - min(predicted_perc_used_internet_past12months_wght_age_15_to_49_wom),
-            mean = mean(predicted_perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% 
+  summarize(diff = max(predicted) - min(predicted),
+            mean = mean(predicted)) %>% 
   ggplot(aes(x = mean, y = diff)) + 
   geom_text(aes(label = gid_0, color = continent)) + 
   labs(x = "National Internet Adoption (Women)",

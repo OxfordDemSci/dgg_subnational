@@ -1,0 +1,37 @@
+---
+title: "Disparities plots"
+author: Casey Breen
+---
+
+Summary: Make a plot about disparities
+
+```{r}
+## libary packages + custom functions 
+library(here)
+source(here("code", "helpers.R"))
+```
+
+
+```{r}
+predictions <- read_csv(here("out", "predictions_with_uncertainty.csv"))
+
+predictions <- predictions %>% 
+  mutate(date = as.Date(paste0(date, "-01")))
+```
+
+
+
+
+```{r}
+predictions %>% 
+  filter(date == "2024-11-01") %>% 
+  filter(outcome == "internet_women") %>% 
+  group_by(gid_0) %>% 
+  summarize(diff = max(predicted) - min(predicted)) %>% 
+  arrange(desc(diff)) %>% 
+  summarize(mean(diff))
+  
+
+
+```
+
