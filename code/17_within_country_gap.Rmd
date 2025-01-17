@@ -32,6 +32,20 @@ predictions %>%
   summarize(mean(diff))
   
 
-
+predictions %>% 
+  filter(date == "2024-11-01") %>% 
+  select(gid_0, gid_1, outcome, predicted) %>% 
+  pivot_wider(names_from = outcome, values_from = predicted) %>% 
+  mutate(diff = internet_men - internet_women) %>% filter(diff > 0.2) %>% 
+  distinct(gid_1)
+  
 ```
+```{r}
+predictions %>% 
+  filter(date == "2024-11-01") %>% 
+  filter(outcome == "internet_women") %>% 
+  count(predicted < 0.5)
+```
+
+
 

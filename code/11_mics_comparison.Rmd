@@ -14,12 +14,12 @@ source(here("code", "helpers.R"))
 
 ```{r}
 ### read in training and test datasets 
-master_file <- fread(here("data", "master_data_file_dec27_with_national.csv")) %>%
+master_file <- fread(here("data", "master_data_file_jan16_with_national.csv")) %>%
   filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% 
   drop_na() %>% 
   filter(year != 2024)
 
-master_file_full <- fread(here("data", "master_data_file_dec27_with_national.csv")) %>%
+master_file_full <- fread(here("data", "master_data_file_jan16_with_national.csv")) %>%
   filter(!is.na(fb_pntr_18p_female))
 
 ## read in predictions

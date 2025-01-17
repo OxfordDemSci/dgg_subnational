@@ -94,7 +94,7 @@ mobile_plot_men <- mobile_data_men %>%
   mutate(diff = max - min) %>%
   mutate(
     country = fct_relevel(country, "Overall mean"), # Move "Overall mean" to the top
-    country = fct_reorder(country, diff, .desc = TRUE) # Order by descending difference
+    country = fct_reorder(country, diff, .desc = FALSE) # Order by descending difference
   ) %>%
   ggplot(aes(y = country, x = max, xend = min)) +
   geom_dumbbell(
@@ -118,7 +118,7 @@ mobile_plot_men <- mobile_data_men %>%
   labs(
     x = "",
     y = "",
-    title = "Women"
+    title = "Men"
   ) +
   theme_minimal() +
   theme(
@@ -137,7 +137,7 @@ mobile_plot_women <- mobile_data_women %>%
   mutate(diff = max - min) %>%
   mutate(
     country = fct_relevel(country, "Overall mean"), # Move "Overall mean" to the top
-    country = fct_reorder(country, diff, .desc = TRUE) # Order by descending difference
+    country = fct_reorder(country, diff, .desc = FALSE) # Order by descending difference
   ) %>%
   ggplot(aes(y = country, x = max, xend = min)) +
   geom_dumbbell(
@@ -161,7 +161,7 @@ mobile_plot_women <- mobile_data_women %>%
   labs(
     x = "Mobile Penetration ",
     y = "",
-    title = "Men"
+    title = "Women"
   ) +
   theme_minimal() +
   theme(
@@ -186,7 +186,7 @@ internet_plot_men <- internet_data_men %>%
   mutate(diff = max - min) %>%
   mutate(
     country = fct_relevel(country, "Overall mean"), # Move "Overall mean" to the top
-    country = fct_reorder(country, diff, .desc = TRUE) # Order by descending difference
+    country = fct_reorder(country, diff, .desc = FALSE) # Order by descending difference
   ) %>%
   ggplot(aes(y = country, x = max, xend = min)) +
   geom_dumbbell(
@@ -210,7 +210,7 @@ internet_plot_men <- internet_data_men %>%
   labs(
     x = "",
     y = "",
-    title = "Women"
+    title = "Men"
   ) +
   theme_minimal() +
   theme(
@@ -229,7 +229,7 @@ internet_plot_women <- internet_data_women %>%
   mutate(diff = max - min) %>%
   mutate(
     country = fct_relevel(country, "Overall mean"), # Move "Overall mean" to the top
-    country = fct_reorder(country, diff, .desc = TRUE) # Order by descending difference
+    country = fct_reorder(country, diff, .desc = FALSE) # Order by descending difference
   ) %>%
   ggplot(aes(y = country, x = max, xend = min)) +
   geom_dumbbell(
@@ -253,7 +253,7 @@ internet_plot_women <- internet_data_women %>%
   labs(
     x = "Internet Penetration ",
     y = "",
-    title = "Men"
+    title = "Women"
   ) +
   theme_minimal() +
   theme(

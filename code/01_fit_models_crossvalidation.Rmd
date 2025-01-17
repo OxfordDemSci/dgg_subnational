@@ -18,11 +18,15 @@ source(here("code", "helpers.R"))
 
 ```{r}
 ## read in training and test datasets 
-master_file <- read_csv(here("data","master_data_file_dec27_with_national.csv"))
+master_file <- read_csv(here("data","master_data_file_jan16_with_national.csv")) %>% 
+  #filter(!country %in% c("Lesotho", "Côte d'Ivoire", "Mozambique", "")) %>% 
+  filter(!(country ==  "Tanzania" & dhsyear == 2015)) %>% 
+  filter(!(country ==  "Nepal" & dhsyear == 2016)) %>% 
+  filter(!(country ==  "Lesotho"))
 
 ## read in covariates 
 master_file <- master_file %>% 
-  dplyr::select(country, gid_0, gid_1, perc_used_internet_past12months_wght_age_15_to_49_wom, continent, all_of(c(dhs_vars, fb_feats, off_feats))) %>% ## the vectors of vars are defined in helper function
+  dplyr::select(country, gid_0, gid_1, year, perc_used_internet_past12months_wght_age_15_to_49_wom, continent, all_of(c(dhs_vars, fb_feats, off_feats))) %>% ## the vectors of vars are defined in helper function
   mutate(continent = case_when(continent == "Africa" ~ 1,
                                TRUE ~ 0)) %>%
   drop_na(dhs_vars, fb_feats) %>% 
@@ -35,8 +39,7 @@ master_file <- master_file %>%
 ## check missing
 master_file %>%
   summarise(across(everything(), ~sum(is.na(.)))) %>%
-  pivot_longer(-1) %>%
-  View()
+  pivot_longer(-1) 
 
 ## impute missing values as median (only necessary for a handful of cases)
 master_file <- master_file %>% 
@@ -57,26 +60,15 @@ master_file <- master_file %>%
 master_file <- master_file %>% 
   mutate(dhsyear = case_when(
   country == "India" & dhsyear == 2019 ~ 2020,
-  TRUE ~ dhsyear)) %>% 
-  filter(country != "Indonesia") %>% 
-  filter(!(country == "Nepal" & dhsyear == 2016))
-
-master_file <- master_file %>% 
-  mutate(fb_pntr_18p_female = case_when(
-    fb_pntr_18p_female > 1.1 ~ 1.1,
-    TRUE ~ fb_pntr_18p_female
-  )) %>% 
-  mutate(fb_pntr_18p_male = case_when(
-    fb_pntr_18p_male > 1.1 ~ 1.1,
-    TRUE ~ fb_pntr_18p_male
-  ))
+  TRUE ~ dhsyear)) 
 
 master_file %>%
   group_by(country) %>%
   filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>%
   filter(!is.na(fb_pntr_18p_female)) %>%
   summarize(cor = cor(perc_used_internet_past12months_wght_age_15_to_49_wom, fb_pntr_18p_female),
-            n()) %>% arrange(cor)
+            n()) %>% 
+  arrange(cor) 
 ```
 
 ## make predictions 
@@ -84,7 +76,7 @@ master_file %>%
 ```{r}
 # Define a list of outcomes and corresponding feature sets
 outcomes <- c(
-  "perc_used_internet_past12months_wght_age_15_to_49_wom",
+  "perc_used_internet_past12months_wght_age_15_to_49_wom", 
    "perc_owns_mobile_telephone_wght_age_15_to_49_wom",
    "perc_owns_mobile_telephone_wght_age_15_to_49_men",
    "perc_used_internet_past12months_wght_age_15_to_49_men",
@@ -94,8 +86,8 @@ outcomes <- c(
 
 ## define feature sets 
 feature_sets <- list(
- fb = fb_feats,
- offline = off_feats,
+  fb = fb_feats,
+  offline = off_feats,
   fb_and_offline = c(fb_feats, off_feats) # , national_covars national_covars
 )
 
@@ -147,7 +139,7 @@ predictions_combined <- predictions_combined %>%
 
 ```{r}
 # Write the LOCO predictions to a .csv file
-write_csv(predictions_combined, here("out", "combined_predictions_lmics_national_covars_full.csv"))
+write_csv(predictions_combined, here("out", "combined_predictions_lmics_national_covars_full_test.csv"))
 ```
 
 

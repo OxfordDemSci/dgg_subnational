@@ -197,6 +197,8 @@ run_loco_model <- function(data, outcome, covar_list = c(fb_feats, off_feats)) {
       superlearner = sl_fit$predict(task = prediction_task),
       observed = gadm1_holdout %>% pull(!!sym(outcome)),
       gid_1 = gadm1_holdout %>% pull(gid_1),
+      gid_0 = gadm1_holdout %>% pull(gid_0),
+      year = gadm1_holdout %>% pull(year),
       country = holdout_country
     )
     
@@ -222,7 +224,7 @@ run_loco_model <- function(data, outcome, covar_list = c(fb_feats, off_feats)) {
   
   # Reshape dataframe to long format and add feature set column
   predictions_df_long <- predictions_df %>%
-    pivot_longer(-c(country, observed, gid_1), names_to = "model", values_to = "predicted") %>%
+    pivot_longer(-c(country, observed, gid_1, gid_0, year), names_to = "model", values_to = "predicted") %>%
     mutate(outcome = outcome, feature_set = feature_set)
   
   return(predictions_df_long)
@@ -302,7 +304,9 @@ run_model_10fold <- function(data, outcome, covar_list = c(fb_feats, off_feats))
       superlearner = sl_fit$predict(task = prediction_task),
       observed = test_data %>% pull(outcome),
       country = test_data %>% pull(country),
-      gid_1 = test_data %>% pull(gid_1)
+      gid_1 = test_data %>% pull(gid_1),
+      gid_0 = test_data %>% pull(gid_0),
+      year = test_data %>% pull(year)
     )
     
     # Store predictions in list
@@ -322,7 +326,7 @@ run_model_10fold <- function(data, outcome, covar_list = c(fb_feats, off_feats))
   
   # Reshape dataframe to long format and add feature set column
   predictions_df_long <- predictions_df %>%
-    pivot_longer(-c(observed, country, gid_1), names_to = "model", values_to = "predicted") %>%
+    pivot_longer(-c(country, observed, gid_1, gid_0, year), names_to = "model", values_to = "predicted") %>%
     mutate(outcome = outcome, feature_set = feature_set)
   
   return(predictions_df_long)
@@ -394,6 +398,7 @@ superlearner_train_and_predict <- function(data,
     observed = predict_data %>% pull(outcome),
     country = predict_data %>% pull(country),
     gid_1 = predict_data %>% pull(gid_1),
+    gid_0 = predict_data %>% pull(gid_0),
     outcome = outcome
   )
   
@@ -406,13 +411,10 @@ superlearner_train_and_predict <- function(data,
 
 ## ---- Variables ----
 dhs_vars <- tolower(c(
-  "perc_ever_used_internet_wght_age_15_to_49_wom",
   "perc_used_internet_past12months_wght_age_15_to_49_wom",
   "perc_owns_mobile_telephone_wght_age_15_to_49_wom",
-  "perc_ever_used_internet_wght_age_15_to_49_men",
   "perc_used_internet_past12months_wght_age_15_to_49_men",
   "perc_owns_mobile_telephone_wght_age_15_to_49_men",
-  "perc_ever_used_internet_wght_age_15_to_49_fm_ratio",
   "perc_used_internet_past12months_wght_age_15_to_49_fm_ratio",
   "perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio"
 ))

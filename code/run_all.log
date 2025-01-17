@@ -1,9 +1,142 @@
 ================================
 Running  02_make_predictions.Rmd 
-
-Driver: GPKG 
-Available layers:
-
-Running  02_make_predictions.Rmd 
-Driver: GPKG 
-Available layers:
+Finished with 02_make_predictions.Rmd, time:: 170.425 sec elapsed
+================================
+================================
+Running  03_model_performance.Rmd 
+Finished with 03_model_performance.Rmd, time:: 26.518 sec elapsed
+================================
+================================
+Running  04_within_country_analysis.Rmd 
+Finished with 04_within_country_analysis.Rmd, time:: 1.533 sec elapsed
+================================
+================================
+Running  05_geo_map.Rmd 
+Finished with 05_geo_map.Rmd, time:: 107.1 sec elapsed
+================================
+================================
+Running  06_feature_importance.Rmd 
+Finished with 06_feature_importance.Rmd, time:: 6.042 sec elapsed
+================================
+================================
+Running  07_superlearner_weights.Rmd 
+perc_used_internet_past12months_wght_age_15_to_49_wom 
+perc_owns_mobile_telephone_wght_age_15_to_49_wom 
+perc_owns_mobile_telephone_wght_age_15_to_49_men 
+perc_used_internet_past12months_wght_age_15_to_49_men 
+perc_used_internet_past12months_wght_age_15_to_49_fm_ratio 
+perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio 
+Finished with 07_superlearner_weights.Rmd, time:: 162.569 sec elapsed
+================================
+================================
+Running  08_residual_analysis.Rmd 
+Finished with 08_residual_analysis.Rmd, time:: 1.045 sec elapsed
+================================
+================================
+Running  09_var_explained.Rmd 
+Within-country MLD (MLD_W): 0.003677251 
+Between-country MLD (MLD_B): 0.01447789 
+Total MLD: 0.01815514 
+Ratio of Within-country to Between-country MLD: 0.2539908 
+Within-country MLD (MLD_W): 0.001689627 
+Between-country MLD (MLD_B): 0.003971818 
+Total MLD: 0.005661444 
+Ratio of Within-country to Between-country MLD: 0.4254039 
+Within-country MLD (MLD_W): 0.006709765 
+Between-country MLD (MLD_B): 0.009404 
+Total MLD: 0.01611376 
+Ratio of Within-country to Between-country MLD: 0.7135012 
+Within-country MLD (MLD_W): 0.005612485 
+Between-country MLD (MLD_B): 0.005271665 
+Total MLD: 0.01088415 
+Ratio of Within-country to Between-country MLD: 1.064651 
+Within-country MLD (MLD_W): 0.001749078 
+Between-country MLD (MLD_B): 0.006297944 
+Total MLD: 0.008047022 
+Ratio of Within-country to Between-country MLD: 0.2777221 
+Within-country MLD (MLD_W): 0.000497959 
+Between-country MLD (MLD_B): 0.001065243 
+Total MLD: 0.001563202 
+Ratio of Within-country to Between-country MLD: 0.4674607 
+Within-country MLD (MLD_W): 0.004333677 
+Between-country MLD (MLD_B): 0.01422659 
+Total MLD: 0.01856027 
+Ratio of Within-country to Between-country MLD: 0.304618 
+Within-country MLD (MLD_W): 0.003087548 
+Between-country MLD (MLD_B): 0.00810005 
+Total MLD: 0.0111876 
+Ratio of Within-country to Between-country MLD: 0.3811764 
+Within-country MLD (MLD_W): 0.0005303802 
+Between-country MLD (MLD_B): 0.005352272 
+Total MLD: 0.005882652 
+Ratio of Within-country to Between-country MLD: 0.09909441 
+Within-country MLD (MLD_W): 8.564567e-05 
+Between-country MLD (MLD_B): 0.0001854391 
+Total MLD: 0.0002710847 
+Ratio of Within-country to Between-country MLD: 0.4618534 
+Within-country MLD (MLD_W): 0.001380113 
+Between-country MLD (MLD_B): 0.006376438 
+Total MLD: 0.00775655 
+Ratio of Within-country to Between-country MLD: 0.2164394 
+Within-country MLD (MLD_W): 0.0009355192 
+Between-country MLD (MLD_B): 0.002767187 
+Total MLD: 0.003702707 
+Ratio of Within-country to Between-country MLD: 0.3380758 
+Within-country MLD (MLD_W): 0.0004802083 
+Between-country MLD (MLD_B): 0.002056603 
+Total MLD: 0.002536811 
+Ratio of Within-country to Between-country MLD: 0.2334959 
+Within-country MLD (MLD_W): 2.810744e-05 
+Between-country MLD (MLD_B): 0.0003776769 
+Total MLD: 0.0004057843 
+Ratio of Within-country to Between-country MLD: 0.07442193 
+Within-country MLD (MLD_W): 0.0009448525 
+Between-country MLD (MLD_B): 0.00708259 
+Total MLD: 0.008027442 
+Ratio of Within-country to Between-country MLD: 0.1334049 
+Within-country MLD (MLD_W): 0.0005016077 
+Between-country MLD (MLD_B): 0.002799759 
+Total MLD: 0.003301367 
+Ratio of Within-country to Between-country MLD: 0.179161 
+Within-country MLD (MLD_W): 0.001711068 
+Between-country MLD (MLD_B): 0.01701243 
+Total MLD: 0.0187235 
+Ratio of Within-country to Between-country MLD: 0.1005775 
+Within-country MLD (MLD_W): 0.000560981 
+Between-country MLD (MLD_B): 0.003626995 
+Total MLD: 0.004187976 
+Ratio of Within-country to Between-country MLD: 0.1546682 
+Within-country MLD (MLD_W): 0.003361393 
+Between-country MLD (MLD_B): 0.03970793 
+Total MLD: 0.04306932 
+Ratio of Within-country to Between-country MLD: 0.08465296 
+Within-country MLD (MLD_W): 0.002498361 
+Between-country MLD (MLD_B): 0.02369494 
+Total MLD: 0.0261933 
+Ratio of Within-country to Between-country MLD: 0.1054386 
+Finished with 09_var_explained.Rmd, time:: 1.031 sec elapsed
+================================
+================================
+Running  11_mics_comparison.Rmd 
+Finished with 11_mics_comparison.Rmd, time:: 3.624 sec elapsed
+================================
+================================
+Running  13_var_coverage_table.Rmd 
+Finished with 13_var_coverage_table.Rmd, time:: 1.124 sec elapsed
+================================
+================================
+Running  14_trends.Rmd 
+Finished with 14_trends.Rmd, time:: 1.937 sec elapsed
+================================
+================================
+Running  15_lsms_comparison.Rmd 
+Finished with 15_lsms_comparison.Rmd, time:: 2.601 sec elapsed
+================================
+================================
+Running  16_disparities_plots.Rmd 
+Finished with 16_disparities_plots.Rmd, time:: 2.572 sec elapsed
+================================
+================================
+Running  17_within_country_gap.Rmd 
+Finished with 17_within_country_gap.Rmd, time:: 1.135 sec elapsed
+================================

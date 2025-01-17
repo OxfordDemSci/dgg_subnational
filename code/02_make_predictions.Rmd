@@ -16,15 +16,19 @@ set.seed(1)
 
 ```{r}
 ## read in training and test datasets 
-master_file <- read_csv(here("data", "master_data_file_dec27_with_national.csv"), 
+master_file <- read_csv(here("data", "master_data_file_jan16_with_national.csv"), 
                   locale = locale(encoding = "ISO-8859-1")) %>%
   janitor::clean_names() %>% 
     mutate(continent = case_when(continent == "Africa" ~ 1,
                                TRUE ~ 0)) %>% 
   dplyr::select(gid_1, country, all_of(c(dhs_vars, fb_feats, off_feats))) %>% 
-  filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% drop_na() 
+  filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% drop_na() %>% 
+  #filter(!country %in% c("Lesotho", "Côte d'Ivoire", "Mozambique", "")) %>% 
+  filter(!(country ==  "Tanzania" & dhsyear == 2015)) %>% 
+  filter(!(country ==  "Nepal" & dhsyear == 2016)) %>% 
+  filter(!(country ==  "Lesotho"))
 
-master_file_full <- read_csv(here("data",  "master_data_file_dec27_with_national.csv"), 
+master_file_full <- read_csv(here("data",  "master_data_file_jan16_with_national.csv"), 
                   locale = locale(encoding = "ISO-8859-1")) %>%
   janitor::clean_names() %>% 
   mutate(continent = case_when(continent == "Africa" ~ 1,
@@ -32,8 +36,6 @@ master_file_full <- read_csv(here("data",  "master_data_file_dec27_with_national
     mutate(pop_all_age_total = pop_all_age_female + pop_all_age_male) %>%
   filter(!is.na(fb_pntr_18p_female_national)) %>% 
   mutate(dhsyear = year) 
-  # select(all_of(c(fb_feats, off_feats))) %>%
-  # drop_na(c(fb_feats, off_feats))
 ```
 
 

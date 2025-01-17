@@ -24,7 +24,7 @@ predictions_combined <- read_csv(here("out", "combined_predictions_lmics_nationa
   filter(feature_set == "fb_and_offline") 
 
 ## read in training and test datasets 
-master_file <- read_csv(here("data", "master_data_file_dec27_with_national.csv")) %>% 
+master_file <- read_csv(here("data", "master_data_file_jan16_with_national.csv")) %>% 
   dplyr::select(country, gid_1, all_of(c(dhs_vars, fb_feats, off_feats))) %>% ## the vectors of vars are defined in helper function 
   filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>%
   drop_na()

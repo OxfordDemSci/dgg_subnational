@@ -13,11 +13,11 @@ source(here("code", "helpers.R"))
 
 ```{r}
 ## read in training and test datasets 
-master_file <- read_csv(here("data", "master_data_file_dec27_with_national.csv")) %>%
+master_file <- read_csv(here("data", "master_data_file_jan16_with_national.csv")) %>%
   dplyr::select(country, all_of(c(dhs_vars, fb_feats, off_feats))) %>% 
   filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) 
 
-master_file_full <- read_csv(here("data", "master_data_file_dec27_with_national.csv")) %>% 
+master_file_full <- read_csv(here("data", "master_data_file_jan16_with_national.csv")) %>% 
   filter(!is.na(fb_pntr_18p_female)) %>% 
   filter(year == 2024 & month == 11)
 
