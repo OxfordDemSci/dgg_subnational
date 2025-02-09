@@ -16,8 +16,6 @@ source(here("code", "helpers.R"))
 ## Estimate model performance metrics 
 
 ```{r}
-predictions_old <- read_csv(here("out", "combined_predictions_lmics_national_covars_full.csv"))
-
 ## read predictions
 predictions_combined <- read_csv(here("out", "combined_predictions_lmics_national_covars_full_test.csv")) %>%
   filter(country != "Lesotho" & country != "Swaziland") %>% # & country != "Gambia" 
@@ -52,11 +50,11 @@ mutate(predicted = case_when(
 
 
 ## read in training and test datasets
-gadm1 <- read_csv(here("data", "master_data_file_jan16_with_national.csv"),
+gadm1 <- read_csv(here("data", "master_data_file_feb7_with_national.csv"),
   locale = locale(encoding = "ISO-8859-1")) %>%
   janitor::clean_names() %>%
   mutate(pop_all_age_total_dhsyear = pop_all_age_female + pop_all_age_male) %>%
-  dplyr::select(country, gid_1, dhsyear, pop_all_age_total_dhsyear, continent) %>%
+  dplyr::select(country, gid_0, gid_1, dhsyear, pop_all_age_total_dhsyear, continent) %>%
   filter(!is.na(dhsyear)) %>% 
   filter(!(country == "Bangladesh" & dhsyear == "2014")) %>% 
   filter(!(country == "India" & dhsyear == "2014")) %>% 
@@ -69,7 +67,7 @@ gadm1 <- read_csv(here("data", "master_data_file_jan16_with_national.csv"),
 predictions_combined <- predictions_combined %>%
   left_join(gadm1 %>% 
               mutate(country = case_when(
-                country == "CÃ´te d'Ivoire" ~ "Côte d'Ivoire", TRUE ~ country)), by = c("gid_1", "country", "year" = "dhsyear")) 
+                gid_0 == "CIV" ~ "Côte d'Ivoire", TRUE ~ country)), by = c("gid_0", "gid_1", "year" = "dhsyear")) 
 
 ## estimate model performance metrics
 ## r2, rmse, mae are fine
@@ -112,8 +110,6 @@ predictions_combined <- predictions_combined %>%
     left_join(model_performance_metrics %>% filter(metric == "mae") %>% mutate(mae = value) %>% select("mae", "metric", "cv_method", "model", "outcome", "feature_set"), by = c("cv_method", "model", "outcome", "feature_set")) 
 ```
 
-
-
 ## observed vs. predicted by outcome 
 
 ```{r}
@@ -138,7 +134,7 @@ plot1_observed_predicted <- predictions_combined %>%
   "MAE = ", round(mae, 2))), 
   x = 0.20,
   y = 0.90,
-  size = 3.5) +
+  size = 3) +
   scale_y_continuous(limits = c(0, 1.1)) +
   scale_x_continuous(limits = c(0, 1.1)) +
   facet_wrap(~outcome_categorical, nrow = 2) +
@@ -167,7 +163,7 @@ plot2_observed_predicted <- predictions_combined %>%
   "MAE = ", round(mae, 2))), 
   x = 0.20,
   y = 0.90,
-  size = 3.5) +
+  size = 3) +
   facet_wrap(~outcome_categorical, nrow = 2) +
   theme(legend.position = "none")
 
@@ -183,8 +179,8 @@ plot3_observed_predicted <- predictions_combined %>%
   ) %>%
   ggplot(aes(x = observed, y = predicted, size = pop_all_age_total_dhsyear)) +
   geom_point(alpha = 0.1) +
-  ylim(0, 1.5) +
-  xlim(0, 1.5) +
+  ylim(0, 1.1) +
+  xlim(0, 1.1) +
   geom_abline(slope = 1, linetype = "dashed", color = "grey") +
   theme_cowplot() +
   labs(title = "Gender Gap", size = "Population Size") +
@@ -193,9 +189,9 @@ plot3_observed_predicted <- predictions_combined %>%
   "R\u00B2 = ", round(r2, 2), "\n",
   "r = ", round(r, 2), "\n",
   "MAE = ", round(mae, 2))), 
-  x = 0.25,
-  y = 1.2,
-  size = 3.5) +
+  x = 0.20,
+  y = 0.90,
+  size = 3) +
   facet_wrap(~outcome_categorical, nrow = 2) +
   theme(legend.position = "none") +
   scale_size_continuous(
@@ -282,8 +278,8 @@ plot3_combined <- predictions_combined %>%
   ) %>%
   ggplot(aes(x = observed, y = predicted)) +
   geom_point(aes(size = pop_all_age_total_dhsyear), alpha = 0.1) +
-  ylim(0, 1.5) +
-  xlim(0, 1.5) +
+  ylim(0, 1) +
+  xlim(0, 1) +
   geom_abline(slope = 1, linetype = "dashed", color = "grey") +
   theme_cowplot() +
   labs(title = "Gender Gap", size = "Population Size") +
@@ -622,6 +618,46 @@ ggsave(plot = loco_by_year_fig, filename = here("figures", "loco_by_year_fig.png
 
 
 
+```{r}
+df_for_plot <- predictions_combined %>%
+  filter(
+    model == "superlearner",
+    feature_set == "fb_and_offline",
+    cv_method == "LOCO-CV"
+  ) %>% 
+  group_by(outcome_clean, year) %>% 
+  summarize(error = mean(observed - predicted),
+            error_absolute = mean(abs(observed - predicted))) 
+
+error_over_time_part1 <- df_for_plot %>% 
+  ggplot(aes(x = year, y = error, color = outcome_clean)) + 
+  geom_line() + 
+  geom_point(fill= "white", shape = 21, size = 2) + 
+  theme_cowplot() + 
+  ylim(-0.35, 0.35) + 
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") + 
+  theme_cowplot() + 
+  scale_color_manual(values = cbp1) + 
+  theme(legend.position = "bottom", legend.title = element_blank()) + 
+  labs(x = "Year",
+       y = "Mean Error \n (Observed - Predicted)")
 
 
+error_over_time_part2 <- df_for_plot %>% 
+  ggplot(aes(x = year, y = error_absolute, color = outcome_clean)) + 
+  geom_line() + 
+  geom_point(fill= "white", shape = 21, size = 2) + 
+  theme_cowplot() + 
+  ylim(0, .5) + 
+  geom_hline(yintercept = mean(df_for_plot$error_absolute), linetype = "dashed", color = "black") + 
+  theme_cowplot() + 
+  scale_color_manual(values = cbp1) + 
+  theme(legend.position = "bottom", legend.title = element_blank()) + 
+  labs(x = "Year",
+       y = "Mean Absolute Error")
+
+combined_fig <- plot_grid(error_over_time_part1, error_over_time_part2, nrow = 2)
+
+ggsave(plot = combined_fig, filename = here("figures", "error_over_time.png"), height = 8, width = 6)
+```
 

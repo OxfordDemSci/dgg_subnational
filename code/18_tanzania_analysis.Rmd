@@ -1,0 +1,85 @@
+---
+title: "Tanzania"
+author: Casey Breen
+---
+
+Summary: Quick analysis for Tanzania 2015
+
+```{r}
+## libary packages + custom functions 
+library(here)
+source(here("code", "helpers.R")) 
+```
+
+```{r}
+master_file_full <- read_csv(here("data", "master_data_file_jan16_with_national.csv")) %>% 
+  filter(!is.na(dhsyear))
+
+master_estimates_long <- master_file_full %>% 
+  select(gid_0, gid_1, year, perc_owns_mobile_telephone_wght_age_15_to_49_wom, perc_owns_mobile_telephone_wght_age_15_to_49_men, perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio, perc_used_internet_past12months_wght_age_15_to_49_wom, perc_used_internet_past12months_wght_age_15_to_49_men, perc_used_internet_past12months_wght_age_15_to_49_fm_ratio) %>% 
+  pivot_longer(-c(gid_0, gid_1, year)) %>% 
+  rename(observed = value, outcome= name) %>% 
+  filter(!is.na(observed)) %>% 
+   mutate(outcome = case_when(
+    outcome == "perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio" ~   "mobile_fm_ratio",
+    outcome == "perc_owns_mobile_telephone_wght_age_15_to_49_men"      ~    "mobile_men",
+    outcome == "perc_owns_mobile_telephone_wght_age_15_to_49_wom"      ~      "mobile_women",
+    outcome == "perc_used_internet_past12months_wght_age_15_to_49_fm_ratio" ~ "internet_fm_ratio", 
+    outcome == "perc_used_internet_past12months_wght_age_15_to_49_men" ~      "internet_men",
+    outcome == "perc_used_internet_past12months_wght_age_15_to_49_wom" ~       "internet_women"
+  ))
+
+master_estimates_long <- master_estimates_long %>% 
+   mutate(outcome_clean = case_when(
+    grepl("mobile_fm_ratio", outcome) ~ "Mobile (Ratio)",
+    grepl("mobile_men", outcome) ~ "Mobile (Men)",
+    grepl("mobile_women", outcome) ~ "Mobile (Women)",
+    grepl("internet_fm_ratio", outcome) ~ "Internet (Ratio)",
+    grepl("internet_men", outcome) ~ "Internet (Men)",
+    grepl("internet_women", outcome) ~ "Internet (Women)",
+    TRUE ~ outcome
+  )) %>% mutate(outcome_clean = factor(outcome_clean, 
+                                levels = c("Internet (Women)", "Internet (Men)", "Internet (Ratio)",
+                                           "Mobile (Women)", "Mobile (Men)", "Mobile (Ratio)")))
+```
+
+
+```{r}
+## read in prediction 
+predictions_uncertainty <- read_csv(here("out", "predictions_with_uncertainty.csv"))
+
+predictions_real <- predictions_long %>% 
+  inner_join(master_estimates_long) 
+```
+
+```{r}
+# Plot for "perc_ever_used_internet_wght_age_15_to_49_men"
+tanzania_plot <- predictions_real %>%
+  filter(gid_0 %in% c("TZA")) %>% 
+  group_by(gid_0) %>%
+  mutate(survey = case_when(
+    gid_0 == "NPL" ~ "Nepal (2016)",
+    gid_0 == "TZA" ~ "Tanzania (2015)"
+  )) %>% 
+ filter(year == min(year)) %>%
+  ggplot(aes(x = observed, y = predicted, color = survey)) + # size = pop_all_age_total_dhsyear
+  geom_point(alpha = 1) +
+  geom_abline(slope = 1, linetype = "dashed", color = "grey") +
+  theme_cowplot() +
+  labs(x = "Observed",
+       y = "Predicted") + 
+  ylim(0, 1) + 
+  xlim(0, 1) + 
+  scale_y_continuous(limits = c(0, 1.1)) +
+  scale_x_continuous(limits = c(0, 1.1)) +
+  facet_wrap(~outcome_clean, nrow = 2) +
+  theme(legend.position = "bottom") + 
+  stat_cor(aes(x = observed, y = predicted, label = paste0("italic(r)~`=`~", ..r..)), color= "black") 
+
+## save plot 
+ggsave(plot = tanzania_plot, filename = here("figures", "tanzania_plot.png"), width = 10, height = 6)
+
+```
+
+
+

@@ -134,13 +134,19 @@ gini_results <- filtered_data %>%
 
 ```{r}
 gini_results <- gini_results %>%
-  mutate(continent = countrycode(sourcevar = gid_0, origin = "iso3c", destination = "continent"))
+  mutate(continent = countrycode(sourcevar = gid_0, origin = "iso3c", destination = "continent")) %>% 
+  mutate(continent = case_when(
+    gid_0 %in% c("IND", "PAK", "BGD", "LKA", "NPL", "BTN", "MDV", "AFG") ~ "South Asia",
+    TRUE ~ continent)) %>% 
+  mutate(continent =  case_when(
+    continent == "Asia" ~ "Asia (other)",
+    TRUE ~ continent))
 
 gini_plot <- gini_results %>% 
-  filter(continent %in% c("Africa", "Americas", "Asia")) %>% 
+  filter(continent %in% c("Africa", "Americas", "Asia (other)", "South Asia")) %>% 
   group_by(year, continent) %>% 
   filter(!is.na(gini)) %>% 
-  summarize(gini = median(gini, na.rm = TRUE))  %>% 
+  summarize(gini = mean(gini, na.rm = TRUE))  %>% 
   ggplot(aes(x = year, y = gini, color = continent)) + 
   geom_line() + 
   geom_point(size = 4, shape = 21, fill = "white", stroke = 1.5) +  # Bigger points with white fill
@@ -158,9 +164,107 @@ gini_plot <- gini_results %>%
 trend_plot_combined <- cowplot::plot_grid(trend_plot, gini_plot, ncol = 1, labels = c("", "D"))
 
 ggsave(plot = trend_plot_combined, filename = here("figures", "trend_plot_combined.png"), height = 8, width = 10)
-
 ```
 
 
+
+
+```{r}
+# Filter for Guatemala
+data_filter <- predictions %>%
+  filter(gid_0 == "AFG") %>% 
+  filter(outcome %in% c("internet_fm_ratio", "internet_men", "internet_women"))
+
+# Calculate median line
+median_data <- data_filter %>%
+  group_by(date, outcome) %>%
+  summarize(median_predicted = median(predicted, na.rm = TRUE))
+
+# Plot with median as dark line and others as clear grey
+afghanistan_plot <- ggplot() +
+  geom_line(data = data_filter, aes(x = date, y = predicted, group = gid_1),
+            color = "grey80", size = 0.5) +
+  geom_line(data = median_data, aes(x = date, y = median_predicted),
+            color = "black", size = 1) +
+  theme_cowplot() +
+  labs(
+    title = "Afghanistan",
+    x = "Date",
+  ) + 
+  background_grid() + 
+  facet_wrap(~outcome) + 
+  ylim(0, 0.5)
+```
+
+
+```{r}
+# Filter for Guatemala
+data_filter <- predictions %>%
+  filter(gid_0 == "AFG") %>% 
+  filter(outcome %in% c("mobile_fm_ratio", "mobile_men", "mobile_women"))
+
+# Calculate median line
+median_data <- data_filter %>%
+  group_by(date, outcome) %>%
+  summarize(median_predicted = median(predicted, na.rm = TRUE))
+
+# Plot with median as dark line and others as clear grey
+afghanistan_plot <- ggplot() +
+  geom_line(data = data_filter, aes(x = date, y = predicted, group = gid_1),
+            color = "grey80", size = 0.5) +
+  geom_line(data = median_data, aes(x = date, y = median_predicted),
+            color = "black", size = 1) +
+  theme_cowplot() +
+  labs(
+    title = "Afghanistan",
+    x = "Date",
+  ) + 
+  background_grid() + 
+  facet_wrap(~outcome) + 
+  ylim(0, 1)
+```
+
+
+
+
+```{r}
+# Filter for Guatemala
+data_filter <- predictions %>%
+    filter(outcome == "mobile_fm_ratio") %>% 
+  filter(gid_0 == "AFG")
+
+# Calculate median line
+median_data <- data_filter %>%
+  group_by(date) %>%
+  summarize(median_predicted = median(predicted, na.rm = TRUE))
+
+# Plot with median as dark line and others as clear grey
+afghanistan_plot <- ggplot() +
+  geom_line(data = median_data, aes(x = date, y = median_predicted),
+            color = "black", size = 1) +
+    geom_point(data = median_data, aes(x = date, y = median_predicted),
+            color = "black", fill = "white", shape = 21, size = 3) + 
+  theme_cowplot() +
+  labs(
+    title = "Afghanistan",
+    x = "Date",
+    y = "Gender Gap (Internet)"
+  ) + 
+ background_grid() + 
+  ylim(0, .9) + 
+  geom_vline(xintercept = as.Date("2021-08-01"), linetype = "dashed", color = "firebrick") + 
+ # Improved text annotation (moved slightly to the right)
+  annotate("text", x = as.Date("2022-01-01"), 
+           y = 0.22, label = "Taliban Resurgence", 
+           size = 4, colour = "firebrick", fontface = "bold", hjust = 0) +
+
+  # Left-pointing arrow segment to connect text to the event
+  annotate("segment", 
+           x = as.Date("2021-12-20"), xend = as.Date("2021-09-01"), 
+           y = 0.22, yend = 0.22,
+           arrow = arrow(length = unit(0.2, "cm")), 
+           color = "firebrick", size = 0.8)
+
+```
 
 

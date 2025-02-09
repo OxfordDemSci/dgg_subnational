@@ -201,35 +201,37 @@ var_importance_data <- cv_results %>%
   arrange(desc(avg_r_squared)) %>%
   slice_head(n = 10) %>% 
   mutate(feature_recode = case_when(
-    feature == "fb_pntr_18p_female" ~ "Facebook Penetration (Female)",
-    feature == "fb_pntr_18p_male" ~ "Facebook Penetration (Male)",
-    grepl("all_devices_age_18_plus_gg", feature) ~ "Facebook Penetration Gender Gap",
-    grepl("fb_pntr_18p_male_national", feature) ~ "Facebook Penetration National (Male)",
-    grepl("fb_pntr_18p_female_national", feature) ~ "Facebook Penetration National (Female)",
-    grepl("rwi_mean_wght", feature) ~ "Relative Wealth Index (Pop-weighted)",
-    grepl("subnational_hdi_males", feature) ~ "Human Development Index (Male)",
-    grepl("rwi_mean", feature) ~ "Relative Wealth Index (Mean)",
-    grepl("subnational_hdi_females", feature) ~ "Human Development Index (Female)",
-    grepl("ios_age_18_plus_female_frac_2021", feature) ~ "iOS FB Usage (Female)",
-    grepl("income_index_males", feature) ~ "Income Index (Male)",
-    grepl("educational_index_females", feature) ~ "Educational Index (Female)",
-    grepl("educational_index_males", feature) ~ "Educational Index (Male)",
-    grepl("nl_mean", feature) ~ "Night Light Mean",
-    grepl("wifi_age_18_plus_female_frac_2024_tess", feature) ~ "WiFi FB Usage (Female)",
-    grepl("wifi_age_18_plus_male_frac_2024_tess", feature) ~ "WiFi FB Usage (Male)",
-    grepl("hdi", feature) ~ "Human Development Index (National)",
-    feature == "gdi" ~ "Gender Development Index (National)",
-    feature == "subnational_gdi" ~ "Gender Development Index",
-    grepl("ios_age_18_plus_male_frac_2021", feature) ~ "iOS FB Usage (Male)",
-    grepl("income_index_females", feature) ~ "Income Index (Female)",
-    grepl("pop_density", feature) ~ "Population Density",
-    grepl("wifi_age_18_plus_male_frac_2021", feature) ~ "WiFi FB Usage (Male)",
-    grepl("wifi_age_18_plus_female_frac_2021", feature) ~ "WiFi FB Usage (Female)",
+    feature == "fb_pntr_18p_female" ~ "Subnational Facebook Penetration (Female)",
+    feature == "fb_pntr_18p_male" ~ "Subnational Facebook Penetration (Male)",
+    grepl("all_devices_age_18_plus_gg", feature) ~ "Subnational Facebook Penetration Gender Gap",
+    grepl("fb_pntr_18p_male_national", feature) ~ "National Facebook Penetration (Male)",
+    grepl("fb_pntr_18p_female_national", feature) ~ "National Facebook Penetration (Female)",
+    grepl("rwi_mean_wght", feature) ~ "Subnational Relative Wealth Index (Pop-weighted)",
+    grepl("subnational_hdi_males", feature) ~ "Subnational Human Development Index (Male)",
+    grepl("rwi_mean", feature) ~ "Subnational Relative Wealth Index (Mean)",
+    grepl("subnational_hdi_females", feature) ~ "Subnational Human Development Index (Female)",
+    grepl("ios_age_18_plus_female_frac_2024", feature) ~ "Subnational iOS FB Usage (Female)",
+    grepl("income_index_males", feature) ~ "Subnational Income Index (Male)",
+    grepl("educational_index_females", feature) ~ "Subnational Educational Index (Female)",
+    grepl("educational_index_males", feature) ~ "Subnational Educational Index (Male)",
+    grepl("nl_mean", feature) ~ "Subnational Night Light Mean",
+    grepl("wifi_age_18_plus_female_frac_2024_tess", feature) ~ "Subnational WiFi FB Usage (Female)",
+    grepl("wifi_age_18_plus_male_frac_2024_tess", feature) ~ "Subnational WiFi FB Usage (Male)",
+    grepl("×4g_age_13_plus_female_frac_2024", feature) ~ "Subnational WiFi FB Usage (Male)",
+    grepl("hdi", feature) ~ "National Human Development Index",
+    feature == "gdi" ~ "National Gender Development Index",
+    feature == "subnational_gdi" ~ "Subnational Gender Development Index",
+    grepl("ios_age_18_plus_male_frac_2024", feature) ~ "Subnational iOS FB Usage (Male)",
+    grepl("income_index_females", feature) ~ "Subnational Income Index (Female)",
+    grepl("pop_density", feature) ~ "Subnational Population Density",
+    grepl("wifi_age_18_plus_male_frac_2021", feature) ~ "Subnational WiFi FB Usage (Male)",
+    grepl("wifi_age_18_plus_female_frac_2021", feature) ~ "Subnational WiFi FB Usage (Female)",
+    feature == "ios_age_13_plus_male_frac_2024" ~ "Subnational iOS FB Usage (Male)",
     feature == "dhsyear" ~ "DHS Survey Year",
-    feature == "x4g_age_18_plus_female_frac_2024" ~ "4G+ Network FB Usage", 
-    grepl("all_devices_age_18_dhsyear_gg_national", feature) ~ "Facebook National Gender Gap",
-    grepl("all_devices_age_18_plus_gg_2021_impute", feature) ~ "Facebook Gender Gap",
-        grepl("rel_date", feature) ~ "Year",
+    feature == "x4g_age_13_plus_female_frac_2024" ~ "Subnational 4G+ Network FB Usage", 
+    grepl("all_devices_age_18_dhsyear_gg_national", feature) ~ "Subnational Facebook National Gender Gap",
+    grepl("all_devices_age_18_plus_gg_2021_impute", feature) ~ "Subnational Facebook Gender Gap",
+    grepl("rel_date", feature) ~ "Year",
     TRUE ~ feature  # Default case
   )) %>% 
   group_by(outcome) %>%
@@ -249,6 +251,7 @@ var_importance_data <- cv_results %>%
     grepl("used_internet_past12months_wght_age_15_to_49_wom", outcome) ~ "Internet (Women)",
     TRUE ~ outcome
   )) # Default to keep original name if no match
+
 
 var_importance_plot <- var_importance_data %>% 
   filter(outcome == "perc_used_internet_past12months_wght_age_15_to_49_wom") %>% 

@@ -109,6 +109,40 @@ ggsave(plot = lsms_plot, filename = here("figures", "predicted_vs_lsms_with_lege
 ```
 
 
+```{r}
+lsms_plot_time_trend_mae <- lsms_data %>% 
+  mutate(mae = abs(predicted - lsms_estimate)) %>% 
+  group_by(outcome_clean, year) %>% 
+  summarize(mae = mean(mae)) %>% 
+  ggplot(aes(x = year, y = mae, color = outcome_clean)) + 
+  geom_line() + 
+  geom_point(fill= "white", shape = 21, size = 2) + 
+  ylim(0, .5) + 
+  theme_cowplot() + 
+  theme(legend.position = "bottom", legend.title = element_blank()) + 
+  labs(x = "Year", y = "Mean Absolute Error")
+
+
+lsms_plot_time_trend_error <- lsms_data %>% 
+  mutate(mae = predicted - lsms_estimate) %>% 
+  group_by(outcome_clean, year) %>% 
+  summarize(mae = mean(mae)) %>% 
+  ggplot(aes(x = year, y = mae, color = outcome_clean)) + 
+  geom_line() + 
+  geom_point(fill= "white", shape = 21, size = 2) + 
+  ylim(-0.35, .35) + 
+  theme_cowplot() + 
+  theme(legend.position = "bottom", legend.title = element_blank()) + 
+  labs(x = "Year", y = "Mean Error \n (Observed - Predicted)")
+  
+
+lsms_error_trend <- cowplot::plot_grid(lsms_plot_time_trend_error, lsms_plot_time_trend_mae, nrow = 2 )
+
+ggsave(plot = lsms_error_trend, filename = here("figures", "lsms_error_over_time.png"), height = 8, width = 6)
+
+```
+
+
 
 
 ```{r}
@@ -179,24 +213,75 @@ mics_data <- read_csv(here("data", "mics_ground_truth.csv")) %>% janitor::clean_
 
 
 ```{r}
+## mics long 
 mics_long <- mics_data %>% 
   filter(internet_n_sample_f > 100) %>% 
-  select(iso3, gid_1, survey_year, internet_women = internet_f_weighted, internet_men =  internet_m_weighted, mobile_women = mobile_f_weighted, mobile_men = mobile_m_weighted) %>% 
+  mutate(year = survey_year) %>% 
+  select(iso3, gid_1, year, internet_women = internet_f_weighted, internet_men =  internet_m_weighted, mobile_women = mobile_f_weighted, mobile_men = mobile_m_weighted) %>% 
   mutate(mobile_fm_ratio = mobile_women/mobile_men) %>% 
   mutate(internet_fm_ratio = internet_women/internet_men) %>% 
-  pivot_longer(-c(gid_1, iso3, survey_year)) %>% 
+  pivot_longer(-c(gid_1, iso3, year)) %>% 
   rename(mics_estimate = value, outcome = name) 
 
+mics_long <- mics_long %>% 
+  inner_join(predictions, by= c("year", "gid_1", "outcome")) %>% 
+  mutate(mics_estimate = case_when(
+    mics_estimate > 1 ~ 1,z
+    TRUE ~ mics_estimate
+  ))
+  
+# Calculate R-squared and correlation (r) by outcome
+r_squared_results <- mics_long %>% 
+  filter(!is.na(mics_estimate)) %>% 
+  group_by(outcome) %>%
+  summarize(
+    r = cor(predicted, mics_estimate, use = "complete.obs"),  # Calculate correlation
+    r2 = compute_r2(predicted, mics_estimate),  # Calculate R-squared
+    mae = mean(abs(predicted - mics_estimate)), 
+    .groups = "drop"
+  )
 
-predictions %>% 
-  inner_join(mics_long, by = c("year" = "survey_year", "gid_1", "outcome")) %>% 
-  ggplot(aes(x = mics_estimate, y = predicted)) + 
+mics_long <-  mics_long %>% 
+   mutate(outcome_clean = case_when(
+    grepl("mobile_fm_ratio", outcome) ~ "Mobile (Ratio)",
+    grepl("mobile_men", outcome) ~ "Mobile (Men)",
+    grepl("mobile_women", outcome) ~ "Mobile (Women)",
+    grepl("internet_fm_ratio", outcome) ~ "Internet (Ratio)",
+    grepl("internet_men", outcome) ~ "Internet (Men)",
+    grepl("internet_women", outcome) ~ "Internet (Women)",
+    TRUE ~ outcome
+  )) %>% mutate(outcome_clean = factor(outcome_clean, 
+                                levels = c("Internet (Women)", "Internet (Men)", "Internet (Ratio)",
+                                           "Mobile (Women)", "Mobile (Men)", "Mobile (Ratio)")))
+
+mics_survey <- mics_long %>% 
+  left_join(r_squared_results) %>% 
+  mutate(survey = case_when(
+    iso3 == "SUR" ~ "Suriname (2018)",
+    iso3 == "GUY" ~ "Guyana (2019)", 
+    iso3 == "JAM" ~ "Jamaica (2022)"
+  )) %>% 
+  ggplot(aes(x = mics_estimate, y = predicted, color = survey)) + 
   geom_point() + 
-  ggpubr::stat_cor() + 
-  facet_wrap(~outcome) + 
   theme_cowplot() + 
-  geom_abline(slope = 1, linetype = "dashed", color = "red") + 
-  ylim(0, 1.3) + 
-  xlim(0, 1.3)
+  geom_abline(slope = 1, linetype = "dashed", color = "black") + 
+  ylim(0, 1.1) + 
+   geom_label(
+      aes(label = paste("MAE == ", round(mae, 2))),
+    x = 0.25,  
+    y = 0.9, 
+    size = 3.5,
+    parse = TRUE,
+    inherit.aes = FALSE
+  ) +
+  xlim(0, 1.1) + 
+  theme(legend.position = "bottom") + 
+    facet_wrap(~outcome_clean) + 
+  labs(y = "Predicted",
+       x = "MICS Ground Truth")
+
+
+ggsave(plot = mics_survey, filename = here("figures", "mics_survey.png"), width = 10, height = 7, bg = "white")
+
 ```
 

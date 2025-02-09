@@ -16,7 +16,7 @@ set.seed(1)
 
 ```{r}
 ## read in training and test datasets 
-master_file <- read_csv(here("data", "master_data_file_jan16_with_national.csv"), 
+master_file <- read_csv(here("data", "master_data_file_feb7_with_national.csv"), 
                   locale = locale(encoding = "ISO-8859-1")) %>%
   janitor::clean_names() %>% 
     mutate(continent = case_when(continent == "Africa" ~ 1,
@@ -25,10 +25,9 @@ master_file <- read_csv(here("data", "master_data_file_jan16_with_national.csv")
   filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% drop_na() %>% 
   #filter(!country %in% c("Lesotho", "Côte d'Ivoire", "Mozambique", "")) %>% 
   filter(!(country ==  "Tanzania" & dhsyear == 2015)) %>% 
-  filter(!(country ==  "Nepal" & dhsyear == 2016)) %>% 
-  filter(!(country ==  "Lesotho"))
+  filter(!(country ==  "Nepal" & dhsyear == 2016)) 
 
-master_file_full <- read_csv(here("data",  "master_data_file_jan16_with_national.csv"), 
+master_file_full <- read_csv(here("data",  "master_data_file_feb7_with_national.csv"), 
                   locale = locale(encoding = "ISO-8859-1")) %>%
   janitor::clean_names() %>% 
   mutate(continent = case_when(continent == "Africa" ~ 1,
@@ -55,7 +54,7 @@ sl_predictions_internet_men <- superlearner_train_and_predict(data = master_file
                                                  outcome = "perc_used_internet_past12months_wght_age_15_to_49_men",
                                                  predict_data = master_file_full,
                                                  return_fit = T) 
-
+ 
 ## sl predictions for internet fm ratio  
 sl_predictions_internet_fm_ratio <- superlearner_train_and_predict(data = master_file, 
                                                  covar_list = c(fb_feats, off_feats),
@@ -146,7 +145,7 @@ Read in predictions from cross-validation
 
 ```{r}
 ## read in predictions 
-predictions_combined <- read_csv(here("out",  "combined_predictions_lmics_national_covars_full.csv")) %>% 
+predictions_combined <- read_csv(here("out",  "combined_predictions_lmics_national_covars_full_test.csv")) %>% 
   mutate(predicted = case_when(predicted < 0 ~ 0,
                   TRUE ~ predicted)) %>% 
   filter(cv_method == "loco") %>% 

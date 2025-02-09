@@ -126,10 +126,12 @@ mobile_plot_men <- mobile_data_men %>%
     axis.text.y = element_text(size = 10, face = "bold"),
     axis.title.x = element_text(size = 14, face = "bold")
   ) + 
-  # Use ggtext to bold "Overall mean" via Markdown
   scale_y_discrete(
     labels = c("Overall mean" = expression(bold("Overall mean")), "Other Country" = "Other Country"),
   ) + 
+  # Add numbers above each bar
+geom_text(aes(x = (max + min) / 2-0.05, y = country, label = round(max-min, 2)), 
+          vjust = -0.5, hjust = 0, size = 3.5, color = "black") +
   xlim(0, 1)
 
 # Women plot
@@ -173,6 +175,10 @@ mobile_plot_women <- mobile_data_women %>%
   scale_y_discrete(
     labels = c("Overall mean" = expression(bold("Overall mean")), "Other Country" = "Other Country")
   ) + 
+  xlim(0, 1) + 
+  # Add numbers above each bar
+geom_text(aes(x = (max + min) / 2-0.05, y = country, label = round(max-min, 2)), 
+          vjust = -0.5, hjust = 0, size = 3.5, color = "black") +
   xlim(0, 1)
 ```
 
@@ -222,6 +228,10 @@ internet_plot_men <- internet_data_men %>%
   scale_y_discrete(
     labels = c("Overall mean" = expression(bold("Overall mean")), "Other Country" = "Other Country")
   ) + 
+  xlim(0, 1)+ 
+  # Add numbers above each bar
+geom_text(aes(x = (max + min) / 2-0.05, y = country, label = round(max-min, 2)), 
+          vjust = -0.5, hjust = 0, size = 3.5, color = "black") +
   xlim(0, 1)
 
 # Women plot
@@ -265,6 +275,10 @@ internet_plot_women <- internet_data_women %>%
   scale_y_discrete(
     labels = c("Overall mean" = expression(bold("Overall mean")), "Other Country" = "Other Country")
   ) + 
+  xlim(0, 1) + 
+  # Add numbers above each bar
+geom_text(aes(x = (max + min) / 2-0.05, y = country, label = round(max-min, 2)), 
+          vjust = -0.5, hjust = 0, size = 3.5, color = "black") +
   xlim(0, 1)
 
 ```

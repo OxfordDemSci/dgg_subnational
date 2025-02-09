@@ -11,12 +11,13 @@ Summary: Create plots of within-country variation in internet adoption and mobil
 library(here)
 source(here("code", "helpers.R"))
 
-
 ## read in prediction 
 predictions_long <- read_csv(here("out", "predictions_with_uncertainty.csv"))
 
+predictions_wide <- read_csv(here("out", "predictions_wide.csv"))
+
 ## predictions continent 
-predictions$continent <- countrycode(predictions$gid_0, origin = 'iso3c', destination = 'continent')
+predictions_wide$continent <- countrycode(predictions_wide$gid_0, origin = 'iso3c', destination = 'continent')
 
 ## predictions continent 
 predictions_long$continent <- countrycode(predictions_long$gid_0, origin = 'iso3c', destination = 'continent')
@@ -87,18 +88,17 @@ spread_plot <- predictions_long %>%
 
 ## write rds 
 write_rds(spread_plot, file = here("figures", "spread_plot.rds"))
-
 ```
 
 
 
 
 ```{r}
-predictions <- predictions %>% 
-  filter(year == 2024 & month == 2) %>% 
+predictions_wide <- predictions_wide %>% 
+  filter(year == 2024 & month == 11) %>% 
   mutate(across(c(predicted_perc_used_internet_past12months_wght_age_15_to_49_wom, predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom, predicted_perc_used_internet_past12months_wght_age_15_to_49_men, predicted_perc_owns_mobile_telephone_wght_age_15_to_49_men), ~ ifelse(. > 1, 1, .))) 
 
-internet_vs_mobile_predictions_women <- predictions %>% 
+internet_vs_mobile_predictions_women <- predictions_wide %>% 
   ggplot(aes(x = predicted_perc_used_internet_past12months_wght_age_15_to_49_wom, y =predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom )) + 
   geom_point(aes(color = continent), alpha = 0.4) + 
   theme_cowplot() + 
@@ -110,7 +110,7 @@ internet_vs_mobile_predictions_women <- predictions %>%
   xlim(0, 1.2) + 
   theme(legend.position = "none")
 
-internet_vs_mobile_predictions_men <- predictions %>% 
+internet_vs_mobile_predictions_men <- predictions_wide %>% 
   ggplot(aes(x = predicted_perc_used_internet_past12months_wght_age_15_to_49_men, y =predicted_perc_owns_mobile_telephone_wght_age_15_to_49_men )) + 
   geom_point(aes(color = continent), alpha = 0.4) + 
   theme_cowplot() + 
@@ -122,7 +122,7 @@ internet_vs_mobile_predictions_men <- predictions %>%
   xlim(0, 1.2) + 
   theme(legend.position = "none")
 
-internet_vs_mobile_predictions_fm_ratio <- predictions %>% 
+internet_vs_mobile_predictions_fm_ratio <- predictions_wide %>% 
   ggplot(aes(x = predicted_perc_used_internet_past12months_wght_age_15_to_49_fm_ratio, y =predicted_perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio )) + 
   geom_point(aes(color = continent), alpha = 0.4) + 
   theme_cowplot() + 
