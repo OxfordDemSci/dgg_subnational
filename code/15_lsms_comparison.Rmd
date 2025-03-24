@@ -31,7 +31,7 @@ gadm1 <- read_csv(here("data", "subnational_ground_truth_sep17_2024.csv"), local
 ```{r}
 lsms_estimates_long <- lsms_estimates %>% 
     # filter(!gid_1 %in% gadm1$gid_1) %>% 
-  filter(!(iso3 == "NER" & survey_year == 2021)) %>% 
+ filter(!(iso3 == "NER" & survey_year == 2021)) %>% 
  filter(internet_n_sample_f > 1000) %>% 
   select(iso3, gid_1, survey_year, internet_women = internet_f_weighted, internet_men =  internet_m_weighted, mobile_women = mobile_f_weighted, mobile_men = mobile_m_weighted) %>% 
   mutate(mobile_fm_ratio = mobile_women/mobile_men) %>% 
@@ -39,7 +39,7 @@ lsms_estimates_long <- lsms_estimates %>%
   pivot_longer(-c(gid_1, iso3, survey_year)) %>% 
   rename(lsms_estimate = value, outcome = name)
 
-lsms_estimates_long <- lsms_estimates_long %>% 
+lsms_estimates_long <- lsms_estimates_long %>%
   filter(!(iso3 == "NGA" & outcome %in% c("mobile_women", "mobile_men", "mobile_fm_ratio")))
 ```
 
@@ -119,6 +119,7 @@ lsms_plot_time_trend_mae <- lsms_data %>%
   geom_point(fill= "white", shape = 21, size = 2) + 
   ylim(0, .5) + 
   theme_cowplot() + 
+    scale_color_manual(values = cbp1) + 
   theme(legend.position = "bottom", legend.title = element_blank()) + 
   labs(x = "Year", y = "Mean Absolute Error")
 
@@ -129,6 +130,7 @@ lsms_plot_time_trend_error <- lsms_data %>%
   summarize(mae = mean(mae)) %>% 
   ggplot(aes(x = year, y = mae, color = outcome_clean)) + 
   geom_line() + 
+    scale_color_manual(values = cbp1) + 
   geom_point(fill= "white", shape = 21, size = 2) + 
   ylim(-0.35, .35) + 
   theme_cowplot() + 
@@ -136,7 +138,7 @@ lsms_plot_time_trend_error <- lsms_data %>%
   labs(x = "Year", y = "Mean Error \n (Observed - Predicted)")
   
 
-lsms_error_trend <- cowplot::plot_grid(lsms_plot_time_trend_error, lsms_plot_time_trend_mae, nrow = 2 )
+lsms_error_trend <- cowplot::plot_grid(lsms_plot_time_trend_error, lsms_plot_time_trend_mae, nrow = 2, labels = "AUTO")
 
 ggsave(plot = lsms_error_trend, filename = here("figures", "lsms_error_over_time.png"), height = 8, width = 6)
 
@@ -226,7 +228,7 @@ mics_long <- mics_data %>%
 mics_long <- mics_long %>% 
   inner_join(predictions, by= c("year", "gid_1", "outcome")) %>% 
   mutate(mics_estimate = case_when(
-    mics_estimate > 1 ~ 1,z
+    mics_estimate > 1 ~ 1,
     TRUE ~ mics_estimate
   ))
   

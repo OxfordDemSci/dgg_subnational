@@ -13,22 +13,36 @@ source(here("code", "helpers.R"))
 
 ```{r}
 ## read in training and test datasets 
-master_file <- read_csv(here("data", "master_data_file_jan16_with_national.csv")) %>%
+master_file <- read_csv(here("data", "master_data_file_march12_with_national.csv")) %>%
   dplyr::select(country, all_of(c(dhs_vars, fb_feats, off_feats))) %>% 
   filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) 
 
-master_file_full <- read_csv(here("data", "master_data_file_jan16_with_national.csv")) %>% 
+master_file_full <- read_csv(here("data", "master_data_file_march12_with_national.csv")) %>% 
   filter(!is.na(fb_pntr_18p_female)) %>% 
-  filter(year == 2024 & month == 11)
+  filter(year == 2025 & month == 01)
+
+
+# Define the list of variables
+variables <- c(
+  "predicted_perc_owns_mobile_telephone_wght_age_15_to_49_wom",
+  "predicted_perc_owns_mobile_telephone_wght_age_15_to_49_men",
+  "predicted_perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio",
+  "predicted_perc_used_internet_past12months_wght_age_15_to_49_wom",
+  "predicted_perc_used_internet_past12months_wght_age_15_to_49_men",
+  "predicted_perc_used_internet_past12months_wght_age_15_to_49_fm_ratio"
+)
 
 ## read in predictions 
-predictions_wide <- read_csv(here("out", "predictions_wide.csv")) 
+predictions_wide <- read_csv(here("out", "predictions_wide.csv")) %>% 
+    mutate(across(all_of(variables), ~ case_when(. > 1 ~ 1, TRUE ~ .)))
+
+  
 
 predictions_uncertainty <- read_csv(here("out", "predictions_with_uncertainty.csv")) %>% 
   filter(outcome == "internet_women") %>% 
-  filter(date == "2024-11")
+  filter(date == "2025-01") 
 
-loco_predictions <- read_csv(here("out", "combined_predictions_lmics_national_covars_full.csv")) %>% 
+loco_predictions <- read_csv(here("out", "combined_predictions_lmics_national_covars_full_test.csv")) %>% 
   filter(model == "superlearner" & feature_set == "fb_and_offline" & cv_method == "loco") %>% 
   filter()
 ```
@@ -50,10 +64,10 @@ gadm1_map <- gadm1_map %>%
 ```{r}
 shapefile_df <- gadm1_map %>% 
   left_join(predictions_uncertainty, by = c("GID_1" = "gid_1")) %>% 
-    left_join(predictions_wide %>% filter(year == 2024 & month == 11), by = c("GID_1" = "gid_1")) 
+  left_join(predictions_wide %>% filter(year == 2025 & month == 1), by = c("GID_1" = "gid_1")) 
 
 shapefile_df_observed <- gadm1_map %>% 
-  left_join(predictions_wide %>% filter(!is.na(observed_perc_used_internet_past12months_wght_age_15_to_49_fm_ratio)), by = c("GID_1" = "gid_1")) 
+  left_join(predictions_wide %>% filter(!is.na(observed_perc_used_internet_past12months_wght_age_15_to_49_fm_ratio)), by = c("GID_1" = "gid_1"))
 ```
 
 
@@ -73,26 +87,7 @@ internet_women_observed <- ggplot() +
     xlim = c(-120, 160),  # Set longitude range
     ylim = c(-60, 60)     # Set latitude range
   )
-  
-internet_women_predicted <- ggplot() +
-  geom_sf(data = gadm1_map, fill = "grey70", color = "black", linewidth = 0.5) +
-  geom_sf(data = shapefile_df, aes(fill = predicted_perc_used_internet_past12months_wght_age_15_to_49_wom), 
-          color = "white", size = 0.01, alpha = 0.8, linewidth = 0.05) +
-  scale_fill_viridis(
-    na.value = "transparent", 
-    limits = c(-0.001, 1.5), 
-    trans = "sqrt", 
-    breaks = c(0, 0.1, 0.25, 0.5, 1),
-    alpha = 1
-  ) +
-  theme_void() +
-  theme(legend.position = "bottom", plot.title = element_text(hjust = 0.3)) + 
-  labs(fill = "Internet Use",
-       title = "Women, predicted") +
-  coord_sf(
-    xlim = c(-120, 160),  # Set longitude range
-    ylim = c(-60, 60)     # Set latitude range
-  )
+
 
 # Women, error 
 internet_women_predicted_error <- ggplot() +
@@ -164,15 +159,69 @@ internet_women_predicted_error_relative <- ggplot() +
 
 ## internet women observed and predicted 
 ggsave(plot = internet_women_observed, filename = here("figures", "internet_lmic_observed.png"), height = 7, width = 10)
-ggsave(plot = internet_women_predicted, filename = here("figures", "internet_lmic_predicted.png"), height = 7, width = 10)
 
 ## create uncertainty visualization 
 uncertainty_error_plot <- cowplot::plot_grid(internet_women_predicted_error, internet_women_predicted_error_relative, ncol = 1, labels = "AUTO")
 
 
 ggsave(plot = uncertainty_error_plot, filename = here("figures", "internet_women_predicted_error.png"), height = 13, width = 10)
-
 ```
+
+
+```{r}
+titles <- c(
+  "Mobile Ownership (Women, Predicted)",
+  "Mobile Ownership (Men, Predicted)",
+  "Mobile Ownership (Mobile Gender Gap, Predicted)",
+  "Internet Use (Women, Predicted)",
+  "Internet Use (Men, Predicted)",
+  "Internet Use (Internet Gender Gap, Predicted)"
+)
+
+titles_legend <- c(
+  "Adoption",
+  "Adoption",
+  "Gender Gap",
+  "Adoption",
+  "Adoption",
+  "Gender Gap"
+)
+
+# Loop over each variable
+for (i in seq_along(variables)) {
+  
+  var <- variables[i]
+  title_text <- titles[i]
+  legend_text <- titles_legend[i]
+  filename <- here(paste0("figures/", var, "_map.png"))
+  
+  # Generate map
+  plot_map <- ggplot() +
+    geom_sf(data = gadm1_map, fill = "grey70", color = "black", linewidth = 0.5) +
+    geom_sf(data = shapefile_df, aes_string(fill = var), 
+            color = "white", size = 0.01, alpha = 0.8, linewidth = 0.05) +
+    scale_fill_viridis(
+      na.value = "transparent", 
+      limits = c(0, 1),  # Ensure all maps use the same scale
+      alpha = 1
+    ) +
+    theme_void() +
+    theme(
+      legend.position = "bottom",
+      plot.title = element_text(hjust = 0.3, size = 14, face = "bold"),
+      legend.margin = margin(-10, 0, 0, 0, "pt")) + 
+    labs(fill = legend_text,
+         title = title_text) +
+    coord_sf(
+      xlim = c(-120, 160),  # Set longitude range
+      ylim = c(-60, 60)     # Set latitude range
+    )
+
+  # Save plot
+  ggsave(plot = plot_map, filename = filename, height = 7, width = 10)
+}
+```
+
 
 
 ## Nigeria Plot
@@ -226,7 +275,7 @@ error_stats <- shapefile_df_nigeria %>%
 
 # Create the plot
 error_dist_nigeria <- ggplot(shapefile_df_nigeria, aes(x = observed, y = predicted_loco)) + 
-  geom_point(aes(size = pop_all_age_total), alpha = 0.3) +
+  geom_point(aes(size = pop_all_age), alpha = 0.3) +
   geom_abline(slope = 1, linetype = "dashed") +
   xlim(0, 1) + 
   ylim(0, 1) + 
@@ -308,7 +357,7 @@ error_stats_zim <- shapefile_df_zimbabwe %>%
 # Create the plot
 error_dist_zim <- shapefile_df_zimbabwe %>% 
   ggplot(aes(x = observed, y = predicted_loco)) + 
-  geom_point(aes(size = pop_all_age_total), alpha = 0.3) +
+  geom_point(aes(size = pop_all_age), alpha = 0.3) +
   geom_label(
     data = tibble(
       x = 0.2, 
@@ -392,7 +441,7 @@ error_stats_senegal <- shapefile_df_senegal %>%
 # Create the plot
 error_dist_senegal <- shapefile_df_senegal %>% 
   ggplot(aes(x = observed, y = predicted_loco)) + 
-  geom_point(aes(size = pop_all_age_total), alpha = 0.3) +
+  geom_point(aes(size = pop_all_age), alpha = 0.3) +
   geom_label(
     data = tibble(
       x = 0.2, 
@@ -451,6 +500,8 @@ error_plot <- cowplot::plot_grid(error_metrics, spread_plot, labels = c("", "L")
 country_error_viz_final <- plot_grid(country_error_viz, error_plot, ncol = 1, rel_heights = c(1, 0.5))
 
 ggsave(plot = country_error_viz_final, filename = here("figures", "country_error_viz.png"), height = 17, width = 14)
+
+ggsave(plot = country_error_viz_final, filename = here("figures", "fig3_country_error_viz.pdf"), height = 17, width = 14)
 
 ```
 

@@ -26,7 +26,7 @@ predictions_long$continent <- countrycode(predictions_long$gid_0, origin = 'iso3
 
 ```{r}
 spread_plot_df <- predictions_long %>% 
-  filter(date == "2024-11") %>% 
+  filter(date == "2025-01") %>% 
   mutate(outcome_clean = case_when(
     grepl("mobile_fm_ratio", outcome) ~ "Mobile (Ratio)",
     grepl("mobile_men", outcome) ~ "Mobile (Men)",
@@ -70,7 +70,7 @@ ggsave(spread_plot, filename = here("figures", "spread_plot.png"), width = 12, h
 ```{r}
 ## create spread plot 
 spread_plot <- predictions_long %>% 
-    filter(date == "2024-11") %>% 
+    filter(date == "2025-01") %>% 
   filter(outcome == "internet_women") %>% 
   group_by(continent, gid_0) %>% 
   summarize(diff = max(predicted) - min(predicted),
@@ -84,7 +84,7 @@ spread_plot <- predictions_long %>%
   scale_color_manual(values = cud) + 
   geom_smooth(se = F, method = "lm") + 
   theme(legend.position = "bottom") + 
-  stat_cor(label.x = .55, label.y = .45, size = 6, p.accuracy = 0.01, aes(label = paste0("italic(r)~`=`~", ..r..)))
+  stat_cor(label.x = .65, label.y = .55, size = 6, p.accuracy = 0.01, aes(label = paste0("italic(r)~`=`~", ..r..)))
 
 ## write rds 
 write_rds(spread_plot, file = here("figures", "spread_plot.rds"))

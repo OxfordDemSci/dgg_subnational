@@ -12,7 +12,7 @@ source(here("code", "helpers.R"))
 ```
 
 ```{r}
-master_file_full <- read_csv(here("data", "master_data_file_jan16_with_national.csv")) %>% 
+master_file_full <- read_csv(here("data", "master_data_file_march12_with_national.csv")) %>% 
   filter(!is.na(dhsyear))
 
 master_estimates_long <- master_file_full %>% 
@@ -48,7 +48,7 @@ master_estimates_long <- master_estimates_long %>%
 ## read in prediction 
 predictions_uncertainty <- read_csv(here("out", "predictions_with_uncertainty.csv"))
 
-predictions_real <- predictions_long %>% 
+predictions_real <- predictions_uncertainty %>% 
   inner_join(master_estimates_long) 
 ```
 

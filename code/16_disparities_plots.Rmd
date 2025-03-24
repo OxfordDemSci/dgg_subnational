@@ -23,7 +23,7 @@ predictions <- predictions %>%
 
 ```{r}
 abs_diff_results <- predictions %>% 
-  filter(date == "2024-11-01" & outcome %in% c("internet_women", "internet_men", 'mobile_men', "mobile_women")) %>% 
+  filter(date == "2025-01-01" & outcome %in% c("internet_women", "internet_men", 'mobile_men', "mobile_women")) %>% 
   group_by(gid_0, outcome) %>% 
   mutate(predicted = case_when(
     predicted > 1 ~ 1,
@@ -287,8 +287,190 @@ geom_text(aes(x = (max + min) / 2-0.05, y = country, label = round(max-min, 2)),
 
 ```{r}
 # Combine plots using cowplot
-combined_plot <- plot_grid(mobile_plot_men, internet_plot_men,  mobile_plot_women, internet_plot_women,  ncol = 2, labels = "AUTO")
+combined_plot <- plot_grid(mobile_plot_men, internet_plot_men,  mobile_plot_women, internet_plot_women,   ncol = 2, labels = "AUTO")
 
 ggsave(plot = combined_plot, filename = here("figures", "disparities_plot.png"), width = 10, height = 8)
+
+ggsave(plot = combined_plot, filename = here("figures", "fig5_disparities_plot.pdf"), width = 10, height = 8)
+
+```
+
+
+
+
+```{r}
+abs_diff_results_gaps <- predictions %>% 
+  filter(date == "2025-01-01" & outcome %in% c("internet_fm_ratio", "mobile_fm_ratio")) %>% 
+  group_by(gid_0, outcome) %>% 
+  mutate(predicted = case_when(
+    predicted > 1 ~ 1,
+    TRUE ~ predicted)) %>% 
+  summarize(diff = max(predicted) - min(predicted),
+            avg = median(predicted),
+            min = min(predicted),
+            max = max(predicted)) 
+
+abs_diff_results_gaps_mean <-  abs_diff_results_gaps %>% 
+  group_by(outcome) %>% 
+  summarize(diff = mean(max) - mean(min),
+            min = mean(min),
+            max = mean(max))  %>% 
+  mutate(country = "Overall mean")
+```
+
+```{r}
+# Prepare Internet data for dumbbell plot
+gender_gap_data_internet <- abs_diff_results_gaps %>%
+  mutate(
+    country = countrycode(gid_0, origin = "iso3c", destination = "country.name")
+  ) %>%
+  mutate(country = case_when(
+    country == "Congo - Brazzaville" ~ "Republic of the Congo", 
+    country == "Congo - Kinshasa" ~ "Democratic Republic of the Congo",
+    TRUE ~ country
+  )) %>% 
+  group_by(outcome) %>%
+  slice_max(diff, n = 10, with_ties = FALSE)  %>% # Select top 10 countries by gender
+  bind_rows(abs_diff_results_gaps_mean) %>% 
+  filter(str_detect(outcome, "internet")) 
+
+
+# Prepare Internet data for dumbbell plot
+gender_gap_data_mobile <- abs_diff_results_gaps %>%
+  mutate(
+    country = countrycode(gid_0, origin = "iso3c", destination = "country.name")
+  ) %>%
+  mutate(country = case_when(
+    country == "Congo - Brazzaville" ~ "Republic of the Congo", 
+    country == "Congo - Kinshasa" ~ "Democratic Republic of the Congo",
+    TRUE ~ country
+  )) %>% 
+  group_by(outcome) %>%
+  slice_max(diff, n = 10, with_ties = FALSE)  %>% # Select top 10 countries by gender
+  bind_rows(abs_diff_results_gaps_mean) %>% 
+  filter(str_detect(outcome, "mobile"))
+```
+
+
+```{r}
+# Gender Gap Plot
+gender_gap_internet <- gender_gap_data_internet %>%
+  mutate(diff = max - min) %>%
+  mutate(
+    country = fct_relevel(country, "Overall mean"), # Move "Overall mean" to the top
+    country = fct_reorder(country, diff, .desc = FALSE) # Order by descending difference
+  ) %>%
+  ggplot(aes(y = country, x = max, xend = min)) +
+  geom_dumbbell(
+    color = "darkgray",
+    size = 1,
+    size_x = 3,
+    size_xend = 3,
+    colour_x = "#F69541",
+    colour_xend = "#699DC6"
+  ) +
+  geom_dumbbell(
+    data = gender_gap_data_internet %>% filter(country == "Overall mean"),
+    aes(y = fct_relevel(country, "Overall mean"), x = max, xend = min),
+    color = "darkgrey",
+    size = 1.5,
+    size_x = 4,
+    size_xend = 4,
+    colour_x = "#F69541",
+    colour_xend = "#699DC6"
+  ) +
+  labs(
+    x = "Gender Gap",
+    y = "",
+    title = "Gender Gap, Internet"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    axis.text.y = element_text(size = 10, face = "bold"),
+  ) + 
+  scale_y_discrete(
+    labels = c("Overall mean" = expression(bold("Overall mean")), "Other Country" = "Other Country"),
+  ) + 
+  # Add numbers above each bar
+geom_text(aes(x = (max + min) / 2-0.05, y = country, label = round(max-min, 2)), 
+          vjust = -0.5, hjust = 0, size = 3.5, color = "black") +
+  xlim(0, 1)
+
+# Gender Gap Plot
+gender_gap_mobile <- gender_gap_data_mobile %>%
+  mutate(diff = max - min) %>%
+  mutate(
+    country = fct_relevel(country, "Overall mean"), # Move "Overall mean" to the top
+    country = fct_reorder(country, diff, .desc = FALSE) # Order by descending difference
+  ) %>%
+  ggplot(aes(y = country, x = max, xend = min)) +
+  geom_dumbbell(
+    color = "darkgray",
+    size = 1,
+    size_x = 3,
+    size_xend = 3,
+    colour_x = "#F69541",
+    colour_xend = "#699DC6"
+  ) +
+  geom_dumbbell(
+    data = gender_gap_data_mobile %>% filter(country == "Overall mean"),
+    aes(y = fct_relevel(country, "Overall mean"), x = max, xend = min),
+    color = "darkgrey",
+    size = 1.5,
+    size_x = 4,
+    size_xend = 4,
+    colour_x = "#F69541",
+    colour_xend = "#699DC6"
+  ) +
+  labs(
+    x = "Gender Gap",
+    y = "",
+    title = "Gender Gap, Mobile"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "none",
+    axis.text.y = element_text(size = 10, face = "bold"),
+  ) + 
+  scale_y_discrete(
+    labels = c("Overall mean" = expression(bold("Overall mean")), "Other Country" = "Other Country"),
+  ) + 
+  # Add numbers above each bar
+geom_text(aes(x = (max + min) / 2-0.05, y = country, label = round(max-min, 2)), 
+          vjust = -0.5, hjust = 0, size = 3.5, color = "black") +
+  xlim(0, 1)
+
+```
+
+## save combined plot 
+
+```{r}
+combined_plot_gender_disparities <- plot_grid(gender_gap_mobile, gender_gap_internet, labels = "AUTO")
+
+ggsave(plot = combined_plot_gender_disparities, filename = here("figures", "combined_plot_gender_disparities.png"), width = 10, height = 5)
+
+```
+
+
+
+
+```{r}
+# Prepare Internet data for dumbbell plot
+internet_data <- abs_diff_results %>%
+  filter(str_detect(outcome, "internet")) %>%
+  mutate(
+    gender = ifelse(str_detect(outcome, "women"), "Women", "Men"),
+    country = countrycode(gid_0, origin = "iso3c", destination = "country.name")
+  ) %>%
+  mutate(country = case_when(
+    country == "Congo - Brazzaville" ~ "Republic of the Congo", 
+    country == "Congo - Kinshasa" ~ "Democratic Republic of the Congo",
+    TRUE ~ country
+  )) %>% 
+  group_by(outcome) %>%
+  slice_max(diff, n = 10, with_ties = FALSE)  %>% # Select top 10 countries by gender
+  bind_rows(abs_diff_results_mean) %>% 
+  filter(str_detect(outcome, "internet")) 
 ```
 

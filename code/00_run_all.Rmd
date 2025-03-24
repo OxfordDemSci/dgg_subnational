@@ -27,7 +27,7 @@ sink(con, append=TRUE, split=TRUE)
 sink(con, append=TRUE, type = "message")
 
 ## Loop to process files
-for (cur_file in rmd_files) { #rmd_files[2:10]
+for (cur_file in rmd_files] { 
 
   cat("================================\n")
   source(here("code", "helpers.R"))

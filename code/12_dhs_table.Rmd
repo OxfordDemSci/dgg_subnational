@@ -13,14 +13,14 @@ source(here("code", "helpers.R"))
 
 
 ```{r}
-master_file <- read_csv(here("data", "master_data_file_jan16_with_national.csv")) 
+master_file <- read_csv(here("data", "master_data_file_march12_with_national.csv")) 
 ```
 
 ```{r}
 # Define the list of country names in lowercase
 countries <- c("angola", "armenia", "benin", "burkina_faso", "burundi", "cambodia", 
                "cameroon", "cote_divoire", "ethiopia", "gabon", "gambia", "guinea", "haiti", "india", 
-               "kenya", "liberia", "madagascar", "malawi", "mali", "mauritania", "mozabique", "nepal", 
+               "kenya", "liberia", "madagascar", "malawi", "mali", "mauritania", "mozambique", "nepal", 
                "nigeria", "pakistan", "rwanda", "senegal", "sierra_leone", "south_africa", 
                "tanzania", "timor-leste", "uganda", "zambia", "zimbabwe")
  
@@ -88,7 +88,6 @@ surveys_women <- dhs_surveys_wom %>%
   mutate(country_code = substring(v000, 1, 2)) %>% 
   dplyr::select(country_code, start_year, end_year, n_women)
 
-
 surveys_men <- dhs_surveys_men %>% 
   group_by(mv000) %>% 
   summarize(n_men = n()) %>% 
@@ -104,14 +103,13 @@ joint_files <- left_join(surveys_women, surveys_men , by = "country_code") %>%
                                country_code ==  "LB" ~ "Liberia",
                                TRUE ~ country))
 
-
 table <- joint_files %>% 
   dplyr::select(country, country_code, start_year, end_year, n_women, n_men) %>% 
+  arrange(country) %>% 
   mutate(start_year = case_when(country == "Nepal" ~ 2022, TRUE ~ start_year)) %>% 
   mutate(end_year = case_when(country == "Nepal" ~ 2022, TRUE ~ end_year))
 
-print(xtable(table, digits = 0), include.rownames=FALSE, file = here("figures", "dhs_table.html"))
-
+print(xtable(table, digits = 0), include.rownames=FALSE, file = here("figures", "dhs_table.tex"))
 
 table %>% summarize(wom = sum(n_women), men = sum(n_men)) %>% 
   mutate(total = wom + men)
@@ -119,7 +117,7 @@ table %>% summarize(wom = sum(n_women), men = sum(n_men)) %>%
 
 
 ```{r}
-master_file_full <- read_csv(here("data", "master_data_file_jan16_with_national.csv"), 
+master_file_full <- read_csv(here("data", "master_data_file_march12_with_national.csv"), 
                        locale = locale(encoding = "ISO-8859-1"),
                        show_col_types = FALSE) %>%
   janitor::clean_names() %>% 

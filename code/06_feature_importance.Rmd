@@ -32,7 +32,7 @@ predictions_combined <- read_csv(here("out", "combined_predictions_lmics_nationa
                    "perc_used_internet_past12months_wght_age_15_to_49_wom") ~ "Internet"))
 
 ## read in training and test datasets 
-master_file <- read_csv(here("data", "master_data_file_jan16_with_national.csv")) %>%
+master_file <- read_csv(here("data", "master_data_file_march12_with_national.csv")) %>%
   dplyr::select(country, gid_1, dhsyear, pop_all_age_total, continent) 
 
 
@@ -122,7 +122,6 @@ filtered_data <- model_performance_metrics %>%
   )
 
 feature_comparison_plot <- filtered_data %>%
-  filter(!outcome %in% c("perc_ever_used_internet_wght_age_15_to_49_fm_ratio", "perc_ever_used_internet_wght_age_15_to_49_men", "perc_ever_used_internet_wght_age_15_to_49_wom")) %>% 
   mutate(feature_set = case_when(
     feature_set == "fb" ~ "Facebook",
     feature_set == "fb_and_offline" ~ "Facebook and Offline",
@@ -155,7 +154,7 @@ feature_comparison_plot <- filtered_data %>%
 
 ```{r}
 ## read in training and test datasets 
-master_file <- read_csv(here("data", "master_data_file_jan16_with_national.csv")) %>%
+master_file <- read_csv(here("data", "master_data_file_march12_with_national.csv")) %>%
   dplyr::select(country, gid_1, all_of(c(dhs_vars, fb_feats, off_feats))) %>% ## the vectors of vars are defined in helper function
   filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% drop_na() %>% 
   mutate(continent = case_when(continent == "Africa" ~ 1,
@@ -259,7 +258,7 @@ var_importance_plot <- var_importance_data %>%
   geom_point() +
   theme_cowplot() +
   geom_segment(aes(yend = feature_idea, x = 0, xend = avg_r_squared), linewidth = 0.5) +
-  geom_segment(aes(yend = feature_idea, x = 0, xend = max(avg_r_squared)), linetype = "dashed", size = 0.1) +
+ # geom_segment(aes(yend = feature_idea, x = 0, xend = max(avg_r_squared)), linetype = "dashed", size = 0.1) +
   labs(x = expression("R" ^ 2),
        y = "",
        title = "Feature Importance") +
@@ -274,6 +273,9 @@ var_importance_plot <- var_importance_data %>%
 r_squaredplot <- plot_grid(feature_comparison_plot, var_importance_plot, labels = "AUTO")
 
 ggsave(plot = r_squaredplot, filename = here("figures", "feature_and_var_importance.png"), width = 13, height = 6, units = "in", dpi = 300)
+
+ggsave(plot = r_squaredplot, filename = here("figures", "fig6_feature_and_var_importance.pdf"), width = 13, height = 6, dpi = 300)
+
 
 ```
 
@@ -293,7 +295,7 @@ var_importance_plot <- var_importance_data %>%
   geom_point() +
   theme_cowplot() +
   geom_segment(aes(yend = feature_idea, x = 0, xend = avg_r_squared), size = 0.5) +
-  geom_segment(aes(yend = feature_idea, x = 0, xend = max(avg_r_squared)), linetype = "dashed", size = 0.1) +
+ # geom_segment(aes(yend = feature_idea, x = 0, xend = max(avg_r_squared)), linetype = "dashed", size = 0.1) +
   labs(x = expression("R" ^ 2),
        y = "",
        title = "Feature Importance") +

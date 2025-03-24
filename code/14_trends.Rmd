@@ -164,6 +164,8 @@ gini_plot <- gini_results %>%
 trend_plot_combined <- cowplot::plot_grid(trend_plot, gini_plot, ncol = 1, labels = c("", "D"))
 
 ggsave(plot = trend_plot_combined, filename = here("figures", "trend_plot_combined.png"), height = 8, width = 10)
+
+ggsave(plot = trend_plot_combined , filename = here("figures", "fig7_trend_plot_combined.pdf"), height = 8, width = 10)
 ```
 
 
@@ -230,7 +232,7 @@ afghanistan_plot <- ggplot() +
 ```{r}
 # Filter for Guatemala
 data_filter <- predictions %>%
-    filter(outcome == "mobile_fm_ratio") %>% 
+    filter(outcome == "internet_fm_ratio") %>% 
   filter(gid_0 == "AFG")
 
 # Calculate median line
@@ -251,7 +253,7 @@ afghanistan_plot <- ggplot() +
     y = "Gender Gap (Internet)"
   ) + 
  background_grid() + 
-  ylim(0, .9) + 
+  ylim(0, .4) + 
   geom_vline(xintercept = as.Date("2021-08-01"), linetype = "dashed", color = "firebrick") + 
  # Improved text annotation (moved slightly to the right)
   annotate("text", x = as.Date("2022-01-01"), 

@@ -13,13 +13,13 @@ source(here("code", "helpers.R"))
 
 
 ```{r}
-master_file <- read_csv(here("data", "master_data_file_jan16_with_national.csv")) 
+master_file <- read_csv(here("data", "master_data_file_march12_with_national.csv")) 
 ```
 
 
 
 ```{r}
-master_file_full <- read_csv(here("data", "master_data_file_dec24_with_national.csv")) %>% 
+master_file_full <- read_csv(here("data", "master_data_file_march12_with_national.csv")) %>% 
   filter(!is.na(fb_pntr_18p_female))
 ```
 
@@ -27,7 +27,8 @@ master_file_full <- read_csv(here("data", "master_data_file_dec24_with_national.
 ```{r}
 ## columns 
 master_file_select <- master_file %>% 
-  dplyr::select(gid_0, gid_1, country, dhs_vars, off_feats, fb_feats)
+  dplyr::select(gid_0, gid_1, country, dhs_vars, off_feats, fb_feats) %>% 
+  filter(country != "North Macedonia")
 
 result_list <- list()
 i = 1

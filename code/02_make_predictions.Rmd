@@ -16,27 +16,27 @@ set.seed(1)
 
 ```{r}
 ## read in training and test datasets 
-master_file <- read_csv(here("data", "master_data_file_feb7_with_national.csv"), 
-                  locale = locale(encoding = "ISO-8859-1")) %>%
+master_file <- read_csv(here("data", "master_data_file_march12_with_national.csv"), 
+                        locale = locale(encoding = "ISO-8859-1")) %>%
   janitor::clean_names() %>% 
-    mutate(continent = case_when(continent == "Africa" ~ 1,
+  mutate(continent = case_when(continent == "Africa" ~ 1,
                                TRUE ~ 0)) %>% 
   dplyr::select(gid_1, country, all_of(c(dhs_vars, fb_feats, off_feats))) %>% 
   filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% drop_na() %>% 
   #filter(!country %in% c("Lesotho", "Côte d'Ivoire", "Mozambique", "")) %>% 
   filter(!(country ==  "Tanzania" & dhsyear == 2015)) %>% 
-  filter(!(country ==  "Nepal" & dhsyear == 2016)) 
+  filter(!(country ==  "Nepal" & dhsyear == 2016)) %>% 
+  filter(country != "Lesotho")
 
-master_file_full <- read_csv(here("data",  "master_data_file_feb7_with_national.csv"), 
-                  locale = locale(encoding = "ISO-8859-1")) %>%
+master_file_full <- read_csv(here("data",  "master_data_file_march12_with_national.csv"), 
+                             locale = locale(encoding = "ISO-8859-1")) %>%
   janitor::clean_names() %>% 
   mutate(continent = case_when(continent == "Africa" ~ 1,
                                TRUE ~ 0)) %>% 
-    mutate(pop_all_age_total = pop_all_age_female + pop_all_age_male) %>%
+  mutate(pop_all_age_total = pop_all_age_female + pop_all_age_male) %>%
   filter(!is.na(fb_pntr_18p_female_national)) %>% 
   mutate(dhsyear = year) 
 ```
-
 
 ## predictions for internet 
 
@@ -145,7 +145,7 @@ Read in predictions from cross-validation
 
 ```{r}
 ## read in predictions 
-predictions_combined <- read_csv(here("out",  "combined_predictions_lmics_national_covars_full_test.csv")) %>% 
+predictions_combined <- read_csv(here("out",  "combined_predictions_lmics_national_covars_full.csv")) %>% 
   mutate(predicted = case_when(predicted < 0 ~ 0,
                   TRUE ~ predicted)) %>% 
   filter(cv_method == "loco") %>% 

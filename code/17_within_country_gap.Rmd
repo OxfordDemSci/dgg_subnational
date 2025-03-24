@@ -24,16 +24,24 @@ predictions <- predictions %>%
 
 ```{r}
 predictions %>% 
-  filter(date == "2024-11-01") %>% 
+  filter(date == "2025-01-01") %>% 
   filter(outcome == "internet_women") %>% 
   group_by(gid_0) %>% 
   summarize(diff = max(predicted) - min(predicted)) %>% 
   arrange(desc(diff)) %>% 
   summarize(mean(diff))
+
+
+predictions %>% 
+  filter(date == "2025-01-01") %>% 
+  filter(outcome == "internet_women") %>% 
+  group_by(gid_0) %>% 
+  summarize(diff = max(predicted) - min(predicted)) %>% 
+  count(diff > .3)
   
 
 predictions %>% 
-  filter(date == "2024-11-01") %>% 
+  filter(date == "2025-01-01") %>% 
   select(gid_0, gid_1, outcome, predicted) %>% 
   pivot_wider(names_from = outcome, values_from = predicted) %>% 
   mutate(diff = internet_men - internet_women) %>% filter(diff > 0.2) %>% 
@@ -42,7 +50,7 @@ predictions %>%
 ```
 ```{r}
 predictions %>% 
-  filter(date == "2024-11-01") %>% 
+  filter(date == "2025-01-01") %>% 
   filter(outcome == "internet_women") %>% 
   count(predicted < 0.5)
 ```

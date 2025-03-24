@@ -12,7 +12,7 @@ library(here)
 source(here("code", "helpers.R"))
 
 ## read in training and test datasets 
-master_file <- read_csv(here("data", "master_data_file_jan16_with_national.csv")) %>% 
+master_file <- read_csv(here("data", "master_data_file_march12_with_national.csv")) %>% 
   dplyr::select(country, all_of(c(dhs_vars, fb_feats, off_feats))) %>% 
   filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% drop_na() 
 ```

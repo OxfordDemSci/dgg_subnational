@@ -18,10 +18,10 @@ source(here("code", "helpers.R"))
 
 ```{r}
 ## read in training and test datasets 
-master_file <- read_csv(here("data","master_data_file_jan16_with_national.csv")) %>% 
+master_file <- read_csv(here("data","master_data_file_march12_with_national.csv")) %>% 
   filter(!(country ==  "Tanzania" & dhsyear == 2015)) %>% 
   filter(!(country ==  "Nepal" & dhsyear == 2016)) %>% 
-  filter(!(country ==  "Lesotho"))
+  filter(!(country == "Lesotho"))
 
 ## read in covariates 
 master_file <- master_file %>% 
@@ -138,7 +138,7 @@ predictions_combined <- predictions_combined %>%
 
 ```{r}
 # Write the LOCO predictions to a .csv file
-write_csv(predictions_combined, here("out", "combined_predictions_lmics_national_covars_full_test.csv"))
+write_csv(predictions_combined, here("out", "combined_predictions_lmics_national_covars_full.csv"))
 ```
 
 
