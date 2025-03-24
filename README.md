@@ -1,6 +1,6 @@
 ## Mapping subnational gender gaps in internet and mobile adoption using social media data
 
-This repository contains code and materials to replicate ["Mapping subnational gender gaps in internet and mobile adoption using social media data"](https://osf.io/)
+This repository contains code and materials to replicate ["Mapping subnational gender gaps in internet and mobile adoption using social media data"]([https://osf.io/](https://osf.io/preprints/socarxiv/qnzsw_v2))
 
 ### Replication Package
 
@@ -43,7 +43,7 @@ Alternatively, researchers can run the following files individually in order:
 
 ### Authors
 
-- [Casey Breen](caseybreen.com)
+- [Casey Breen](https:://caseybreen.com)
 - Masoomali Fatehkia
 - Jiani Yan
 - Xinyi Zhao
