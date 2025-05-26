@@ -161,7 +161,7 @@ mobile_plot_women <- mobile_data_women %>%
     colour_xend = "#699DC6"
   ) +
   labs(
-    x = "Mobile Penetration ",
+    x = "Mobile Adoption",
     y = "",
     title = "Women"
   ) +
@@ -261,7 +261,7 @@ internet_plot_women <- internet_data_women %>%
     colour_xend = "#699DC6"
   ) +
   labs(
-    x = "Internet Penetration ",
+    x = "Internet Adoption ",
     y = "",
     title = "Women"
   ) +
@@ -287,12 +287,33 @@ geom_text(aes(x = (max + min) / 2-0.05, y = country, label = round(max-min, 2)),
 
 ```{r}
 # Combine plots using cowplot
-combined_plot <- plot_grid(mobile_plot_men, internet_plot_men,  mobile_plot_women, internet_plot_women,   ncol = 2, labels = "AUTO")
+combined_plot <- plot_grid(mobile_plot_men, internet_plot_men,  mobile_plot_women, internet_plot_women, ncol = 2, labels = "AUTO")
 
-ggsave(plot = combined_plot, filename = here("figures", "disparities_plot.png"), width = 10, height = 8)
+# Dummy plot for shared legend
+legend_plot_levels <- ggplot(
+  data.frame(x = c(1, 2), y = c(1, 2), group = c("Subnational Region with Lowest Adoption", "Subnational Region with Highest Adoption")),
+  aes(x = x, y = y, color = group)
+) +
+  geom_point(size = 4) +
+  scale_color_manual(
+    values = c(
+      "Subnational Region with Lowest Adoption" = "#699DC6",
+      "Subnational Region with Highest Adoption" = "#F69541"
+    ),
+    breaks = c("Subnational Region with Lowest Adoption", "Subnational Region with Highest Adoption")
+  ) +
+  guides(color = guide_legend(title = NULL)) +
+  theme_void() +
+  theme(legend.position = "bottom", legend.text = element_text(size = 10))
 
-ggsave(plot = combined_plot, filename = here("figures", "fig5_disparities_plot.pdf"), width = 10, height = 8)
+## Extract Legend 
+legend_levels <- ggpubr::get_legend(legend_plot_levels)
 
+## extract legend 
+combined_plot_levels_legend <- plot_grid(combined_plot, legend_levels, ncol = 1, rel_heights = c(2, 0.1))
+
+## ggsave 
+ggsave(plot = combined_plot_levels_legend, filename = here("figures", "withincountry_disparities_levels.png"), width = 10, height = 8)
 ```
 
 
@@ -353,7 +374,8 @@ gender_gap_data_mobile <- abs_diff_results_gaps %>%
 
 
 ```{r}
-# Gender Gap Plot
+## Gender Gap Plot, internet 
+
 gender_gap_internet <- gender_gap_data_internet %>%
   mutate(diff = max - min) %>%
   mutate(
@@ -380,24 +402,30 @@ gender_gap_internet <- gender_gap_data_internet %>%
     colour_xend = "#699DC6"
   ) +
   labs(
-    x = "Gender Gap",
+    x = "Gender Gap Index, Internet",
     y = "",
-    title = "Gender Gap, Internet"
+    title = "Subnational Spread"
   ) +
   theme_minimal() +
   theme(
     legend.position = "none",
     axis.text.y = element_text(size = 10, face = "bold"),
+        plot.title = element_text(size = 13)
   ) + 
   scale_y_discrete(
     labels = c("Overall mean" = expression(bold("Overall mean")), "Other Country" = "Other Country"),
   ) + 
-  # Add numbers above each bar
-geom_text(aes(x = (max + min) / 2-0.05, y = country, label = round(max-min, 2)), 
-          vjust = -0.5, hjust = 0, size = 3.5, color = "black") +
-  xlim(0, 1)
+  geom_text(aes(x = (max + min) / 2-0.05, y = country, label = round(max-min, 2)), 
+            vjust = -0.5, hjust = 0, size = 3.5, color = "black") +
+  xlim(0, 1) +
+  scale_x_continuous(
+  limits = c(0, 1.02),
+  breaks = c(0, 0.25, 0.5, 0.75, 1),
+  labels = c(
+    "0", "0.25", "0.5", "0.75", "1.00 \n(parity)"))
 
-# Gender Gap Plot
+## Gender Gap Plot, mobile 
+
 gender_gap_mobile <- gender_gap_data_mobile %>%
   mutate(diff = max - min) %>%
   mutate(
@@ -424,36 +452,64 @@ gender_gap_mobile <- gender_gap_data_mobile %>%
     colour_xend = "#699DC6"
   ) +
   labs(
-    x = "Gender Gap",
+    x = "Gender Gap Index, Mobile",
     y = "",
-    title = "Gender Gap, Mobile"
+    title = "Subnational Spread"
   ) +
   theme_minimal() +
   theme(
     legend.position = "none",
     axis.text.y = element_text(size = 10, face = "bold"),
+    plot.title = element_text(size = 13)
   ) + 
   scale_y_discrete(
     labels = c("Overall mean" = expression(bold("Overall mean")), "Other Country" = "Other Country"),
   ) + 
-  # Add numbers above each bar
-geom_text(aes(x = (max + min) / 2-0.05, y = country, label = round(max-min, 2)), 
-          vjust = -0.5, hjust = 0, size = 3.5, color = "black") +
-  xlim(0, 1)
+  geom_text(aes(x = (max + min) / 2-0.05, y = country, label = round(max-min, 2)), 
+            vjust = -0.5, hjust = 0, size = 3.5, color = "black") +
+  scale_x_continuous(
+  limits = c(0, 1.02),
+  breaks = c(0, 0.25, 0.5, 0.75, 1),
+  labels = c(
+    "0", "0.25", "0.5", "0.75", "1.00 \n(parity)"))
 
+
+# Dummy plot for shared legend
+legend_plot <- ggplot(data.frame(x = c(1, 2), y = c(1, 2), group = c("Lowest Gender Gap Index (Least Equal)", "Highest Gender Gap Index (Most Equal)")), 
+                      aes(x = x, y = y, color = group)) +
+  geom_point(size = 4) +
+  scale_color_manual(
+    values = c(
+      "Lowest Gender Gap Index (Least Equal)" = "#699DC6",
+      "Highest Gender Gap Index (Most Equal)" = "#F69541"
+    ),
+    breaks = c(
+      "Lowest Gender Gap Index (Least Equal)",  # blue first
+      "Highest Gender Gap Index (Most Equal)"   # orange second
+    )
+  ) + 
+  guides(color = guide_legend(title = NULL)) +
+  theme_void() +
+  theme(legend.position = "bottom", legend.text = element_text(size = 10))
+
+## Extract Legend 
+legend <- ggpubr::get_legend(legend_plot)
+
+## Combine into one plot 
+combined_plot <- plot_grid(
+  gender_gap_mobile, 
+  gender_gap_internet, 
+  labels = "AUTO", 
+  ncol = 2
+)
+
+## Add on legend 
+combined_plot_gender_disparities <- plot_grid(combined_plot, legend, ncol = 1, rel_heights = c(1, 0.1))
+
+## Save plot 
+ggsave(plot = combined_plot_gender_disparities, filename = here("figures", "fig5_disparities_plot.pdf"), width = 10, height = 5)
+combined_plot_gender_disparities
 ```
-
-## save combined plot 
-
-```{r}
-combined_plot_gender_disparities <- plot_grid(gender_gap_mobile, gender_gap_internet, labels = "AUTO")
-
-ggsave(plot = combined_plot_gender_disparities, filename = here("figures", "combined_plot_gender_disparities.png"), width = 10, height = 5)
-
-```
-
-
-
 
 ```{r}
 # Prepare Internet data for dumbbell plot

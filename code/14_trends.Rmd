@@ -43,11 +43,13 @@ afghanistan_plot <- ggplot() +
   labs(
     title = "Afghanistan",
     x = "Date",
-    y = "Gender Gap (Internet)"
+    y = "Gender Gap Index (Internet)"
   ) + 
     background_grid() + 
-  ylim(0, max(data_filter$predicted)) + 
-  ylim(0, .8)
+  scale_y_continuous(
+    limits = c(0, 1),
+    breaks = c(0.00, 0.25, 0.50, 0.75, 1.00),
+    labels = c("0.00", "0.25", "0.50", "0.75", "(Parity) 1.00"))
 ```
 
 
@@ -69,14 +71,19 @@ nigeria_plot <- ggplot() +
   geom_line(data = median_data, aes(x = date, y = median_predicted),
             color = "black", size = 1) +
   theme_cowplot() +
-      background_grid() + 
+  background_grid() + 
   labs(
     title = "Nigeria",
     x = "Date",
-    y = "Gender Gap (Internet)"
+    y = "Gender Gap Index (Internet)"
   ) + 
-  ylim(0, max(data_filter$predicted)) + 
-  ylim(0, 1)
+  scale_y_continuous(
+    limits = c(0, 1),
+    breaks = c(0.00, 0.25, 0.50, 0.75, 1.00),
+    labels = c("0.00", "0.25", "0.50", "0.75", "(Parity) 1.00"))
+
+
+nigeria_plot
 ```
 
 
@@ -102,10 +109,12 @@ india_plot <- ggplot() +
   labs(
     title = "India",
     x = "Date",
-    y = "Gender Gap (Internet)"
+    y = "Gender Gap Index (Internet)"
   ) + 
-  ylim(0, max(data_filter$predicted)) + 
-  ylim(0, 1)
+  scale_y_continuous(
+    limits = c(0, 1),
+    breaks = c(0.00, 0.25, 0.50, 0.75, 1.00),
+    labels = c("0.00", "0.25", "0.50", "0.75", "(Parity) 1.00"))
 ```
 
 ```{r}
@@ -146,16 +155,21 @@ gini_plot <- gini_results %>%
   filter(continent %in% c("Africa", "Americas", "Asia (other)", "South Asia")) %>% 
   group_by(year, continent) %>% 
   filter(!is.na(gini)) %>% 
-  summarize(gini = mean(gini, na.rm = TRUE))  %>% 
-  ggplot(aes(x = year, y = gini, color = continent)) + 
+  summarize(gini = mean(gini, na.rm = TRUE)) %>% 
+  ggplot(aes(x = year, y = gini, color = continent, shape = continent)) + 
   geom_line() + 
-  geom_point(size = 4, shape = 21, fill = "white", stroke = 1.5) +  # Bigger points with white fill
+  geom_point(size = 4, fill = "white", stroke = 1.5) +  # fill only applies to shape 21+
   theme_cowplot() + 
-  ylim(0, 0.4) + 
+  scale_y_continuous(
+  limits = c(0, 0.4),
+  breaks = c(0, 0.1, 0.2, 0.3, 0.4),
+  labels = c("(Perfect Equality) 0.0", "0.1", "0.2", "0.3", "0.4")
+) + 
   theme(legend.position = "bottom") + 
   scale_x_continuous(breaks = seq(min(gini_results$year, na.rm = TRUE), 
-                                  max(gini_results$year, na.rm = TRUE), by = 1)) +  # Year intervals
+                                  max(gini_results$year, na.rm = TRUE), by = 1)) + 
   scale_color_manual(values = cud) + 
+  scale_shape_manual(values = c(21, 22, 23, 24)) +  # Assign different shapes to continents
   background_grid() + 
   labs(x = "Date", y = "Gini Index")
 ```
@@ -165,7 +179,7 @@ trend_plot_combined <- cowplot::plot_grid(trend_plot, gini_plot, ncol = 1, label
 
 ggsave(plot = trend_plot_combined, filename = here("figures", "trend_plot_combined.png"), height = 8, width = 10)
 
-ggsave(plot = trend_plot_combined , filename = here("figures", "fig7_trend_plot_combined.pdf"), height = 8, width = 10)
+ggsave(plot = trend_plot_combined , filename = here("figures", "fig7_trend_plot_combined.pdf"), height = 8, width = 11)
 ```
 
 
@@ -225,8 +239,6 @@ afghanistan_plot <- ggplot() +
   facet_wrap(~outcome) + 
   ylim(0, 1)
 ```
-
-
 
 
 ```{r}

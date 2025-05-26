@@ -94,10 +94,10 @@ r_squared_results <- national_predictions_comparison_df %>%
 
 mics_comparison_fig <-  national_predictions_comparison_df %>% 
   left_join(r_squared_results) %>% 
-  ggplot(aes(y = observed, x = predicted_national, label = gid_0, color = year)) + 
+  ggplot(aes(x = observed, y = predicted_national, label = gid_0, color = year)) + 
   geom_text() +
   theme_cowplot() + 
-  geom_abline(color = "grey", linetype = "dashed") + 
+  geom_abline(color = "darkgrey", linetype = "dashed") + 
   ylim(0, 1) + 
   xlim(0, 1) + 
   labs(x = "Ground Truth, MICS", 
@@ -105,18 +105,34 @@ mics_comparison_fig <-  national_predictions_comparison_df %>%
        color = "MICS Survey Year") + 
   geom_label(
       aes(label = paste("atop(italic(r) == ", round(r, 2), ", italic(MAE) == ", round(mae, 2), ")")),
-   # aes(label = paste("italic(r) == ", round(r, 2))),
     x = 0.2,  # Adjusted position for better visibility
     y = 0.9, 
     size = 3.5,
     parse = TRUE,
     inherit.aes = FALSE
-  ) +
+  ) + 
+  facet_wrap(~outcome_clean) + 
   theme(
+    strip.background = element_rect(fill = "white", color = "black", linewidth = 0.8),
+    strip.text = element_text(size = 11, face = "bold", color = "black"),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+    panel.background = element_rect(fill = "#f9f9f9", color = NA),
+    panel.grid = element_line(color = "grey95"),
+    panel.spacing = unit(1.5, "lines"),
+    aspect.ratio = .9,
     legend.position = "bottom",
-    legend.key.width = unit(2, "cm"),
-    legend.text = element_text(size = 10) ) + 
-  facet_wrap(~outcome_clean)
+    legend.justification = "center",  # centers the whole legend box
+    legend.title = element_text(size = 13, hjust = 0.5, vjust = 1, margin = margin(b = 4)),
+    legend.text = element_text(size = 11)
+  ) +
+  guides(
+    color = guide_colorbar(
+      title.position = "top",
+      title.hjust = 0.5,
+      barwidth = unit(10, "cm"),
+      barheight = unit(0.5, "cm")
+    )
+  )
 
 ggsave(plot = mics_comparison_fig, filename = here("figures", "mics_comparison.png"), height = 7, width = 10)
 ```

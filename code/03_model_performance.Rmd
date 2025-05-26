@@ -136,7 +136,18 @@ plot1_observed_predicted <- predictions_combined %>%
   scale_y_continuous(limits = c(0, 1.1)) +
   scale_x_continuous(limits = c(0, 1.1)) +
   facet_wrap(~outcome_categorical, nrow = 2) +
-  theme(legend.position = "none")
+  labs(x = "Observed",
+       y = "Predicted") + 
+   theme(
+    strip.background = element_rect(fill = "white", color = "black", linewidth = 0.8),
+    strip.text = element_text(size = 11, face = "bold", color = "black"),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+    panel.background = element_rect(fill = "#f9f9f9", color = NA),
+    panel.grid = element_line(color = "grey95"),
+    panel.spacing = unit(.2, "lines"),
+    aspect.ratio = .9,
+    legend.position = "none"
+  )
 
 # Plot for "perc_ever_used_internet_wght_age_15_to_49_"
 plot2_observed_predicted <- predictions_combined %>%
@@ -163,7 +174,18 @@ plot2_observed_predicted <- predictions_combined %>%
   y = 0.90,
   size = 3) +
   facet_wrap(~outcome_categorical, nrow = 2) +
-  theme(legend.position = "none")
+  labs(x = "Observed",
+       y = "Predicted") + 
+   theme(
+    strip.background = element_rect(fill = "white", color = "black", linewidth = 0.8),
+    strip.text = element_text(size = 11, face = "bold", color = "black"),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+    panel.background = element_rect(fill = "#f9f9f9", color = NA),
+    panel.grid = element_line(color = "grey95"),
+    panel.spacing = unit(.2, "lines"),
+    aspect.ratio = .9,
+    legend.position = "none"
+  )
 
 
 # Plot for "perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio"
@@ -179,9 +201,9 @@ plot3_observed_predicted <- predictions_combined %>%
   geom_point(alpha = 0.1) +
   ylim(0, 1.1) +
   xlim(0, 1.1) +
-  geom_abline(slope = 1, linetype = "dashed", color = "grey") +
+  geom_abline(slope = 1, linetype = "dashed", color = "darkgrey") +
   theme_cowplot() +
-  labs(title = "Gender Gap", size = "Population Size") +
+  labs(title = "Gender Gap Index", size = "Population Size") +
      geom_label(aes(
     label = paste0(
   "R\u00B2 = ", round(r2, 2), "\n",
@@ -196,7 +218,19 @@ plot3_observed_predicted <- predictions_combined %>%
     breaks = c(300000, 1000000, 3000000, 10000000),
     labels = c("300k", "1m", "3m", "10m")
   ) +
-  guides(size = guide_legend(override.aes = list(alpha = 1)))
+  guides(size = guide_legend(override.aes = list(alpha = 1))) + 
+  labs(x = "Observed",
+       y = "Predicted") + 
+   theme(
+    strip.background = element_rect(fill = "white", color = "black", linewidth = 0.8),
+    strip.text = element_text(size = 11, face = "bold", color = "black"),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+    panel.background = element_rect(fill = "#f9f9f9", color = NA),
+    panel.grid = element_line(color = "grey95"),
+    panel.spacing = unit(.2, "lines"),
+    aspect.ratio = .9,
+    legend.position = "none"
+  )
 
 # Combine plots using cowplot's plot_grid
 combined_plot_observed_predicted <- plot_grid(plot1_observed_predicted, plot2_observed_predicted, plot3_observed_predicted, ncol = 3, labels = "AUTO")
@@ -215,205 +249,100 @@ ggsave(plot = combined_plot_observed_predicted_legend, here("figures", "fig2_obs
 ```
 
 ```{r}
-# Plot for "perc_ever_used_internet_wght_age_15_to_49_men"
-plot1_combined <- predictions_combined %>%
-  filter(
-    model == "superlearner",
-    outcome %in% c("perc_owns_mobile_telephone_wght_age_15_to_49_wom", "perc_used_internet_past12months_wght_age_15_to_49_wom"),
-    feature_set == "fb_and_offline") %>% 
-  ggplot(aes(x = observed, y = predicted)) +
-  geom_point(aes(size = pop_all_age_total_dhsyear), alpha = 0.1) +
-  # geom_smooth() +
-    scale_y_continuous(limits = c(0, 1.1)) +
-    scale_x_continuous(limits = c(0, 1.1)) +
-  geom_abline(slope = 1, linetype = "dashed", color = "grey") +
-  theme_cowplot() +
-  labs(title = "Women") +
-  geom_label(
-  aes(
-    label = paste0(
-  "R\u00B2 = ", round(r2, 2), "\n",
-  "r = ", round(r, 2), "\n",
-  "MAE = ", round(mae, 2))), 
-  x = 0.20,
-  y = 0.90,
-  size = 3.5) +
-  facet_grid(rows = vars(outcome_categorical), cols = vars(cv_method)) +
-  theme(legend.position = "none") 
-
-
-# Plot for "perc_ever_used_internet_wght_age_15_to_49_wom"
-plot2_combined <- predictions_combined %>%
-  filter(
-    model == "superlearner",
-    outcome %in% c("perc_owns_mobile_telephone_wght_age_15_to_49_men", "perc_used_internet_past12months_wght_age_15_to_49_men"),
-    feature_set == "fb_and_offline"
-  ) %>%
-  ggplot(aes(x = observed, y = predicted)) +
-  geom_point(aes(size = pop_all_age_total_dhsyear), alpha = 0.1) +
-  # geom_smooth() +
-    scale_y_continuous(limits = c(0, 1.1)) +
-    scale_x_continuous(limits = c(0, 1.1)) +
-  geom_abline(slope = 1, linetype = "dashed", color = "grey") +
-  theme_cowplot() +
-  labs(title = "Men") +
-  geom_label(
-  aes(
-    label = paste0(
-  "R\u00B2 = ", round(r2, 2), "\n",
-  "r = ", round(r, 2), "\n",
-  "MAE = ", round(mae, 2))), 
-  x = 0.20,
-  y = 0.90,
-  size = 3.5) +
-  facet_grid(rows = vars(outcome_categorical), cols = vars(cv_method)) +
-  theme(legend.position = "none") 
-
-
-plot3_combined <- predictions_combined %>%
-  filter(
-    model == "superlearner",
-    outcome %in% c("perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio", "perc_used_internet_past12months_wght_age_15_to_49_fm_ratio"),
-    feature_set == "fb_and_offline"
-  ) %>%
-  ggplot(aes(x = observed, y = predicted)) +
-  geom_point(aes(size = pop_all_age_total_dhsyear), alpha = 0.1) +
-  ylim(0, 1.1) +
-  xlim(0, 1.1) +
-  geom_abline(slope = 1, linetype = "dashed", color = "grey") +
-  theme_cowplot() +
-  labs(title = "Gender Gap", size = "Population Size") +
-  geom_label(
-  aes(
-    label = paste0(
-  "R\u00B2 = ", round(r2, 2), "\n",
-  "r = ", round(r, 2), "\n",
-  "MAE = ", round(mae, 2))), 
-  x = 0.2,
-  y = .90,
-  size = 3.5) +
-  facet_grid(rows = vars(outcome_categorical), cols = vars(cv_method)) +
-  theme(legend.position = "none") +
-  scale_size_continuous(
-    breaks = c(300000, 1000000, 3000000),
-    labels = c("300k", "1m", "3m")
-  ) +
-  guides(size = guide_legend(override.aes = list(alpha = 1))) 
-
-
-# Extract the legend from plot3_internet12m (or from whichever plot you prefer)
-legend <- cowplot::get_legend(
-  plot3_combined + theme(legend.position = "bottom", legend.direction = "horizontal")
+# Define outcomes and labels
+outcomes <- list(
+  perc_owns_mobile_telephone_wght_age_15_to_49_wom = "Own mobile, women",
+  perc_owns_mobile_telephone_wght_age_15_to_49_men = "Own mobile, men",
+  perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio = "Own mobile, gender gap",
+  perc_used_internet_past12months_wght_age_15_to_49_wom = "Internet, women",
+  perc_used_internet_past12months_wght_age_15_to_49_men = "Internet, men",
+  perc_used_internet_past12months_wght_age_15_to_49_fm_ratio = "Internet, gender gap"
 )
 
-# Combine the plots without legends
-plot_combined_observed_predicted <- plot_grid(plot1_combined, plot2_combined, plot3_combined, ncol = 1, labels = "AUTO", align = "v")
-
-# Combine the combined_plots with the extracted legend and place it at the bottom
-plot_combined_observed_predicted_legend <- plot_grid(plot_combined_observed_predicted, legend, ncol = 1, rel_heights = c(1, .1))
-
-ggsave(plot = plot_combined_observed_predicted_legend, here("figures" ,"plot_combined_observed_predicted.png"), width = 6, height = 18)
-```
-
-
-
-```{r}
-## observed predicted used internet
-observed_predicted_plot_country_mobile_wom <- predictions_combined %>%
+# Precompute metrics
+metrics_by_country_outcome <- predictions_combined %>%
   filter(
     model == "superlearner",
     cv_method == "LOCO-CV",
-    feature_set == "fb_and_offline",
-    outcome == "perc_owns_mobile_telephone_wght_age_15_to_49_wom"
+    feature_set == "fb_and_offline"
   ) %>%
-  ggplot(aes(x = observed, y = predicted)) +
-  geom_point(alpha = 0.3, aes(size = pop_all_age_total_dhsyear)) +
-  stat_cor(aes(x = observed, y = predicted, label = paste0("italic(r)~`=`~", ..r..))) + # Adjusted stat_cor
-  labs(
-    title = "Own mobile, women",
-    x = "Observed",
-    y = "Predicted",
-    size = "Population Size"
-  ) +
-  theme_cowplot() +
-  xlim(0, 1.1) +
-  ylim(0, 1.1) +
+  group_by(outcome, country) %>%
+  summarize(
+    r = cor(observed, predicted, use = "complete.obs"),
+    mae = mean(abs(observed - predicted), na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Loop over outcomes
+for (i in seq_along(outcomes)) {
+  outcome_var <- names(outcomes)[i]
+  title_text <- outcomes[[i]]
+  
+  # Filter and join metrics
+  df <- predictions_combined %>%
+    filter(
+      model == "superlearner",
+      cv_method == "LOCO-CV",
+      feature_set == "fb_and_offline",
+      outcome == outcome_var
+    ) %>%
+    left_join(
+      metrics_by_country_outcome %>% filter(outcome == outcome_var),
+      by = c("country", "outcome")
+    )
+  
+  # Create plot
+  plot_obj <- ggplot(df, aes(x = observed, y = predicted)) +
+    geom_point(alpha = 0.3, aes(size = pop_all_age_total_dhsyear)) +
+    geom_abline(slope = 1, linetype = "dashed") +
+    geom_label(
+      data = distinct(df, country, r, mae),
+      aes(
+        x = 0.1, y = 1.05,
+        label = paste0("r==", round(r, 2), "*','~MAE==", round(mae, 2))
+      ),
+      parse = TRUE,
+      inherit.aes = FALSE,
+      size = 3,
+      label.size = NA,
+      fill = "white",
+      label.padding = unit(0.15, "lines")
+    ) +
     facet_wrap(~country) +
-  geom_abline(slope = 1, linetype = "dashed") +
-  # facet_wrap(~country) +
-  scale_size_continuous(
-    breaks = c(300000, 1000000, 3000000, 10000000),
-    labels = c("300k", "1m", "3m", "10m")
-  ) +
-  guides(size = guide_legend(override.aes = list(alpha = 1))) +
-  theme(legend.position = "bottom")
-
-
-## observed predicted used internet
-observed_predicted_plot_country_mobile_men <- predictions_combined %>%
-  filter(
-    model == "superlearner",
-    cv_method == "LOCO-CV",
-    outcome == "perc_owns_mobile_telephone_wght_age_15_to_49_men",
-    feature_set == "fb_and_offline"
-  ) %>%
-  ggplot(aes(x = observed, y = predicted)) +
-  geom_point(aes(size = pop_all_age_total_dhsyear), alpha = 0.3) +
-  # geom_smooth() +
-  stat_cor(aes(label =  paste0("italic(r)~`=`~", ..r..))) +
-  labs(
-    title = "Own mobile, men",
-    x = "Observed",
-    y = "Predicted",
-    size = "Population Size"
-  ) +
-  theme_cowplot() +
-  xlim(0, 1.1) +
-  ylim(0, 1.1) +
-  geom_abline(slope = 1, linetype = "dashed") +
-  facet_wrap(~country) +
-  scale_size_continuous(
-    breaks = c(300000, 1000000, 3000000, 10000000),
-    labels = c("300k", "1m", "3m", "10m")
-  ) +
-  guides(size = guide_legend(override.aes = list(alpha = 1))) +
-  theme(legend.position = "bottom")
-
-## observed predicted used internet
-observed_predicted_plot_country_mobile_fm_ratio <- predictions_combined %>%
-  filter(
-    model == "superlearner",
-    cv_method == "LOCO-CV",
-    outcome == "perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio",
-    feature_set == "fb_and_offline"
-  ) %>%
-  ggplot(aes(x = observed, y = predicted)) +
-  geom_point(alpha = 0.3, aes(size = pop_all_age_total_dhsyear)) +
-  # geom_smooth() +
-  stat_cor(aes(label =  paste0("italic(r)~`=`~", ..r..))) +
-  labs(
-    title = "Own mobile, gender gap",
-    x = "Observed",
-    y = "Predicted",
-    size = "Population Size"
-  ) +
-  theme_cowplot() +
-  xlim(0, 1.1) +
-  ylim(0, 1.1) +
-  geom_abline(slope = 1, linetype = "dashed") +
-  facet_wrap(~country) +
-  scale_size_continuous(
-    breaks = c(300000, 1000000, 3000000, 10000000),
-    labels = c("300k", "1m", "3m", "10m")
-  ) +
-  guides(size = guide_legend(override.aes = list(alpha = 1))) +
-  theme(legend.position = "bottom")  
-
-## save plots
-ggsave(plot = observed_predicted_plot_country_mobile_wom, filename = here("figures", "observed_predicted_plot_country_mobile_wom.png"), width = 10, height = 8)
-ggsave(plot = observed_predicted_plot_country_mobile_men, filename = here("figures", "observed_predicted_plot_country_mobile_men.png"), width = 10, height = 8)
-ggsave(plot = observed_predicted_plot_country_mobile_fm_ratio, filename = here("figures", "observed_predicted_plot_country_mobile_fm_ratio.png"), width = 10, height = 8)
+    scale_size_continuous(
+      breaks = c(300000, 1000000, 3000000, 10000000),
+      labels = c("300k", "1m", "3m", "10m")
+    ) +
+    guides(size = guide_legend(override.aes = list(alpha = 1))) +
+    labs(
+      title = title_text,
+      x = "Observed",
+      y = "Predicted",
+      size = "Population Size"
+    ) +
+    theme_cowplot() +
+    xlim(0, 1.1) + ylim(0, 1.1) +
+    theme(
+      strip.background = element_rect(fill = "white", color = "black", linewidth = 0.8),
+      strip.text = element_text(size = 11, face = "bold", color = "black"),
+      panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+      panel.background = element_rect(fill = "#f9f9f9", color = NA),
+      panel.grid = element_line(color = "grey95"),
+      panel.spacing = unit(.2, "lines"),
+      aspect.ratio = .9,
+      legend.position = ifelse(grepl("fm_ratio", outcome_var), "none", "bottom")
+    )
+  
+  # Save plot
+  ggsave(
+    plot = plot_obj,
+    filename = here("figures", paste0("observed_predicted_plot_country_", outcome_var, ".png")),
+    width = 10,
+    height = 9
+  )
+}
 ```
+
 
 
 ```{r}
@@ -507,9 +436,9 @@ observed_predicted_plot_country_internet_fm_ratio <- predictions_combined %>%
   theme(legend.position = "bottom")
 
 ## save plots
-ggsave(plot = observed_predicted_plot_country_internet_wom, filename = here("figures", "observed_predicted_plot_country_internet_wom.png"), width = 10, height = 8)
-ggsave(plot = observed_predicted_plot_country_internet_men, filename = here("figures", "observed_predicted_plot_country_internet_men.png"), width = 10, height = 8)
-ggsave(plot = observed_predicted_plot_country_internet_fm_ratio, filename = here("figures", "observed_predicted_plot_country_internet_fm_ratio.png"), width = 10, height = 8)
+ggsave(plot = observed_predicted_plot_country_internet_wom, filename = here("figures", "observed_predicted_plot_country_internet_wom.png"), width = 10, height = 9)
+ggsave(plot = observed_predicted_plot_country_internet_men, filename = here("figures", "observed_predicted_plot_country_internet_men.png"), width = 10, height = 9)
+ggsave(plot = observed_predicted_plot_country_internet_fm_ratio, filename = here("figures", "observed_predicted_plot_country_internet_fm_ratio.png"), width = 10, height = 9)
 ```
 
 

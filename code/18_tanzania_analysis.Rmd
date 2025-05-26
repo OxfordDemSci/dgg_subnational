@@ -53,8 +53,22 @@ predictions_real <- predictions_uncertainty %>%
 ```
 
 ```{r}
+# Calculate R-squared and correlation (r) by outcome
+model_performance_metrics <- predictions_real %>%
+  filter(!is.na(observed)) %>% 
+    filter(!is.na(predicted)) %>% 
+  group_by(outcome_clean) %>%
+  summarize(
+    r = cor(observed, predicted, use = "complete.obs"),  # Calculate correlation
+    r2 = compute_r2(observed, predicted),  # Calculate R-squared
+    mae = mean(abs(observed - predicted)), 
+    .groups = "drop"
+  )
+
+
 # Plot for "perc_ever_used_internet_wght_age_15_to_49_men"
 tanzania_plot <- predictions_real %>%
+  left_join(model_performance_metrics) %>% 
   filter(gid_0 %in% c("TZA")) %>% 
   group_by(gid_0) %>%
   mutate(survey = case_when(
@@ -66,15 +80,35 @@ tanzania_plot <- predictions_real %>%
   geom_point(alpha = 1) +
   geom_abline(slope = 1, linetype = "dashed", color = "grey") +
   theme_cowplot() +
-  labs(x = "Observed",
-       y = "Predicted") + 
-  ylim(0, 1) + 
-  xlim(0, 1) + 
+  labs(x = "Observed (Admin-1 Level)",
+       y = "Predicted (Admin-1 Level)") + 
   scale_y_continuous(limits = c(0, 1.1)) +
   scale_x_continuous(limits = c(0, 1.1)) +
   facet_wrap(~outcome_clean, nrow = 2) +
   theme(legend.position = "bottom") + 
-  stat_cor(aes(x = observed, y = predicted, label = paste0("italic(r)~`=`~", ..r..)), color= "black") 
+  geom_label(
+    aes(
+      label = paste0("atop(italic(r)==", round(r, 2), ",~italic(MAE)==", round(mae, 2), ")")
+    ),
+    parse = TRUE,
+    x = 0.20,
+    y = 0.9,
+    size = 3.2,
+    inherit.aes = FALSE
+  ) +
+  theme(
+    strip.background = element_rect(fill = "white", color = "black", linewidth = 0.8),
+    strip.text = element_text(size = 11, face = "bold", color = "black"),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+    panel.background = element_rect(fill = "#f9f9f9", color = NA),
+    panel.grid = element_line(color = "grey95"),
+    panel.spacing = unit(1.5, "lines"),
+    aspect.ratio = .9,
+    legend.position = "bottom",
+    legend.justification = "center",  # centers the whole legend box
+    legend.title = element_text(size = 13, hjust = 0.5, vjust = 1, margin = margin(b = 4)),
+    legend.text = element_text(size = 11)
+  ) 
 
 ## save plot 
 ggsave(plot = tanzania_plot, filename = here("figures", "tanzania_plot.png"), width = 10, height = 6)
