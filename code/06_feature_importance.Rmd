@@ -91,8 +91,19 @@ r2_plot <- model_performance_metrics %>%
     title = expression(bold("Algorithm Performance " (R^2))),
     fill = "Cross-Validation") + 
   facet_wrap(~outcome_clean, ncol = 1) + 
-  theme(legend.position = "bottom") + 
-  scale_fill_manual(values=cbp1)
+  scale_fill_manual(values=cbp1) + 
+  theme(
+    strip.background = element_rect(fill = "white", color = "black", linewidth = 0.8),
+    strip.text = element_text(size = 11, face = "bold", color = "black"),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+    panel.background = element_rect(fill = "#f9f9f9", color = NA),
+    panel.grid = element_line(color = "grey95"),
+    panel.spacing = unit(1.5, "lines"),
+    legend.position = "bottom",
+    legend.justification = "center",  # centers the whole legend box
+    legend.title = element_text(size = 13, hjust = 0.5, vjust = 1, margin = margin(b = 4)),
+    legend.text = element_text(size = 11)
+  ) 
 
 ## save plot 
 ggsave(plot = r2_plot, filename = here("figures", "r2_plot_dhsyear.png"), height = 12, width = 8)
@@ -116,7 +127,7 @@ filtered_data <- model_performance_metrics %>%
     gender_group = case_when(
       grepl("_men$", outcome) ~ "Men",
       grepl("_wom$", outcome) ~ "Women",
-      grepl("_fm_ratio$", outcome) ~ "Gender Gap",
+      grepl("_fm_ratio$", outcome) ~ "Gender Gap Index",
       TRUE ~ "Other"
     )
   )
@@ -128,7 +139,7 @@ feature_comparison_plot <- filtered_data %>%
     feature_set == "offline" ~ "Offline"
   )) %>% 
   ggplot() + 
-  geom_point(aes(x = value, y = gender_group, color = feature_set, shape = feature_set), size = 3, position = position_dodge(width = .25)) +
+  geom_point(aes(x = value, y = gender_group, color = feature_set, shape = feature_set), size = 5, position = position_dodge(width = .25)) +
   theme_minimal(16) +
   labs(x = expression("Model Performance: R" ^ 2),
        y = NULL
@@ -139,13 +150,15 @@ feature_comparison_plot <- filtered_data %>%
     legend.box.background = element_rect(color = "black", fill = "white", linewidth = 0.3),
     legend.background = element_blank(),
     panel.border = element_rect(colour = "black", fill = NA, size = 1),
-    strip.background = element_rect(colour = "grey", fill = "grey"),
+    panel.grid = element_line(color = "grey95"),
+    strip.background = element_rect(colour = "black", fill = "white",  linewidth = 1),
     strip.text.y = element_text(angle = 0, color = "black", hjust = 0.5),
     strip.placement = "inside",
     legend.key.size = unit(0.3, "cm"),  # Adjusts size of legend keys
     legend.text = element_text(size = 12),  # Adjusts size of legend text
     legend.title = element_blank()) +
-  ggsci::scale_color_lancet() + 
+ # ggsci::scale_color_lancet() + 
+  scale_color_viridis_d() + 
   xlim(0, 0.8) + 
   facet_grid(category ~ ., scales = "free_y", space = "free_y", switch = "y")
 ```
@@ -255,7 +268,7 @@ var_importance_data <- cv_results %>%
 var_importance_plot <- var_importance_data %>% 
   filter(outcome == "perc_used_internet_past12months_wght_age_15_to_49_wom") %>% 
   ggplot(aes(y = feature_idea, x = avg_r_squared)) +
-  geom_point() +
+  geom_point(size = 3) +
   theme_cowplot() +
   geom_segment(aes(yend = feature_idea, x = 0, xend = avg_r_squared), linewidth = 0.5) +
  # geom_segment(aes(yend = feature_idea, x = 0, xend = max(avg_r_squared)), linetype = "dashed", size = 0.1) +
@@ -275,8 +288,6 @@ r_squaredplot <- plot_grid(feature_comparison_plot, var_importance_plot, labels 
 ggsave(plot = r_squaredplot, filename = here("figures", "feature_and_var_importance.png"), width = 13, height = 6, units = "in", dpi = 300)
 
 ggsave(plot = r_squaredplot, filename = here("figures", "fig6_feature_and_var_importance.pdf"), width = 13, height = 6, dpi = 300)
-
-
 ```
 
 
@@ -301,7 +312,20 @@ var_importance_plot <- var_importance_data %>%
        title = "Feature Importance") +
   facet_wrap(~outcome_clean_f, scales = "free_y", nrow = 3) +
   scale_y_discrete(breaks = var_importance_data$feature_idea,
-                   labels = var_importance_data$feature_recode)
+                   labels = var_importance_data$feature_recode) + 
+   theme(
+    strip.background = element_rect(fill = "white", color = "black", linewidth = 0.8),
+    strip.text = element_text(size = 11, face = "bold", color = "black"),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+    panel.background = element_rect(fill = "#f9f9f9", color = NA),
+    panel.grid = element_line(color = "grey95"),
+    panel.spacing = unit(1.5, "lines"),
+    aspect.ratio = .9,
+    legend.position = "bottom",
+    legend.justification = "center",  # centers the whole legend box
+    legend.title = element_text(size = 13, hjust = 0.5, vjust = 1, margin = margin(b = 4)),
+    legend.text = element_text(size = 11)
+  ) 
 
 ggsave(plot = var_importance_plot, filename = here( "figures", "feature_importance.png"), width = 13, height = 8, units = "in", dpi = 300)
 ```

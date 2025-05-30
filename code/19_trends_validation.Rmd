@@ -1,0 +1,212 @@
+---
+title: "Trends Validation"
+author: Casey Breen
+---
+
+Summary: Create trend over time plots 
+
+
+```{r}
+## libary packages + custom functions 
+library(here)
+source(here("code", "helpers.R"))
+```
+
+```{r}
+## Read in predictions 
+predictions <- read_csv(here("out", "predictions_with_uncertainty.csv"))
+
+## Subnational file for repetitive measurement  
+ground_truth <- read_csv(here("data", "subnational_master_file_for_repetitive_measurement.csv"))
+
+# Example: Get GADM1 names for Nigeria
+gadm1_map <- read_sf(here("data", "gadm_410-levels.gpkg"), layer = "ADM_1")
+```
+
+
+```{r}
+## LSMS Estimates 
+ground_truth_long <- ground_truth %>%
+  mutate(
+    mobile_fm_ratio   = perc_owns_mobile_telephone_wght_age_15_to_49_wom /
+                        perc_owns_mobile_telephone_wght_age_15_to_49_men,
+    internet_fm_ratio = perc_used_internet_past12months_wght_age_15_to_49_wom /
+                        perc_used_internet_past12months_wght_age_15_to_49_men
+  ) %>%
+  select(
+    gid_0, 
+    gid_1,
+    year,
+    survey_type,
+    internet_women     = perc_used_internet_past12months_wght_age_15_to_49_wom,
+    internet_men       = perc_used_internet_past12months_wght_age_15_to_49_men,
+    mobile_women       = perc_owns_mobile_telephone_wght_age_15_to_49_wom,
+    mobile_men         = perc_owns_mobile_telephone_wght_age_15_to_49_men,
+    mobile_fm_ratio,
+    internet_fm_ratio,
+    internet_n_sample_f, internet_n_sample_m,
+    mobile_n_sample_f, mobile_n_sample_m
+  ) %>%
+  pivot_longer(
+    cols = c(internet_women, internet_men, mobile_women, mobile_men,
+             mobile_fm_ratio, internet_fm_ratio),
+    names_to = "outcome",
+    values_to = "observed"
+  ) %>%
+  mutate(
+    sample_size = case_when(
+      outcome == "mobile_women"      ~ mobile_n_sample_f,
+      outcome == "mobile_men"        ~ mobile_n_sample_m,
+      outcome == "internet_women"    ~ internet_n_sample_f,
+      outcome == "internet_men"      ~ internet_n_sample_m,
+      outcome == "mobile_fm_ratio"   ~ pmin(mobile_n_sample_f, mobile_n_sample_m),
+      outcome == "internet_fm_ratio" ~ pmin(internet_n_sample_f, internet_n_sample_m),
+      TRUE ~ NA_real_
+    )
+  ) %>% 
+  select(gid_0, gid_1, year, outcome, observed, sample_size, survey_type)
+
+## LSMS Estimates 
+ground_truth_long <- ground_truth_long %>% 
+  filter(!(gid_0 == "NGA" & outcome %in% c("mobile_women", "mobile_men", "mobile_fm_ratio"))) %>% 
+  filter(sample_size > 150)
+
+## top code at 1 
+ground_truth_long <-  ground_truth_long %>%
+  mutate(observed = case_when(observed > 1 ~ 1, TRUE ~ observed))
+```
+
+## Complete list of all surveys with multiple 
+
+```{r}
+## identify surveys with multiple 
+multi_survey <- ground_truth_long %>% 
+  count(gid_0, year, survey_type) %>% 
+  group_by(gid_0) %>% 
+  filter(n() > 1) %>% 
+  arrange(desc(gid_0)) %>% 
+  select(gid_0, year, survey_type)
+```
+
+
+```{r}
+make_country_outcome_plot <- function(predictions_df = predictions, country_code, outcome_var, y_label, plot_title, file_name) {
+  
+  df <- predictions_df %>%
+    group_by(year, gid_0, gid_1, outcome) %>% 
+    summarize(
+      predicted = mean(predicted, na.rm = TRUE),
+      n = n(),  .groups = "drop"
+    ) %>% 
+    ungroup() %>% 
+    left_join(ground_truth_long, by = c("gid_0", "gid_1", "year", "outcome")) %>%
+    filter(gid_0 == country_code, outcome == outcome_var) %>%
+    mutate(year = as.integer(year)) %>% 
+    mutate(date = as.Date(paste0(year, "-01-01")))
+  
+  
+  df <- df %>%
+    left_join(gadm1_map %>% as.data.frame() %>% select(gid_1 = GID_1, NAME_1)) %>%
+    mutate(
+      gid_1_name = paste0(NAME_1, " (", gid_1, ")"),
+      NAME_1 = case_when(NAME_1 == "Federal Capital Territory" ~ "Capital Territory", TRUE ~ NAME_1),
+      survey_type = toupper(survey_type),
+      source_type = case_when(
+        survey_type == "LSMS" ~ "LSMS",
+        survey_type == "DHS" ~ "DHS",
+        survey_type == "MICS" ~ "MICS",
+        TRUE ~ "Predicted"
+      )
+    )
+
+  plot <- df %>%
+    ggplot(aes(x = date)) +
+    geom_line(
+      data = filter(df),
+      aes(y = predicted, group = gid_1, color = "Predicted"),
+      linewidth = 1.5
+    ) +
+    geom_point(
+      data = filter(df, source_type != "Predicted"),
+      aes(y = estimate, color = source_type, shape = source_type),
+      size = 3, alpha = 1
+    ) +
+    scale_color_manual(
+      values = c("DHS" = "darkorange",
+                 "MICS" = "red", 
+                 "LSMS" = "darkred",
+                 "Predicted" = "lightblue"),
+      name = "Survey Source"
+    ) +
+    scale_shape_manual(
+      values = c("DHS" = 16, "MICS" = 15, "LSMS" = 17),
+      name = "Survey Source"
+    ) +
+    guides(shape = "none") +
+    facet_wrap(~NAME_1) +
+    labs(
+      x = "Year",
+      y = y_label,
+      title = plot_title
+    ) +
+    theme_cowplot() +
+    theme(
+      legend.position = "bottom",
+      strip.background = element_rect(fill = "white", color = "black", linewidth = 0.8),
+      strip.text = element_text(size = 11, face = "bold"),
+      panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+      panel.background = element_rect(fill = "#f9f9f9"),
+      panel.grid = element_line(color = "grey95"),
+      panel.spacing = unit(1.5, "lines"),
+      aspect.ratio = .9,
+      axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+      legend.title = element_text(size = 13),
+      legend.text = element_text(size = 11)
+    ) +
+    ylim(0, 1)
+
+  ggsave(plot = plot, filename = here("figures", "time_series_plots", file_name), width = 12, height = 12)
+}
+```
+
+
+
+
+```{r}
+# Define mappings from outcome to label
+outcome_labels <- list(
+  internet_women = "Internet Adoption (Women)",
+  internet_men = "Internet Adoption (Men)",
+  internet_fm_ratio = "Internet Gender Gap Index",
+  mobile_women = "Mobile Phone Ownership (Women)",
+  mobile_men = "Mobile Phone Ownership (Men)",
+  mobile_fm_ratio = "Mobile Gender Gap Index")
+
+# Get all country codes and outcomes in the data
+countries <- unique(multi_survey$gid_0)
+outcomes <- names(outcome_labels)
+
+# Loop over each country and outcome
+for (cty in countries) {
+  for (out in outcomes) {
+    
+    # Title and filename
+    label <- outcome_labels[[out]]
+    title <- paste0(cty, ", ", label)
+    file <- paste0(tolower(cty), "_validation_", out, ".png")
+    
+    # Run plot function
+    make_country_outcome_plot(
+      predictions_df = predictions,
+      country_code = cty,
+      outcome_var = out,
+      y_label = label,
+      plot_title = title,
+      file_name = file
+    )
+  }
+}
+```
+
+
+

@@ -48,7 +48,7 @@ spread_plot_df <- spread_plot_df %>%
                                 levels = c("Internet (Women)", "Internet (Men)", "Internet (Ratio)",
                                            "Mobile (Women)", "Mobile (Men)", "Mobile (Ratio)")))
 
-spread_plot <- spread_plot_df %>% 
+spread_plot_facet <- spread_plot_df %>% 
   ggplot(aes(x = mean, y = diff)) + 
   geom_text(aes(label = gid_0, color = continent)) + 
   labs(x = "National Estimate",
@@ -58,11 +58,24 @@ spread_plot <- spread_plot_df %>%
   scale_color_manual(values = cud) + 
   geom_smooth(se = F, method = "lm") + 
   theme(legend.position = "bottom") + 
-  stat_cor(method = "pearson", label.x = Inf, label.y = Inf, size = 5.5,  hjust=1.1, vjust = 5.4, p.accuracy = 0.01,
+  stat_cor(method = "pearson", label.x = Inf, label.y = Inf, size = 5.5,  hjust=1.1, vjust = 4.4, p.accuracy = 0.01,
             aes(label = paste0("italic(r)~`=`~", ..r..))) + 
-  facet_wrap(~outcome_clean, scales = "free")
+  facet_wrap(~outcome_clean, scales = "free") + 
+  theme(
+    strip.background = element_rect(fill = "white", color = "black", linewidth = 0.8),
+    strip.text = element_text(size = 11, face = "bold", color = "black"),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+    panel.background = element_rect(fill = "#f9f9f9", color = NA),
+    panel.grid = element_line(color = "grey95"),
+    panel.spacing = unit(1.5, "lines"),
+    aspect.ratio = .9,
+    legend.position = "bottom",
+    legend.justification = "center",  # centers the whole legend box
+    legend.title = element_text(size = 13, hjust = 0.5, vjust = 1, margin = margin(b = 4)),
+    legend.text = element_text(size = 11)
+  ) 
 
-ggsave(spread_plot, filename = here("figures", "spread_plot.png"), width = 12, height = 8)
+ggsave(spread_plot, filename = here("figures", "spread_plot_facet.png"), width = 12, height = 8)
 ```
 
 

@@ -1,0 +1,119 @@
+---
+title: "Tanzania"
+author: Casey Breen
+---
+
+Summary: Quick analysis for Tanzania 2015
+
+```{r}
+## libary packages + custom functions 
+library(here)
+source(here("code", "helpers.R")) 
+```
+
+```{r}
+master_file_full <- read_csv(here("data", "master_data_file_march12_with_national.csv")) %>% 
+  filter(!is.na(dhsyear))
+
+master_estimates_long <- master_file_full %>% 
+  select(gid_0, gid_1, year, perc_owns_mobile_telephone_wght_age_15_to_49_wom, perc_owns_mobile_telephone_wght_age_15_to_49_men, perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio, perc_used_internet_past12months_wght_age_15_to_49_wom, perc_used_internet_past12months_wght_age_15_to_49_men, perc_used_internet_past12months_wght_age_15_to_49_fm_ratio) %>% 
+  pivot_longer(-c(gid_0, gid_1, year)) %>% 
+  rename(observed = value, outcome= name) %>% 
+  filter(!is.na(observed)) %>% 
+   mutate(outcome = case_when(
+    outcome == "perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio" ~   "mobile_fm_ratio",
+    outcome == "perc_owns_mobile_telephone_wght_age_15_to_49_men"      ~    "mobile_men",
+    outcome == "perc_owns_mobile_telephone_wght_age_15_to_49_wom"      ~      "mobile_women",
+    outcome == "perc_used_internet_past12months_wght_age_15_to_49_fm_ratio" ~ "internet_fm_ratio", 
+    outcome == "perc_used_internet_past12months_wght_age_15_to_49_men" ~      "internet_men",
+    outcome == "perc_used_internet_past12months_wght_age_15_to_49_wom" ~       "internet_women"
+  ))
+
+master_estimates_long <- master_estimates_long %>% 
+   mutate(outcome_clean = case_when(
+    grepl("mobile_fm_ratio", outcome) ~ "Mobile (Ratio)",
+    grepl("mobile_men", outcome) ~ "Mobile (Men)",
+    grepl("mobile_women", outcome) ~ "Mobile (Women)",
+    grepl("internet_fm_ratio", outcome) ~ "Internet (Ratio)",
+    grepl("internet_men", outcome) ~ "Internet (Men)",
+    grepl("internet_women", outcome) ~ "Internet (Women)",
+    TRUE ~ outcome
+  )) %>% mutate(outcome_clean = factor(outcome_clean, 
+                                levels = c("Internet (Women)", "Internet (Men)", "Internet (Ratio)",
+                                           "Mobile (Women)", "Mobile (Men)", "Mobile (Ratio)")))
+```
+
+
+```{r}
+## read in prediction 
+predictions_uncertainty <- read_csv(here("out", "predictions_with_uncertainty.csv"))
+
+predictions_real <- predictions_uncertainty %>% 
+  inner_join(master_estimates_long) 
+```
+
+```{r}
+# Calculate R-squared and correlation (r) by outcome
+model_performance_metrics <- predictions_real %>%
+  filter(!is.na(observed)) %>% 
+    filter(!is.na(predicted)) %>% 
+  group_by(outcome_clean) %>%
+  summarize(
+    r = cor(observed, predicted, use = "complete.obs"),  # Calculate correlation
+    r2 = compute_r2(observed, predicted),  # Calculate R-squared
+    mae = mean(abs(observed - predicted)), 
+    .groups = "drop"
+  )
+
+
+# Plot for "perc_ever_used_internet_wght_age_15_to_49_men"
+tanzania_plot <- predictions_real %>%
+  left_join(model_performance_metrics) %>% 
+  filter(gid_0 %in% c("TZA")) %>% 
+  group_by(gid_0) %>%
+  mutate(survey = case_when(
+    gid_0 == "NPL" ~ "Nepal (2016)",
+    gid_0 == "TZA" ~ "Tanzania (2015)"
+  )) %>% 
+ filter(year == min(year)) %>%
+  ggplot(aes(x = observed, y = predicted, color = survey)) + # size = pop_all_age_total_dhsyear
+  geom_point(alpha = 1) +
+  geom_abline(slope = 1, linetype = "dashed", color = "grey") +
+  theme_cowplot() +
+  labs(x = "Observed (Admin-1 Level)",
+       y = "Predicted (Admin-1 Level)") + 
+  scale_y_continuous(limits = c(0, 1.1)) +
+  scale_x_continuous(limits = c(0, 1.1)) +
+  facet_wrap(~outcome_clean, nrow = 2) +
+  theme(legend.position = "bottom") + 
+  geom_label(
+    aes(
+      label = paste0("atop(italic(r)==", round(r, 2), ",~italic(MAE)==", round(mae, 2), ")")
+    ),
+    parse = TRUE,
+    x = 0.20,
+    y = 0.9,
+    size = 3.2,
+    inherit.aes = FALSE
+  ) +
+  theme(
+    strip.background = element_rect(fill = "white", color = "black", linewidth = 0.8),
+    strip.text = element_text(size = 11, face = "bold", color = "black"),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+    panel.background = element_rect(fill = "#f9f9f9", color = NA),
+    panel.grid = element_line(color = "grey95"),
+    panel.spacing = unit(1.5, "lines"),
+    aspect.ratio = .9,
+    legend.position = "bottom",
+    legend.justification = "center",  # centers the whole legend box
+    legend.title = element_text(size = 13, hjust = 0.5, vjust = 1, margin = margin(b = 4)),
+    legend.text = element_text(size = 11)
+  ) 
+
+## save plot 
+ggsave(plot = tanzania_plot, filename = here("figures", "tanzania_plot.png"), width = 10, height = 6)
+
+```
+
+
+

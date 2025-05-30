@@ -49,67 +49,34 @@ predictions_filter <- predictions_filter %>%
 
 
 ```{r}
-# Filter the data for Internet and Mobile outcomes
-internet_data <- filter(predictions_filter, )
-mobile_data <- filter(predictions_filter, grepl("Mobile", outcome_clean))
 
-## calculate mean residual 
-predictions_filter <- predictions_filter %>% 
-  group_by(outcome_clean) %>% 
-  mutate(mean_residual = mean(residual, na.rm = TRUE))
- 
-# Plot for "perc_ever_used_internet_wght_age_15_to_49_men"
-plot1_residuals <- predictions_filter %>%
-  filter(
-    outcome %in% c("perc_owns_mobile_telephone_wght_age_15_to_49_wom", "perc_used_internet_past12months_wght_age_15_to_49_wom"),
-  ) %>%
-  ggplot() + 
-  geom_histogram(aes(x = residual), bins = 50, fill = "grey", color = "black") + 
-  geom_vline(aes(xintercept = mean_residual), linetype = "dashed", color = "red", linewidth = 1) + 
-  theme_cowplot() + 
-  facet_wrap(~outcome_clean, scales = "free", nrow = 1) + 
-    labs(x = "") + 
-  xlim(-1, 1)
+predictions_filter <- predictions_filter %>% mutate(outcome_clean = factor(outcome_clean, 
+                                levels = c("Internet (Women)", "Internet (Men)", "Internet (Ratio)",
+                                           "Mobile (Women)", "Mobile (Men)", "Mobile (Ratio)")))
 
 
-# Plot for "perc_ever_used_internet_wght_age_15_to_49_men"
-plot2_residuals <- predictions_filter %>%
-  filter(
-    outcome %in% c("perc_owns_mobile_telephone_wght_age_15_to_49_men", "perc_used_internet_past12months_wght_age_15_to_49_men"),
-  ) %>%
-  ggplot() + 
-  geom_histogram(aes(x = residual), bins = 50, fill = "grey", color = "black") + 
-  geom_vline(aes(xintercept = mean_residual), linetype = "dashed", color = "red", linewidth = 1) + 
-  theme_cowplot() + 
-  labs(x = "") + 
-  labs(x = "Residual", y = "Count") + 
-  facet_wrap(~outcome_clean, scales = "free", nrow = 1) + 
-  xlim(-1, 1)
+# Combined plot using facet_grid
+combined_plot_residuals <- predictions_filter %>%
+  ggplot() +
+  geom_histogram(aes(x = residual), bins = 50, fill = "grey", color = "black") +
+  geom_vline(aes(xintercept = mean_residual), linetype = "dashed", color = "red", linewidth = 1) +
+  facet_wrap(~outcome_clean) +
+  theme_cowplot() +
+  labs(x = "Residual", y = "Count") +
+  xlim(-1, 1) + 
+  theme(
+      strip.background = element_rect(fill = "white", color = "black", linewidth = 0.8),
+      strip.text = element_text(size = 9, face = "bold", color = "black"),
+      panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+      panel.background = element_rect(fill = "#f9f9f9", color = NA),
+      panel.grid = element_line(color = "grey95"),
+      panel.spacing = unit(.2, "lines"),
+      aspect.ratio = .9,
+      axis.text = element_text(size = 11),            # Axis tick labels
+      legend.position = "bottom")
 
-
-# Plot for "perc_ever_used_internet_wght_age_15_to_49_men"
-plot3_residuals <- predictions_filter %>%
-  filter(
-    outcome %in% c("perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio", "perc_used_internet_past12months_wght_age_15_to_49_fm_ratio"),
-  ) %>%
-  ggplot() + 
-  geom_histogram(aes(x = residual), bins = 50, fill = "grey", color = "black") + 
-  geom_vline(aes(xintercept = mean_residual), linetype = "dashed", color = "red", linewidth = 1) + 
-  theme_cowplot() + 
-  labs(x = "Residual", y = "Count") + 
-  facet_wrap(~outcome_clean, scales = "free", nrow = 1) + 
-  xlim(-1.5, 1.5)
-
-## combined plot 
-combined_plot_residuals <- plot_grid(plot1_residuals, 
-                                     plot2_residuals, 
-                                     plot3_residuals, ncol = 1, labels = "AUTO")
-
-
-ggsave(plot = combined_plot_residuals, filename = here("figures", "combined_plot_residuals.png"), height = 10, width = 8)
+ggsave(plot = combined_plot_residuals, filename = here("figures", "combined_plot_residuals.png"), height = 5, width = 8)
 ```
-
-
 
 
 

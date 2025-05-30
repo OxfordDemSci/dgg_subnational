@@ -36,12 +36,12 @@ variables <- c(
 predictions_wide <- read_csv(here("out", "predictions_wide.csv")) %>% 
     mutate(across(all_of(variables), ~ case_when(. > 1 ~ 1, TRUE ~ .)))
 
-  
-
+## predictions with uncertainty 
 predictions_uncertainty <- read_csv(here("out", "predictions_with_uncertainty.csv")) %>% 
   filter(outcome == "internet_women") %>% 
   filter(date == "2025-01") 
 
+## loco predictions 
 loco_predictions <- read_csv(here("out", "combined_predictions_lmics_national_covars_full_test.csv")) %>% 
   filter(model == "superlearner" & feature_set == "fb_and_offline" & cv_method == "loco") %>% 
   filter()
@@ -282,8 +282,8 @@ error_dist_nigeria <- ggplot(shapefile_df_nigeria, aes(x = observed, y = predict
   theme_cowplot() + 
   labs(
     title = "",
-    x = "Observed",
-    y = "Predicted",
+    x = "Observed (Admin-1)",
+    y = "Predicted (Admin-1)",
     size = "Population size"
   ) +
   geom_label(
@@ -372,8 +372,8 @@ error_dist_zim <- shapefile_df_zimbabwe %>%
   ) +
   labs(
     title = "",
-    x = "Observed",
-    y = "Predicted",
+    x = "Observed (Admin-1)",
+    y = "Predicted (Admin-1)",
     size = "Population Size"
   ) +
   theme_cowplot() + 
@@ -456,8 +456,8 @@ error_dist_senegal <- shapefile_df_senegal %>%
   ) +
   labs(
     title = "",
-    x = "Observed",
-    y = "Predicted",
+    x = "Observed (Admin-1)",
+    y = "Predicted (Admin-1)",
     size = "Population Size"
   ) +
   theme_cowplot() + 

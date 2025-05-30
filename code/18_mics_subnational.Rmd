@@ -1,0 +1,209 @@
+---
+title: "MICS Surveys"
+author: Casey Breen
+---
+
+Summary: Calculate subnational estimates for MICS surveys. 
+
+
+```{r}
+## Library packages + custom functions 
+library(here)
+source(here("code", "helpers.R"))
+
+## Read in predictions
+predictions <- fread(here("out", "predictions_with_uncertainty.csv")) 
+
+## Read in data file with all subnational estimates 
+subnational_estimates <- read_csv(here("data", "subnational_master_file_for_repetitive_measurement.csv"))
+```
+Reshape data to long 
+
+```{r}
+## Reshape data to long 
+subnational_estimates_long <- subnational_estimates %>%
+  filter(survey_type == "mics") %>%
+  select(
+    gid_0, gid_1, year, survey_type,
+    internet_women     = perc_used_internet_past12months_wght_age_15_to_49_wom,
+    internet_men       = perc_used_internet_past12months_wght_age_15_to_49_men,
+    mobile_women       = perc_owns_mobile_telephone_wght_age_15_to_49_wom,
+    mobile_men         = perc_owns_mobile_telephone_wght_age_15_to_49_men,
+    mobile_fm_ratio    = perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio,
+    internet_fm_ratio  = perc_used_internet_past12months_wght_age_15_to_49_fm_ratio,
+    mobile_n_sample_f,
+    mobile_n_sample_m,
+    internet_n_sample_f,
+    internet_n_sample_m
+  ) %>%
+  pivot_longer(
+    cols = c(internet_women, internet_men, mobile_women, mobile_men,
+             mobile_fm_ratio, internet_fm_ratio),
+    names_to = "outcome",
+    values_to = "observed"
+  ) %>%
+  mutate(
+    sample_size = case_when(
+      outcome == "mobile_women"     ~ mobile_n_sample_f,
+      outcome == "mobile_men"       ~ mobile_n_sample_m,
+      outcome == "internet_women"   ~ internet_n_sample_f,
+      outcome == "internet_men"     ~ internet_n_sample_m,
+      outcome == "mobile_fm_ratio"  ~ pmin(mobile_n_sample_f, mobile_n_sample_m),
+      outcome == "internet_fm_ratio"~ pmin(internet_n_sample_f, internet_n_sample_m),
+      TRUE ~ NA_real_
+    ),
+    observed = pmin(observed, 1)
+  ) %>%
+  select(gid_0, gid_1, year, survey_type, sample_size, outcome, observed)
+
+## Estimates long 
+subnational_estimates_long <- subnational_estimates_long %>% 
+    filter(sample_size > 150) 
+```
+
+
+```{r}
+## Prepare df 
+subnational_predictions_comparison_df <- subnational_estimates_long %>% 
+  left_join(predictions, by = join_by(gid_0, gid_1, year, outcome)) %>% 
+  distinct() %>% 
+   mutate(outcome_clean = case_when(
+    grepl("mobile_fm_ratio", outcome) ~ "Mobile (Ratio)",
+    grepl("mobile_men", outcome) ~ "Mobile (Men)",
+    grepl("mobile_women", outcome) ~ "Mobile (Women)",
+    grepl("internet_fm_ratio", outcome) ~ "Internet (Ratio)",
+    grepl("internet_men", outcome) ~ "Internet (Men)",
+    grepl("internet_women", outcome) ~ "Internet (Women)",
+    TRUE ~ outcome
+  ))
+
+# Define the order of the levels explicitly
+subnational_predictions_comparison_df <- subnational_predictions_comparison_df %>% 
+  mutate(outcome_clean = factor(outcome_clean, 
+                                levels = c("Internet (Women)", "Internet (Men)", "Internet (Ratio)",
+                                           "Mobile (Women)", "Mobile (Men)", "Mobile (Ratio)")))
+
+# Calculate R-squared and correlation (r) by outcome
+r_squared_results <- subnational_predictions_comparison_df %>%
+  filter(!is.na(observed)) %>% 
+    filter(!is.na(predicted)) %>% 
+  group_by(outcome_clean) %>%
+  summarize(
+    r = cor(observed, predicted, use = "complete.obs"),  # Calculate correlation
+    r2 = compute_r2(observed, predicted),  # Calculate R-squared
+    mae = mean(abs(observed - predicted)), 
+    .groups = "drop"
+  )
+
+## Subnational predictions comparison 
+mics_comparison_fig <- subnational_predictions_comparison_df %>% 
+  left_join(r_squared_results) %>% 
+  ggplot(aes(x = observed, y = predicted, color = year)) + 
+  geom_point(size = 2, alpha = 0.85) +
+  geom_abline(color = "grey60", linetype = "dashed") +
+  xlim(0, 1) + 
+  ylim(0, 1) + 
+  labs(
+    x = "Observed, MICS (Admin-1)",
+    y = "Predicted (Admin-1)",
+    color = "MICS Survey Year"
+  ) +
+  geom_label(
+    aes(
+      label = paste0("atop(italic(r)==", round(r, 2), ",~italic(MAE)==", round(mae, 2), ")")
+    ),
+    parse = TRUE,
+    x = 0.20,
+    y = 0.9,
+    size = 3.2,
+    inherit.aes = FALSE
+  ) +
+  facet_wrap(~ outcome_clean, ncol = 3) +
+  theme_cowplot() +
+  theme(
+    strip.background = element_rect(fill = "white", color = "black", linewidth = 0.8),
+    strip.text = element_text(size = 11, face = "bold", color = "black"),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+    panel.background = element_rect(fill = "#f9f9f9", color = NA),
+    panel.grid = element_line(color = "grey95"),
+    panel.spacing = unit(1.5, "lines"),
+    aspect.ratio = .9,
+    legend.position = "bottom",
+    legend.justification = "center",  # centers the whole legend box
+    legend.title = element_text(size = 13, hjust = 0.5, vjust = 1, margin = margin(b = 4)),
+    legend.text = element_text(size = 11)
+  ) +
+  guides(
+    color = guide_colorbar(
+      title.position = "top",
+      title.hjust = 0.5,
+      barwidth = unit(10, "cm"),
+      barheight = unit(0.5, "cm")))
+
+## Save plot 
+ggsave(plot = mics_comparison_fig, filename = here("figures", "mics_comparison_subnational.png"), height = 7, width = 10)
+
+```
+
+
+
+
+
+```{r}
+## Subnational predictions 
+subnational_predictions_comparison_df_select <- subnational_predictions_comparison_df %>% 
+  filter(gid_0 %in% c("SUR", "GUY", "JAM"))
+
+# Calculate R-squared and correlation (r) by outcome
+r_squared_results <- subnational_predictions_comparison_df_select %>% 
+  group_by(outcome) %>%
+  summarize(
+    r = cor(predicted, observed, use = "complete.obs"),  # Calculate correlation
+    r2 = compute_r2(predicted, observed),  # Calculate R-squared
+    mae = mean(abs(predicted - observed)), 
+    .groups = "drop"
+  )
+
+mics_survey <- subnational_predictions_comparison_df_select %>% 
+  left_join(r_squared_results) %>% 
+  mutate(survey = case_when(
+    gid_0 == "SUR" ~ "Suriname (2018)",
+    gid_0 == "GUY" ~ "Guyana (2019)", 
+    gid_0 == "JAM" ~ "Jamaica (2022)"
+  )) %>% 
+  ggplot(aes(x = observed, y = predicted, color = survey, shape = survey)) + 
+  geom_point(size = 2, alpha = 0.85) +
+  theme_cowplot() + 
+  geom_abline(color = "grey60", linetype = "dashed") +
+  ylim(0, 1.1) + 
+  geom_label(
+    aes(label = paste("atop(italic(r) == ", round(r, 2), ", italic(MAE) == ", round(mae, 2), ")")),
+    x = 0.25,  
+    y = 0.9, 
+    size = 3.5,
+    parse = TRUE,
+    inherit.aes = FALSE
+  ) +
+  xlim(0, 1.1) + 
+  theme(legend.position = "bottom") + 
+    facet_wrap(~outcome_clean) + 
+  labs(y = "Predicted (Admin-1)",
+       x = "Observed, MICS (Admin-1)") + 
+  theme(
+    strip.background = element_rect(fill = "white", color = "black", linewidth = 0.8),
+    strip.text = element_text(size = 11, face = "bold", color = "black"),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+    panel.background = element_rect(fill = "#f9f9f9", color = NA),
+    panel.grid = element_line(color = "grey95"),
+    panel.spacing = unit(1.5, "lines"),
+    aspect.ratio = .9,
+    legend.position = "bottom",
+    legend.justification = "center",  # centers the whole legend box
+    legend.title = element_text(size = 13, hjust = 0.5, vjust = 1, margin = margin(b = 4)),
+    legend.text = element_text(size = 11)
+  ) + 
+  scale_color_viridis_d()
+
+## save plot 
+ggsave(plot = mics_survey, filename = here("figures", "mics_survey_latin_america.png"), width = 10, height = 7, bg = "white")
+```
