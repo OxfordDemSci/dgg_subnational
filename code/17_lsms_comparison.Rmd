@@ -12,86 +12,60 @@ source(here("code", "helpers.R"))
 ```
 
 ```{r}
-## Read in data 
-ground_truth_lsms <- read_csv(here("data", "subnational_master_file_for_repetitive_measurement.csv")) %>% 
+## Read in lsms ground truth data  
+ground_truth_lsms <- read_csv(here("data", "subnational_ground_truth.csv")) %>% 
+  filter(survey_type == "lsms")
+
+ground_truth_lsms_wide <- read_csv(here("data", "subnational_ground_truth_wide.csv")) %>% 
   filter(survey_type == "lsms")
 
 ## Read in predictions 
 predictions <- read_csv(here("out", "predictions_with_uncertainty.csv"))
 
-## Show gadm1 
-dhs_ground_truth <- read_csv(here("data", "subnational_ground_truth_sep17_2024.csv"), locale = locale(encoding = "ISO-8859-1")) %>% 
-  mutate(observed = case_when(
-    outcome %in% c("internet_fm_ratio", "mobile_fm_ratio") ~ observed,
-    TRUE ~ observed / 100))
+## Read in DHS ground truth data   
+ground_truth_dhs <- read_csv(here("data", "subnational_ground_truth.csv")) %>% 
+  filter(survey_type == "dhs")
 ```
 
 ```{r}
 ## LSMS Estimates 
-ground_truth_lsms_long <- ground_truth_lsms %>%
-  mutate(
-    mobile_fm_ratio   = perc_owns_mobile_telephone_wght_age_15_to_49_wom /
-                        perc_owns_mobile_telephone_wght_age_15_to_49_men,
-    internet_fm_ratio = perc_used_internet_past12months_wght_age_15_to_49_wom /
-                        perc_used_internet_past12months_wght_age_15_to_49_men
-  ) %>%
-  select(
-    gid_0, gid_1, year,
-    internet_women     = perc_used_internet_past12months_wght_age_15_to_49_wom,
-    internet_men       = perc_used_internet_past12months_wght_age_15_to_49_men,
-    mobile_women       = perc_owns_mobile_telephone_wght_age_15_to_49_wom,
-    mobile_men         = perc_owns_mobile_telephone_wght_age_15_to_49_men,
-    mobile_fm_ratio,
-    internet_fm_ratio,
-    internet_n_sample_f, internet_n_sample_m,
-    mobile_n_sample_f, mobile_n_sample_m
-  ) %>%
-  pivot_longer(
-    cols = c(internet_women, internet_men, mobile_women, mobile_men,
-             mobile_fm_ratio, internet_fm_ratio),
-    names_to = "outcome",
-    values_to = "observed"
-  ) %>%
-  mutate(
-    sample_size = case_when(
-      outcome == "mobile_women"      ~ mobile_n_sample_f,
-      outcome == "mobile_men"        ~ mobile_n_sample_m,
-      outcome == "internet_women"    ~ internet_n_sample_f,
-      outcome == "internet_men"      ~ internet_n_sample_m,
-      outcome == "mobile_fm_ratio"   ~ pmin(mobile_n_sample_f, mobile_n_sample_m),
-      outcome == "internet_fm_ratio" ~ pmin(internet_n_sample_f, internet_n_sample_m),
-      TRUE ~ NA_real_
-    )
-  ) %>% 
-  select(gid_0, gid_1, year, outcome, observed, sample_size)
-
-## LSMS Estimates 
-ground_truth_lsms_long <- ground_truth_lsms_long %>% 
-  #filter(!(gid_0 == "NER" & year == 2021)) %>%
-  filter(!(gid_0 == "NGA" & outcome %in% c("mobile_women", "mobile_men", "mobile_fm_ratio"))) %>% 
-  filter(sample_size > 150)
+ground_truth_lsms <- ground_truth_lsms %>% 
+  filter(!(gid_0 == "NGA" & outcome %in% c("mobile_women", "mobile_men", "mobile_fm_ratio"))) %>% ## Nigeria surveys use different defn of mobile adoption ("access to")
+  filter(sample_size >= 150)
 ```
 
 ## create table 
 
 ```{r}
 ## create table 
-lsms_table <- ground_truth_lsms_long %>%
-  filter(outcome %in% c("mobile_women", "mobile_men")) %>%
-  mutate(gender = if_else(outcome == "mobile_women", "female", "male")) %>%
-  group_by(gid_0, year, gender) %>%
-  summarize(total_sample = sum(sample_size, na.rm = TRUE), .groups = "drop") %>%
-  pivot_wider(
-    names_from = gender,
-    values_from = total_sample,
-    names_glue = "{gender}_sample"
-  ) %>%
+lsms_table <- ground_truth_lsms_wide %>%
+  group_by(gid_0, year) %>%
+  summarize(female_sample_internet = sum(internet_n_sample_f, na.rm = TRUE),
+            female_sample_mobile = sum(mobile_n_sample_f, na.rm = TRUE),
+            male_sample_internet = sum(internet_n_sample_m, na.rm = TRUE), 
+            male_sample_mobile = sum(mobile_n_sample_m, na.rm = TRUE)) %>%
   rename(country_code = gid_0) %>% 
   mutate(country = countrycode::countrycode(country_code, origin = "iso3c", destination = "country.name")) %>% 
-    select(country, country_code, year, female_sample, male_sample)
+    select(country, country_code, year, female_sample_internet, male_sample_internet, female_sample_mobile, male_sample_mobile)
+
+# Add total row
+total_row <- lsms_table %>%
+  ungroup() %>% 
+  summarize(
+    country = "Total",
+    country_code = "",
+    year = NA,
+    female_sample_internet = sum(female_sample_internet, na.rm = TRUE),
+    male_sample_internet = sum(male_sample_internet, na.rm = TRUE),
+    female_sample_mobile = sum(female_sample_mobile, na.rm = TRUE),
+    male_sample_mobile = sum(male_sample_mobile, na.rm = TRUE)
+  )
+
+# Bind total row to table
+lsms_table <- bind_rows(lsms_table, total_row)
 
 ## print table 
-print(xtable(lsms_table, digits = 0), include.rownames=FALSE, file = here("figures", "lsms_sample_table.tex"))
+print(xtable(lsms_table, digits = 0), include.rownames=FALSE, file = here("figures", "lsms_comparison_table.tex"))
 ```
 
 
@@ -100,8 +74,8 @@ print(xtable(lsms_table, digits = 0), include.rownames=FALSE, file = here("figur
 # Joining Data
 lsms_comparison_df <- predictions %>% 
   select(gid_1, predicted, outcome, year) %>% 
-  inner_join(ground_truth_lsms_long, by = c("year", "gid_1", "outcome")) %>% 
-  filter(!is.na(observed) & !is.na(predicted)) #%>%  filter(iso3 != "NER")
+  inner_join(ground_truth_lsms, by = c("year", "gid_1", "outcome")) %>% 
+  filter(!is.na(observed) & !is.na(predicted) & !is.infinite(observed)) #%>%  filter(iso3 != "NER")
 
 # Calculate R-squared and correlation (r) by outcome
 r_squared_results <- lsms_comparison_df %>%
@@ -171,26 +145,27 @@ lsms_plot <- lsms_comparison_df %>%
       barheight = unit(0.5, "cm")))
 
 ## Write 
-ggsave(plot = lsms_plot, filename = here("figures", "predicted_vs_lsms_with_legend.png"), width = 10, height = 7, bg = "white")
+ggsave(plot = lsms_plot, filename = here("figures", "lsms_comparison_subnational.png"), width = 10, height = 7, bg = "white")
 ```
 
 
-## LSMS vs. DHS 
+## LSMS vs. DHS comparisons 
 
 ```{r}
 ## ground truth 
-dhs_vs_lsms_df <- dhs_ground_truth %>% 
-  left_join(ground_truth_lsms_long, by = c("gid_0", "gid_1", "outcome")) %>% 
-  mutate(survey_diff = survey_year - year) %>% 
+dhs_vs_lsms_df <- ground_truth_dhs %>% 
+  rename(observed_dhs = observed, year_dhs = year) %>% 
+  left_join(ground_truth_lsms, by = c("gid_0", "gid_1", "outcome")) %>% 
+  mutate(survey_diff = year_dhs - year) %>% 
   filter(!is.na(observed))
 
 # Calculate R-squared and correlation (r) by outcome
 r_squared_results <- dhs_vs_lsms_df %>%
   group_by(outcome) %>%
   summarize(
-    r = cor(observed, observed, use = "complete.obs"),  # Calculate correlation
-    r2 = compute_r2(observed, observed),  # Calculate R-squared
-    mae = mean(abs(observed - observed)), 
+    r = cor(observed, observed_dhs, use = "complete.obs"),  # Calculate correlation
+    r2 = compute_r2(observed, observed_dhs),  # Calculate R-squared
+    mae = mean(abs(observed - observed_dhs)), 
     .groups = "drop"
   )
 
@@ -209,7 +184,7 @@ dhs_vs_lsms_df <- dhs_vs_lsms_df %>%
 
 lsms_vs_dhs <- dhs_vs_lsms_df %>% 
     left_join(r_squared_results, by = "outcome") %>%
-  ggplot(aes(x = observed, y = observed, color = survey_diff)) + 
+  ggplot(aes(x = observed, y = observed_dhs, color = survey_diff)) + 
   geom_point(size = 2, alpha = 0.85) +
   geom_abline(color = "grey60", linetype = "dashed") +
   xlim(0, 1) + 
@@ -250,7 +225,7 @@ lsms_vs_dhs <- dhs_vs_lsms_df %>%
       barheight = unit(0.5, "cm")))
 
 ## save ggplot 
-ggsave(plot = lsms_vs_dhs, filename = here("figures", "lsms_vs_dhs.png"), width = 10, height = 7, bg = "white")
+ggsave(plot = lsms_vs_dhs, filename = here("figures", "lsms_dhs_comparison_plot.png"), width = 10, height = 7, bg = "white")
 ```
 
 ## LSMS Time Trend Error 
@@ -289,7 +264,6 @@ lsms_plot_time_trend_error <- lsms_comparison_df %>%
 lsms_error_trend <- cowplot::plot_grid(lsms_plot_time_trend_error, lsms_plot_time_trend_mae, nrow = 2, labels = "AUTO")
 
 ggsave(plot = lsms_error_trend, filename = here("figures", "lsms_error_over_time.png"), height = 8, width = 6)
-
 ```
 
 

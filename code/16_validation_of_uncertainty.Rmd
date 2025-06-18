@@ -14,39 +14,24 @@ source(here("code", "helpers.R"))
 ```
 
 ```{r}
-## read in data 
-lsms_estimates <- read_csv(here("data", "lsms_ground_truth.csv"))
-
 ## Read in data 
-ground_truth_lsms <- read_csv(here("data", "subnational_master_file_for_repetitive_measurement.csv")) %>% 
+ground_truth_lsms <- read_csv(here("data", "subnational_ground_truth.csv")) %>% 
   filter(survey_type == "lsms")
 
 ## read in predictions 
 predictions <- read_csv(here("out", "predictions_with_uncertainty.csv"))
-
-## read in ground truth 
-gadm1 <- read_csv(here("data", "subnational_ground_truth_sep17_2024.csv"), locale = locale(encoding = "ISO-8859-1")) %>% 
-  mutate(observed = case_when(
-    outcome %in% c("internet_fm_ratio", "mobile_fm_ratio") ~ observed,
-    TRUE ~ observed / 100))
 ```
 
 
 
 
 ```{r}
-lsms_estimates_long <- lsms_estimates %>% 
-    # filter(!gid_1 %in% gadm1$gid_1) %>% 
-  filter(!(iso3 == "NER" & survey_year == 2021)) %>% 
- filter(internet_n_sample_f > 1000) %>% 
-  select(iso3, gid_1, survey_year, internet_women = internet_f_weighted, internet_men =  internet_m_weighted, mobile_women = mobile_f_weighted, mobile_men = mobile_m_weighted) %>% 
-  mutate(mobile_fm_ratio = mobile_women/mobile_men) %>% 
-  mutate(internet_fm_ratio = internet_women/internet_men) %>% 
-  pivot_longer(-c(gid_1, iso3, survey_year)) %>% 
-  rename(lsms_estimate = value, outcome = name)
+## estimates longs 
+lsms_estimates_long <- ground_truth_lsms %>% 
+ filter(sample_size > 150) 
 
 lsms_estimates_long <- lsms_estimates_long %>% 
-  filter(!(iso3 == "NGA" & outcome %in% c("mobile_women", "mobile_men", "mobile_fm_ratio")))
+  filter(!(gid_0 == "NGA" & outcome %in% c("mobile_women", "mobile_men", "mobile_fm_ratio")))
 ```
 
 
@@ -54,18 +39,9 @@ lsms_estimates_long <- lsms_estimates_long %>%
 # Joining Data
 lsms_data <- predictions %>% 
   select(gid_1, predicted, predicted_error, outcome, year) %>% 
-  inner_join(lsms_estimates_long, by = c("year" = "survey_year", "gid_1", "outcome")) %>% 
-  filter(!is.na(lsms_estimate) & !is.na(predicted)) #%>%  filter(iso3 != "NER")
+  inner_join(lsms_estimates_long, by = c("year", "gid_1", "outcome")) %>% 
+  filter(!is.na(observed) & !is.na(predicted)) #%>%  filter(iso3 != "NER")
 
-# Calculate R-squared and correlation (r) by outcome
-r_squared_results <- lsms_data %>%
-  group_by(outcome) %>%
-  summarize(
-    r = cor(predicted, lsms_estimate, use = "complete.obs"),  # Calculate correlation
-    r2 = compute_r2(predicted, lsms_estimate),  # Calculate R-squared
-    mae = mean(abs(predicted - lsms_estimate)), 
-    .groups = "drop"
-  )
 
 lsms_data <-  lsms_data %>% 
    mutate(outcome_clean = case_when(
@@ -80,17 +56,9 @@ lsms_data <-  lsms_data %>%
                                 levels = c("Internet (Women)", "Internet (Men)", "Internet (Ratio)",
                                            "Mobile (Women)", "Mobile (Men)", "Mobile (Ratio)")))
 
-lsms_data %>% 
-  mutate(error = predicted - lsms_estimate) %>% 
-  count(abs(error) > predicted_error)
-
-lsms_data %>% 
-  mutate(error = predicted - lsms_estimate) %>% 
-  summarize(error = mean(abs(error)), predicted_error = mean(predicted_error)) 
-
 lsms_error_plot <-  lsms_data %>% 
   group_by(outcome_clean) %>% 
-  mutate(error = predicted - lsms_estimate) %>% 
+  mutate(error = predicted - observed) %>% 
   summarize(`Observed error (LSMS)` = mean(abs(error)), `Predicted error` = mean(predicted_error)) %>% 
   pivot_longer(-outcome_clean) %>% 
   ggplot(aes(x = outcome_clean, y = value, fill = name)) + 

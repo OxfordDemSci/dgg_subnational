@@ -1,0 +1,202 @@
+---
+title: "Validation of trends"
+author: Casey Breen
+---
+
+Summary: Validate trends estimates
+
+```{r}
+## libary packages + custom functions 
+library(here)
+source(here("code", "helpers.R"))
+```
+
+```{r}
+## read in ground truth 
+ground_truth <- read_csv(here("data", "subnational_ground_truth.csv")) %>% 
+  mutate(observed = case_when(
+        observed > 1 ~ 1,
+         TRUE ~ observed))
+
+## read in predictions 
+predictions <- read_csv(here("out", "predictions_with_uncertainty.csv")) %>% 
+  mutate(predicted = case_when(
+    predicted > 1 ~ 1,
+    TRUE ~ predicted
+  ))
+```
+
+```{r}
+## restrict to recent surveys 
+ground_truth <- ground_truth %>% 
+  filter(sample_size >= 150 | survey_type == "dhs") 
+
+ground_truth_filter <- ground_truth %>% 
+  filter(!(gid_0 == "NGA" & survey_type == "lsms" & year == 2018)) %>% 
+  filter(!(gid_0 == "NGA" & survey_type == "lsms" & year == 2015)) %>% 
+  filter(!(gid_0 == "BFA" & survey_type == "lsms" & year == 2021))
+
+required_outcomes <- c("internet_women", "internet_men", "mobile_women", "mobile_men", "internet_fm_ratio", "mobile_fm_ratio")
+
+# ground_truth_filter <- ground_truth_filter %>%
+#   filter(outcome %in% required_outcomes) %>%
+#   group_by(gid_1, year, survey_type) %>%
+#   filter(n_distinct(outcome) == length(required_outcomes)) %>%
+#   ungroup()
+```
+
+```{r}
+## multi survey 
+multi_survey <- ground_truth %>% 
+  count(gid_0, year, survey_type) %>% 
+  group_by(gid_0) %>% 
+  filter(n() > 1) %>% 
+  arrange(gid_0) %>% 
+    mutate(country = countrycode::countrycode(gid_0, origin = "iso3c", destination = "country.name")) %>% 
+  select(country, country_code = gid_0, year, survey_type)  %>% 
+  mutate(survey_type = toupper(survey_type))
+  
+## print table 
+print(xtable(multi_survey, digits = 0), include.rownames=FALSE, file = here("figures", "multi_survey.tex"))
+```
+
+
+```{r}
+df_change <- ground_truth_filter %>%
+  group_by(gid_0, gid_1, outcome) %>%
+    filter(n_distinct(year) > 1) %>%  # only keep groups with more than one year
+  arrange(year) %>%
+  summarize(
+    year_start = dplyr::first(year),
+    year_end = dplyr::last(year),
+    estimate_start = dplyr::first(observed),
+    estimate_end = dplyr::last(observed),
+    change = estimate_end - estimate_start,
+    .groups = "drop"
+  )
+
+pred_change <- predictions %>%
+  inner_join(df_change %>% select(gid_1, outcome, year_start, year_end),
+             by = c("gid_1", "outcome")) %>%
+  filter(year %in% c(year_start, year_end)) %>%
+  select(gid_1, outcome, year, predicted, year_start, year_end)
+
+pred_change_wide <- pred_change %>%
+  pivot_wider(names_from = year, values_from = predicted, names_prefix = "year_") %>%
+  rowwise() %>%
+  mutate(predicted_change = cur_data()[[paste0("year_", year_end)]] - 
+                          cur_data()[[paste0("year_", year_start)]]) %>%
+  ungroup() %>%
+  select(gid_1, outcome, year_start, year_end, predicted_change)
+
+change_df <- df_change %>% 
+  left_join(pred_change_wide) 
+```
+
+```{r}
+model_performance_metrics <- change_df %>%
+  #filter(gid_0 != "NGA") %>% 
+  filter(!is.na(predicted_change) & !is.na(change)) %>% 
+  group_by(outcome) %>%
+  summarise(
+    r = cor(predicted_change, change),
+    r2 = compute_r2(predicted_change, change),
+    rmse = compute_rmse(predicted_change, change),
+    mape = compute_mape(predicted_change, change),
+    mare = compute_mare(predicted_change, change),
+    mae = compute_mae(predicted_change, change)
+  )
+
+change_df_metrics <- change_df %>% 
+  left_join(model_performance_metrics)
+
+change_df_metrics <-  change_df_metrics %>% 
+   mutate(outcome_clean = case_when(
+    grepl("mobile_fm_ratio", outcome) ~ "Mobile (Ratio)",
+    grepl("mobile_men", outcome) ~ "Mobile (Men)",
+    grepl("mobile_women", outcome) ~ "Mobile (Women)",
+    grepl("internet_fm_ratio", outcome) ~ "Internet (Ratio)",
+    grepl("internet_men", outcome) ~ "Internet (Men)",
+    grepl("internet_women", outcome) ~ "Internet (Women)",
+    TRUE ~ outcome
+  )) %>% mutate(outcome_clean = factor(outcome_clean, 
+                                levels = c("Internet (Women)", "Internet (Men)", "Internet (Ratio)",
+                                           "Mobile (Women)", "Mobile (Men)", "Mobile (Ratio)")))
+
+
+time_series_plot <- change_df_metrics %>% 
+  mutate(diff = year_start - year_end) %>% 
+  ggplot(aes(x = change, y = predicted_change)) + 
+  geom_point(alpha = 0.2,size = 2,) + 
+  facet_wrap(~outcome_clean) + 
+  geom_label(
+    aes(label = paste("atop(italic(r) == ", round(r, 2), ", italic(MAE) == ", round(mae, 2), ")")),
+    x = -0.2,  # Adjusted position for better visibility
+    y = 0.7, 
+    size = 3.5,
+    parse = TRUE,
+    inherit.aes = FALSE
+  ) +
+  geom_abline(color = "darkgrey", slope = 1, linetype = "dashed") + 
+  theme_cowplot() + 
+  xlim(-.4, 1) + 
+  ylim(-.4, 1)  + 
+  labs(x = "Observed Change (Admin-1)",
+       y = "Predicted Change (Admin-1)") + 
+  theme(
+    strip.background = element_rect(fill = "white", color = "black", linewidth = 0.8),
+    strip.text = element_text(size = 11, face = "bold", color = "black"),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+    panel.background = element_rect(fill = "#f9f9f9", color = NA),
+    panel.grid = element_line(color = "grey95"),
+    panel.spacing = unit(1.5, "lines"),
+    aspect.ratio = .9,
+    legend.position = "bottom",
+    legend.justification = "center",  # centers the whole legend box
+    legend.title = element_text(size = 13, hjust = 0.5, vjust = 1, margin = margin(b = 4)),
+    legend.text = element_text(size = 11)
+  ) +
+  guides(
+    color = guide_colorbar(
+      title.position = "top",
+      title.hjust = 0.5,
+      barwidth = unit(10, "cm"),
+      barheight = unit(0.5, "cm")))
+
+ggsave(plot = time_series_plot, filename = here("figures", "time_series_plot_scatter.png"), width = 10, height = 7, bg = "white")
+```
+
+```{r}
+## time series plot 
+time_series_plot_scatter_country <- change_df_metrics %>% 
+  filter(!gid_0 %in% c("PHL", "KHM", "KGZ")) %>% 
+  ggplot(aes(x = change, y = predicted_change)) + 
+  geom_point() + 
+  facet_wrap(~outcome) + 
+  geom_abline(color = "darkgrey", slope = 1, linetype = "dashed") + 
+  theme_cowplot() + 
+  xlim(-.5, 0.5) + 
+  ylim(-.5, .5) + 
+  facet_grid(gid_0 ~ outcome_clean, scales = "free") + 
+  labs(x = "Observed Change (Admin-1)",
+       y = "Predicted Change (Admin-1)") + 
+  theme(
+    strip.background = element_rect(fill = "white", color = "black", linewidth = 0.8),
+    strip.text = element_text(size = 10, face = "bold", color = "black"),
+    panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+    panel.background = element_rect(fill = "#f9f9f9", color = NA),
+    panel.grid = element_line(color = "grey95"),
+    panel.spacing = unit(.5, "lines"),
+    aspect.ratio = .9,
+    legend.position = "bottom",
+    legend.justification = "center",
+    legend.title = element_text(size = 13, hjust = 0.5, vjust = 1, margin = margin(b = 4)),
+    legend.text = element_text(size = 11),
+    axis.text.x = element_text(angle = 45, hjust = 1)  # <- rotation added
+  )
+
+## plot figure 
+ggsave(plot = time_series_plot_scatter_country, filename = here("figures", "time_series_plot_scatter_country.png"), width = 15, height = 18, bg = "white")
+```
+
+

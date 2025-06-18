@@ -28,18 +28,28 @@ After downloading the required data, researchers can run the following script to
 
 Alternatively, researchers can run the following files individually in order: 
   
-- `01_fit_models_crossvalidation.Rmd` - Fit subnational models using both leave-one-country-out (LOCO) and 10-fold cross-validation.
-- `02_make_predictions.Rmd` - Make predictions for all LMICs using full training data and estimate uncertainty 
-- `03_model_performance.Rmd` - Generate figures and tables summarizing model performance 
-- `04_within_country_analysis.Rmd` - Generate figures and tables summarizing within country performance 
-- `05_geo_map.Rmd` - Geographic visualizations of model predictions and error
-- `06_feature_importance.Rmd` - Analysis of most important features in a model 
-- `07_superlearner_weights.Rmd` - Run all (full) models and get weights from Superlearner showing relative contribution of each learner 
-- `08_residual_analysis.Rmd` - Calculate and plot model residuals 
-- `09_var_explained.Rmd` - Analysis of within vs. between country variance 
-- `10_bootstrap_analysis.Rmd` - Bootstrap analysis to estimate the uncertainty in the R-squared values
-- `11_national_comparison` - Compare our aggregated national predictions with external MICS surveys
-- `12_dhs_tables` - Construct appendix table of numbers of people sampled in each DHS survey (requires access to DHS surveys)
+- `00_run_all.Rmd` – Master script to run the full analysis pipeline in sequence.
+- `01_fit_models_crossvalidation.Rmd` – Fits subnational prediction models using both leave-one-country-out (LOCO) and 10-fold cross-validation.
+- `02_make_predictions.Rmd` – Uses the trained models to generate predictions for all LMICs and estimates associated uncertainty.
+- `03_model_performance.Rmd` – Produces summary figures and tables for overall model performance metrics (e.g., RMSE, R²).
+- `04_within_country_analysis.Rmd` – Evaluates and visualizes within-country performance across models.
+- `05_geo_map.Rmd` – Generates geographic visualizations (maps) of predicted values and associated prediction errors.
+- `06_feature_importance.Rmd` – Assesses and visualizes the relative importance of input features for each model.
+- `07_superlearner_weights.Rmd` – Computes and reports SuperLearner ensemble weights, indicating the relative contribution of each learner.
+- `08_residual_analysis.Rmd` – Analyzes and plots model residuals to assess spatial and structural model fit.
+- `09_var_explained.Rmd` – Decomposes variance explained into within- and between-country components.
+- `10_bootstrap_analysis.Rmd` – Runs bootstrap procedures to estimate uncertainty around DHS ground truth.
+- `11_disparities_plots.Rmd` – Generates plots to explore subnational disparities and patterns in predicted outcomes.
+- `12_dhs_table.Rmd` – Constructs a table summarizing the number of individuals sampled in each DHS survey (requires access to raw DHS microdata).
+- `13_var_coverage_table.Rmd` – Produces a table indicating availability of key predictor variables across country-year units.
+- `14_trends.Rmd` – Analyzes and visualizes time trends in model predictions and covariates.
+- `15_tanzania_analysis.Rmd` – Focused analysis of model results and validation in Tanzania as a case study.
+- `16_validation_of_uncertainty.Rmd` – Validates uncertainty estimates through empirical coverage and interval accuracy checks.
+- `17_lsms_comparison.Rmd` – Compares subnational predictions against LSMS. 
+- `18_mics_comparison.Rmd` – Compares subnational predictions against MICS
+- `19_mics_comparison_national.Rmd` – Compares predictions to MICS at the national level for robustness.
+- `20_trends_validation.Rmd` – Validates predicted trends over time against external benchmarks and survey data.
+- `21_trend_validation_aggregate.Rmd` – Aggregates trend validations across all countries and produces summary figures.
 
 ### Authors
 

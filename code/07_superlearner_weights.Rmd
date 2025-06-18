@@ -95,8 +95,6 @@ results_df <- do.call(rbind, results_list)
 
 # Print the results dataframe
 results_df
-
-
 ```
 
 ```{r}
@@ -117,7 +115,8 @@ results_df <- results_df %>% mutate(outcome_alt = case_when(
 # Pivot the dataframe
 pivoted_df <- results_df %>%
   dplyr::select(learner, weight, outcome_alt) %>% 
-  pivot_wider(names_from = outcome_alt, values_from = weight)
+  pivot_wider(names_from = outcome_alt, values_from = weight) %>% 
+  select(learner, `Internet (Women)`, `Internet (Men)`, `Internet (Ratio)`, `Mobile (Women)`, `Mobile (Men)`, `Mobile (Ratio)`)
 
 
 # Convert the pivoted dataframe to a LaTeX table
@@ -125,7 +124,6 @@ latex_table <- xtable(pivoted_df)
 
 # Print the LaTeX table with appropriate options
 print(latex_table, type = "latex", include.rownames = FALSE, booktabs = TRUE, file = here("figures", "superlearner_weights.tex"))
-
 ```
 
 

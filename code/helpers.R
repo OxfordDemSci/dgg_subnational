@@ -434,30 +434,11 @@ fb_feats <- c(
   'x4g_age_13_plus_male_frac_2024'
 )
 
-# fb_feats <- c(
-#   "fb_pntr_13p_male_dhsyear_impute",
-#   "fb_pntr_13p_female_dhsyear_impute",
-#   "all_devices_age_13_plus_gg_dhsyear_impute",
-#   "ios_age_13_plus_female_frac_2024",
-#   "ios_age_13_plus_male_frac_2024",
-#   "wifi_age_13_plus_female_frac_2024",
-#   "wifi_age_13_plus_male_frac_2024",
-#   "x4g_age_13_plus_female_frac_2024",
-#   "x4g_age_13_plus_male_frac_2024",
-#   "fb_pntr_13p_male_dhsyear_national",
-#   "fb_pntr_13p_female_dhsyear_national",
-#   "all_devices_age_13_plus_gg_dhsyear_national"
-# )
-
 
 off_feats <- tolower(c(
   "nl_mean_zscore",
-  # "rwi_mean",
-  # "rwi_mean_wght",
   "pop_density_zscore",
   "dhsyear",
-  # "pop_all_age_female_zscore",
-  # "pop_all_age_male_zscore",
   "subnational_gdi",
   "subnational_hdi_males",
   "subnational_hdi_females",
@@ -465,12 +446,10 @@ off_feats <- tolower(c(
   "educational_index_males",
   "income_index_females",
   "income_index_males",
-  #  "internet_speed",
   "continent",
   "hdi",
   "gdi",
   "rel_date"
- #"rel_date_squared"
 ))
 
 
@@ -561,4 +540,85 @@ calculate_r_squared <- function(predicted, observed) {
   ss_tot <- sum((observed - mean(observed))^2) # Total Sum of Squares
   r_squared <- 1 - (ss_res / ss_tot)
   return(r_squared)
+}
+
+
+
+## function to create time series comparison plots 
+make_country_outcome_plot <- function(predictions_df = predictions, ground_truth_df = ground_truth, country_code, outcome_var, y_label, plot_title, file_name) {
+  
+  df <- predictions_df %>%
+    group_by(year, gid_0, gid_1, outcome) %>% 
+    summarize(
+      predicted = mean(predicted, na.rm = TRUE),
+      n = n(),  .groups = "drop"
+    ) %>% 
+    ungroup() %>% 
+    left_join(ground_truth, by = c("gid_0", "gid_1", "year", "outcome")) %>%
+    filter(gid_0 == country_code, outcome == outcome_var) %>%
+    mutate(year = as.integer(year)) %>% 
+    mutate(date = as.Date(paste0(year, "-01-01")))
+  
+  
+  df <- df %>%
+    left_join(gadm1_map %>% as.data.frame() %>% select(gid_1 = GID_1, NAME_1)) %>%
+    mutate(
+      gid_1_name = paste0(NAME_1, " (", gid_1, ")"),
+      NAME_1 = case_when(NAME_1 == "Federal Capital Territory" ~ "Capital Territory", TRUE ~ NAME_1),
+      survey_type = toupper(survey_type),
+      source_type = case_when(
+        survey_type == "LSMS" ~ "LSMS",
+        survey_type == "DHS" ~ "DHS",
+        survey_type == "MICS" ~ "MICS",
+        TRUE ~ "Predicted"
+      )
+    )
+  
+  plot <- df %>%
+    ggplot(aes(x = date)) +
+    geom_line(
+      data = filter(df),
+      aes(y = predicted, group = gid_1, color = "Predicted"),
+      linewidth = 1.5
+    ) +
+    geom_point(
+      data = filter(df, source_type != "Predicted"),
+      aes(y = observed, color = source_type, shape = source_type),
+      size = 3, alpha = 1
+    ) +
+    scale_color_manual(
+      values = c("DHS" = "darkorange",
+                 "MICS" = "red", 
+                 "LSMS" = "darkred",
+                 "Predicted" = "lightblue"),
+      name = "Survey Source"
+    ) +
+    scale_shape_manual(
+      values = c("DHS" = 16, "MICS" = 15, "LSMS" = 17),
+      name = "Survey Source"
+    ) +
+    guides(shape = "none") +
+    facet_wrap(~NAME_1) +
+    labs(
+      x = "Year",
+      y = y_label,
+      title = plot_title
+    ) +
+    theme_cowplot() +
+    theme(
+      legend.position = "bottom",
+      strip.background = element_rect(fill = "white", color = "black", linewidth = 0.8),
+      strip.text = element_text(size = 11, face = "bold"),
+      panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+      panel.background = element_rect(fill = "#f9f9f9"),
+      panel.grid = element_line(color = "grey95"),
+      panel.spacing = unit(1.5, "lines"),
+      aspect.ratio = .9,
+      axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1),
+      legend.title = element_text(size = 13),
+      legend.text = element_text(size = 11)
+    ) +
+    ylim(0, 1)
+  
+  ggsave(plot = plot, filename = here("figures", "time_series_plots", file_name), width = 12, height = 12)
 }

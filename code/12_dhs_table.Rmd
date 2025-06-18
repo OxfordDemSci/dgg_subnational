@@ -18,11 +18,39 @@ master_file <- read_csv(here("data", "master_data_file_march12_with_national.csv
 
 ```{r}
 # Define the list of country names in lowercase
-countries <- c("angola", "armenia", "benin", "burkina_faso", "burundi", "cambodia", 
-               "cameroon", "cote_divoire", "ethiopia", "gabon", "gambia", "guinea", "haiti", "india", 
-               "kenya", "liberia", "madagascar", "malawi", "mali", "mauritania", "mozambique", "nepal", 
-               "nigeria", "pakistan", "rwanda", "senegal", "sierra_leone", "south_africa", 
-               "tanzania", "timor-leste", "uganda", "zambia", "zimbabwe")
+countries <- c("angola", 
+               "armenia",
+               "benin",
+               "burkina_faso", 
+               "burundi",
+               "cambodia", 
+               "cameroon", 
+               "cote_divoire",
+               "ethiopia", 
+               "gabon",
+               "gambia",
+               "guinea",
+               "haiti", 
+               "india", 
+               "kenya",
+               "liberia",
+               "madagascar", 
+               "malawi", 
+               "mali",
+               "mauritania", 
+               "mozambique", 
+               "nepal", 
+               "nigeria", 
+               "pakistan",
+               "rwanda",
+               "senegal", 
+               "sierra_leone", 
+               "south_africa", 
+               "tanzania", 
+               "timor-leste", 
+               "uganda",
+               "zambia",
+               "zimbabwe")
  
 # Define a function to check if a folder name contains any country names
 folder_contains_country <- function(folder_name, countries) {

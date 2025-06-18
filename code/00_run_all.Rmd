@@ -27,7 +27,7 @@ sink(con, append=TRUE, split=TRUE)
 sink(con, append=TRUE, type = "message")
 
 ## Loop to process files
-for (cur_file in rmd_files] { 
+for (cur_file in rmd_files[1:20]) { 
 
   cat("================================\n")
   source(here("code", "helpers.R"))
@@ -35,7 +35,7 @@ for (cur_file in rmd_files] {
   cat("Running ", cur_file, "\n")
   source_rmd(here("code", cur_file))
   tictoc::toc()
-  cat("================================\n")
+  cat("================================\n")                                                                                             
 
 }
 sink()

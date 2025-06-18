@@ -75,7 +75,7 @@ spread_plot_facet <- spread_plot_df %>%
     legend.text = element_text(size = 11)
   ) 
 
-ggsave(spread_plot, filename = here("figures", "spread_plot_facet.png"), width = 12, height = 8)
+ggsave(spread_plot_facet, filename = here("figures", "spread_plot_facet.png"), width = 12, height = 8)
 ```
 
 

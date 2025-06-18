@@ -1,0 +1,88 @@
+---
+title: "Trends Validation"
+author: Casey Breen
+---
+
+Summary: Create trend over time plots 
+
+
+```{r}
+## libary packages + custom functions 
+library(here)
+source(here("code", "helpers.R"))
+```
+
+```{r}
+## Read in predictions 
+predictions <- read_csv(here("out", "predictions_with_uncertainty.csv"))
+
+## Subnational file for repetitive measurement  
+ground_truth <- read_csv(here("data", "subnational_ground_truth.csv"))
+
+# Example: Get GADM1 names for Nigeria
+gadm1_map <- read_sf(here("data", "gadm_410-levels.gpkg"), layer = "ADM_1")
+```
+
+
+```{r}
+## LSMS Estimates 
+ground_truth <- ground_truth %>%
+  filter(!(gid_0 == "NGA" & outcome %in% c("mobile_women", "mobile_men", "mobile_fm_ratio"))) %>%
+  filter(sample_size > 150 | survey_type == "dhs")
+
+## Top code at 1 
+ground_truth <- ground_truth %>%
+  mutate(observed = case_when(observed > 1 ~ 1, TRUE ~ observed))
+```
+
+## Complete list of all surveys with multiple 
+
+```{r}
+## identify surveys with multiple 
+multi_survey <- ground_truth %>% 
+  count(gid_0, year, survey_type) %>% 
+  group_by(gid_0) %>% 
+  filter(n() > 1) %>% 
+  arrange(desc(gid_0)) %>% 
+  select(gid_0, year, survey_type)
+```
+
+
+```{r}
+# Define mappings from outcome to label
+outcome_labels <- list(
+  internet_women = "Internet Adoption (Women)",
+  internet_men = "Internet Adoption (Men)",
+  internet_fm_ratio = "Internet Gender Gap Index",
+  mobile_women = "Mobile Phone Ownership (Women)",
+  mobile_men = "Mobile Phone Ownership (Men)",
+  mobile_fm_ratio = "Mobile Gender Gap Index")
+
+# Get all country codes and outcomes in the data
+countries <- unique(multi_survey$gid_0)
+outcomes <- names(outcome_labels)
+
+# Loop over each country and outcome
+for (cty in countries) {
+  for (out in outcomes) {
+    
+    # Title and filename
+    label <- outcome_labels[[out]]
+    title <- paste0(cty, ", ", label)
+    file <- paste0(tolower(cty), "_validation_", out, ".png")
+    
+    # Run plot function
+    make_country_outcome_plot(
+      predictions_df = predictions,
+      country_code = cty,
+      outcome_var = out,
+      y_label = label,
+      plot_title = title,
+      file_name = file
+    )
+  }
+}
+```
+
+
+

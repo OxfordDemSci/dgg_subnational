@@ -42,7 +42,7 @@ predictions_uncertainty <- read_csv(here("out", "predictions_with_uncertainty.cs
   filter(date == "2025-01") 
 
 ## loco predictions 
-loco_predictions <- read_csv(here("out", "combined_predictions_lmics_national_covars_full_test.csv")) %>% 
+loco_predictions <- read_csv(here("out", "combined_predictions_lmics_national_covars_full.csv")) %>% 
   filter(model == "superlearner" & feature_set == "fb_and_offline" & cv_method == "loco") %>% 
   filter()
 ```

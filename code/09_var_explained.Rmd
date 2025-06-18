@@ -13,23 +13,21 @@ source(here("code", "helpers.R"))
 
 
 ```{r}
- set.seed(1234)
-
 ## read in training and test datasets
 master_file <- read_csv(here("data", "master_data_file_march12_with_national.csv")) %>%
-  filter(year == 2024 & month == 11) %>% 
+  filter(year == 2025 & month == 01) %>% 
   dplyr::select(country, all_of(c(dhs_vars, fb_feats, off_feats))) %>%
   filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% drop_na() 
 
 master_file_full <- read_csv(here("data", "master_data_file_march12_with_national.csv")) %>%
-  filter(year == 2024 & month == 11) %>% 
+  filter(year == 2025 & month == 01) %>% 
    filter(!is.na(fb_pntr_18p_female)) 
 ```
 
 
 ```{r}
 predictions <- read_csv(here("out", "predictions_wide.csv")) %>% 
-  filter(year == 2024 & month == 11)
+  filter(year == 2025 & month == 01)
 
 predictions <- predictions %>% 
   left_join(master_file_full %>% select(-country), by = c("gid_1" = "gid_1")) %>% 

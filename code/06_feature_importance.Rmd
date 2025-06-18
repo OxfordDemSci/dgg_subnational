@@ -3,7 +3,7 @@ title: "04 - Quantify R2"
 auhor: "Casey Breen" 
 ---
 
-Summary: Generate figures and tables summarizing model performance 
+Summary: Generate figures and tables summarizing model performance ß
 
 ```{r}
 ## libary packages + custom functions 

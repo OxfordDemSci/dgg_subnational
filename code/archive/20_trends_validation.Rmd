@@ -30,6 +30,10 @@ gadm1 <- read_csv(here("data", "subnational_ground_truth_sep17_2024.csv"), local
     TRUE ~ observed / 100))
 ```
 
+
+
+
+
 ```{r}
 lsms_estimates_long <- lsms_estimates %>% 
     # filter(!gid_1 %in% gadm1$gid_1) %>% 

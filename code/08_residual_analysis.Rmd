@@ -44,16 +44,16 @@ predictions_filter <- predictions_filter %>%
   left_join(master_file, by = "gid_1")
 
 predictions_filter <- predictions_filter %>% 
-  mutate(residual = observed - predicted)
+  mutate(residual = observed - predicted) %>% 
+  mutate(mean_residual = mean(residual))
 ```
 
 
 ```{r}
-
+## predictions filter
 predictions_filter <- predictions_filter %>% mutate(outcome_clean = factor(outcome_clean, 
                                 levels = c("Internet (Women)", "Internet (Men)", "Internet (Ratio)",
                                            "Mobile (Women)", "Mobile (Men)", "Mobile (Ratio)")))
-
 
 # Combined plot using facet_grid
 combined_plot_residuals <- predictions_filter %>%

@@ -1,119 +1,14 @@
 ================================
-Running  09_var_explained.Rmd 
-Within-country MLD (MLD_W): 0.0032364 
-Between-country MLD (MLD_B): 0.01068706 
-Total MLD: 0.01392346 
-Ratio of Within-country to Between-country MLD: 0.3028334 
-Within-country MLD (MLD_W): 0.001245511 
-Between-country MLD (MLD_B): 0.003099367 
-Total MLD: 0.004344878 
-Ratio of Within-country to Between-country MLD: 0.4018599 
-Within-country MLD (MLD_W): 0.007974715 
-Between-country MLD (MLD_B): 0.01132418 
-Total MLD: 0.01929889 
-Ratio of Within-country to Between-country MLD: 0.7042203 
-Within-country MLD (MLD_W): 0.006147553 
-Between-country MLD (MLD_B): 0.006454045 
-Total MLD: 0.0126016 
-Ratio of Within-country to Between-country MLD: 0.9525117 
-Within-country MLD (MLD_W): 0.001867931 
-Between-country MLD (MLD_B): 0.003202045 
-Total MLD: 0.005069976 
-Ratio of Within-country to Between-country MLD: 0.5833558 
-Within-country MLD (MLD_W): 0.0004184291 
-Between-country MLD (MLD_B): 0.0008476599 
-Total MLD: 0.001266089 
-Ratio of Within-country to Between-country MLD: 0.4936285 
-Within-country MLD (MLD_W): 0.004367243 
-Between-country MLD (MLD_B): 0.01506049 
-Total MLD: 0.01942773 
-Ratio of Within-country to Between-country MLD: 0.2899801 
-Within-country MLD (MLD_W): 0.002983212 
-Between-country MLD (MLD_B): 0.007027418 
-Total MLD: 0.01001063 
-Ratio of Within-country to Between-country MLD: 0.4245104 
-Within-country MLD (MLD_W): 0.0007327975 
-Between-country MLD (MLD_B): 0.0009276737 
-Total MLD: 0.001660471 
-Ratio of Within-country to Between-country MLD: 0.7899302 
-Within-country MLD (MLD_W): 9.98375e-05 
-Between-country MLD (MLD_B): 0.0002791094 
-Total MLD: 0.0003789469 
-Ratio of Within-country to Between-country MLD: 0.3577002 
-Within-country MLD (MLD_W): 0.001360542 
-Between-country MLD (MLD_B): 0.005977458 
-Total MLD: 0.007338 
-Ratio of Within-country to Between-country MLD: 0.2276122 
-Within-country MLD (MLD_W): 0.0008542245 
-Between-country MLD (MLD_B): 0.002481291 
-Total MLD: 0.003335516 
-Ratio of Within-country to Between-country MLD: 0.3442661 
-Within-country MLD (MLD_W): 0.0005383636 
-Between-country MLD (MLD_B): 0.003148144 
-Total MLD: 0.003686507 
-Ratio of Within-country to Between-country MLD: 0.1710099 
-Within-country MLD (MLD_W): 2.994833e-05 
-Between-country MLD (MLD_B): 0.0004219528 
-Total MLD: 0.0004519011 
-Ratio of Within-country to Between-country MLD: 0.07097555 
-Within-country MLD (MLD_W): 0.0009131269 
-Between-country MLD (MLD_B): 0.005636937 
-Total MLD: 0.006550064 
-Ratio of Within-country to Between-country MLD: 0.1619899 
-Within-country MLD (MLD_W): 0.0004972228 
-Between-country MLD (MLD_B): 0.002534707 
-Total MLD: 0.00303193 
-Ratio of Within-country to Between-country MLD: 0.1961658 
-Within-country MLD (MLD_W): 0.001596676 
-Between-country MLD (MLD_B): 0.01468692 
-Total MLD: 0.0162836 
-Ratio of Within-country to Between-country MLD: 0.1087141 
-Within-country MLD (MLD_W): 0.0004487208 
-Between-country MLD (MLD_B): 0.002869431 
-Total MLD: 0.003318152 
-Ratio of Within-country to Between-country MLD: 0.1563797 
-Within-country MLD (MLD_W): 0.00365751 
-Between-country MLD (MLD_B): 0.04278237 
-Total MLD: 0.04643988 
-Ratio of Within-country to Between-country MLD: 0.08549105 
-Within-country MLD (MLD_W): 0.002622235 
-Between-country MLD (MLD_B): 0.02366697 
-Total MLD: 0.0262892 
-Ratio of Within-country to Between-country MLD: 0.1107973 
-Finished with 09_var_explained.Rmd, time:: 1.358 sec elapsed
+Running  02_make_predictions.Rmd 
+Finished with 02_make_predictions.Rmd, time:: 177.513 sec elapsed
 ================================
 ================================
-Running  11_mics_comparison.Rmd 
-Finished with 11_mics_comparison.Rmd, time:: 2.597 sec elapsed
+Running  03_model_performance.Rmd 
+Finished with 03_model_performance.Rmd, time:: 37.338 sec elapsed
 ================================
 ================================
-Running  13_var_coverage_table.Rmd 
-Finished with 13_var_coverage_table.Rmd, time:: 1.39 sec elapsed
+Running  04_within_country_analysis.Rmd 
+Finished with 04_within_country_analysis.Rmd, time:: 1.463 sec elapsed
 ================================
 ================================
-Running  14_trends.Rmd 
-Finished with 14_trends.Rmd, time:: 1.74 sec elapsed
-================================
-================================
-Running  15_lsms_comparison.Rmd 
-Finished with 15_lsms_comparison.Rmd, time:: 2.992 sec elapsed
-================================
-================================
-Running  16_disparities_plots.Rmd 
-Finished with 16_disparities_plots.Rmd, time:: 3.09 sec elapsed
-================================
-================================
-Running  17_within_country_gap.Rmd 
-Finished with 17_within_country_gap.Rmd, time:: 1.077 sec elapsed
-================================
-================================
-Running  18_tanzania_analysis.Rmd 
-Finished with 18_tanzania_analysis.Rmd, time:: 0.853 sec elapsed
-================================
-================================
-Running  19_lsms_error.Rmd 
-Finished with 19_lsms_error.Rmd, time:: 0.589 sec elapsed
-================================
-================================
-Running  NA 
-Error in file(con, "r") : invalid 'description' argument
+Running  05_geo_map.Rmd 

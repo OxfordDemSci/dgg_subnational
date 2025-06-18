@@ -16,14 +16,12 @@ set.seed(1)
 
 ```{r}
 ## read in training and test datasets 
-master_file <- read_csv(here("data", "master_data_file_march12_with_national.csv"), 
-                        locale = locale(encoding = "ISO-8859-1")) %>%
+master_file <- read_csv(here("data", "master_data_file_march12_with_national.csv")) %>%
   janitor::clean_names() %>% 
   mutate(continent = case_when(continent == "Africa" ~ 1,
                                TRUE ~ 0)) %>% 
   dplyr::select(gid_1, country, all_of(c(dhs_vars, fb_feats, off_feats))) %>% 
   filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% drop_na() %>% 
-  #filter(!country %in% c("Lesotho", "Côte d'Ivoire", "Mozambique", "")) %>% 
   filter(!(country ==  "Tanzania" & dhsyear == 2015)) %>% 
   filter(!(country ==  "Nepal" & dhsyear == 2016)) %>% 
   filter(country != "Lesotho")
@@ -45,8 +43,7 @@ master_file_full <- read_csv(here("data",  "master_data_file_march12_with_nation
 sl_predictions_internet_wom <- superlearner_train_and_predict(data = master_file, 
                                                  covar_list = c(fb_feats, off_feats),
                                                  outcome = "perc_used_internet_past12months_wght_age_15_to_49_wom",
-                                                 predict_data = master_file_full, return_fit = T
-                                                  ) 
+                                                 predict_data = master_file_full, return_fit = T) 
 
 ## sl predictions for internet men
 sl_predictions_internet_men <- superlearner_train_and_predict(data = master_file, 

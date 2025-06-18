@@ -14,8 +14,7 @@ source(here("code", "helpers.R"))
 
 ```{r}
 ## read in crosswalk 
-xwalk <- read_csv("/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/subnational/data_processing/result_gadm1_LMIC/dhs_cluster_gamd1_crosswalk.csv", 
-                  locale = locale(encoding = "ISO-8859-1")) %>% 
+xwalk <- read_csv(here("data", "dhs_cluster_gamd1_crosswalk.csv")) %>% 
   mutate(GID_0 = substring(GID_1, 1, 3))
 
 xwalk <- xwalk %>% 
@@ -31,11 +30,39 @@ xwalk <- xwalk %>%
 
 ```{r}
 # Define the list of country names in lowercase
-countries <- c("angola", "armenia", "benin", "burkina_faso", "burundi", "cambodia", 
-               "cameroon", "ethiopia", "gabon", "gambia", "guinea", "haiti", "india", 
-               "kenya", "liberia", "madagascar", "malawi", "mali", "mauritania", "nepal", 
-               "nigeria", "pakistan", "rwanda", "senegal", "sierra_leone", "south_africa", 
-               "tanzania", "timor-leste", "uganda", "zambia", "zimbabwe")
+countries <- c("angola", 
+               "armenia",
+               "benin",
+               "burkina_faso", 
+               "burundi",
+               "cambodia", 
+               "cameroon", 
+               "cote_divoire",
+               "ethiopia", 
+               "gabon",
+               "gambia",
+               "guinea",
+               "haiti", 
+               "india", 
+               "kenya",
+               "liberia",
+               "madagascar", 
+               "malawi", 
+               "mali",
+               "mauritania", 
+               "mozambique", 
+               "nepal", 
+               "nigeria", 
+               "pakistan",
+               "rwanda",
+               "senegal", 
+               "sierra_leone", 
+               "south_africa", 
+               "tanzania", 
+               "timor-leste", 
+               "uganda",
+               "zambia",
+               "zimbabwe")
  
 # Define a function to check if a folder name contains any country names
 folder_contains_country <- function(folder_name, countries) {
@@ -342,14 +369,39 @@ final_stats_mobile <- gender_ratios_mobile_long %>%
 combined_stats <- bind_rows(
   mutate(final_stats_mobile),
   mutate(final_stats_internet)
-)
+) %>% mutate(category = case_when(
+  name == "r2_women" & stat == "mobile" ~ "Mobile Women", 
+  name == "r2_men" & stat == "mobile" ~ "Mobile Men", 
+  name == "r2_ratio" & stat == "mobile" ~ "Mobile Gender Gap Index", 
+  name == "r2_women" & stat == "internet" ~ "Internet Women", 
+  name == "r2_men" & stat == "internet" ~ "Internet Men", 
+  name == "r2_ratio" & stat == "internet" ~ "Internet Gender Gap Index")) %>% 
+  select(category, perc_10, perc_50, perc_90, mean_50) 
+
+
+# Define the desired order of categories
+desired_order <- c("Mobile Women", 
+                   "Mobile Men",
+                   "Mobile Gender Gap Index",
+                   "Internet Women", 
+                   "Internet Men",
+                   "Internet Gender Gap Index")
+
+# Reorder your data frame
+combined_stats <- combined_stats %>%
+  mutate(category = factor(category, levels = desired_order)) %>%
+  arrange(category)
 
 # Convert to xtable
 latex_table <- xtable(combined_stats,
                       caption = "Comparison of R-Squared Statistics for Mobile and Internet",
                       label = "tab:stats_comparison",
                       digits = 3,
-                      file = here("tables", "superlearner_weights.tex"))
+                      file = here("figures", "superlearner_weights.tex"))
+## print table 
+print(latex_table, 
+      file = here("figures", "bootstrap_analysis.tex"),
+      include.rownames = FALSE)
 ```
 
 

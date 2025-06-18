@@ -1,0 +1,120 @@
+---
+title: "Long file"
+author: Casey Breen
+---
+
+
+```{r}
+## libary packages + custom functions 
+library(here)
+source(here("code", "helpers.R"))
+```
+
+```{r}
+## ground truth 
+ground_truth_wide <- read_csv('/Users/caseybreen/Library/CloudStorage/Dropbox-NuffieldCollege/Casey Breen/dgg_research/subnational/analysis_files/supplymentary_files/outcome/master_file_for_repetitive_measurement.csv') 
+
+## ground truth 
+ground_truth <- ground_truth %>%
+  group_by(gid_0, gid_1, year, survey_type) %>%
+  mutate(sample_size = case_when(
+  outcome %in% c("internet_fm_ratio", "mobile_fm_ratio") & all(is.na(sample_size)) ~ NA_real_,
+  outcome %in% c("internet_fm_ratio", "mobile_fm_ratio") ~ min(sample_size, na.rm = TRUE),
+  TRUE ~ sample_size
+))
+
+## ground truth 
+ground_truth %>% 
+  write_csv(here("data", "subnational_ground_truth_wide.csv"))
+```
+
+
+
+```{r}
+## Read in predictions 
+predictions <- read_csv(here("out", "predictions_with_uncertainty.csv"))
+
+## Subnational file for repetitive measurement  
+ground_truth <- read_csv(here("data", "subnational_master_file_for_repetitive_measurement.csv"))
+
+# Example: Get GADM1 names for Nigeria
+gadm1_map <- read_sf(here("data", "gadm_410-levels.gpkg"), layer = "ADM_1")
+```
+
+
+Clean subnational 
+
+```{r}
+## LSMS Estimates 
+ground_truth_long <- ground_truth %>%
+  mutate(
+    mobile_fm_ratio   = perc_owns_mobile_telephone_wght_age_15_to_49_wom /
+                        perc_owns_mobile_telephone_wght_age_15_to_49_men,
+    internet_fm_ratio = perc_used_internet_past12months_wght_age_15_to_49_wom /
+                        perc_used_internet_past12months_wght_age_15_to_49_men
+  ) %>%
+  select(
+    gid_0, 
+    gid_1,
+    year,
+    survey_type,
+    internet_women     = perc_used_internet_past12months_wght_age_15_to_49_wom,
+    internet_men       = perc_used_internet_past12months_wght_age_15_to_49_men,
+    mobile_women       = perc_owns_mobile_telephone_wght_age_15_to_49_wom,
+    mobile_men         = perc_owns_mobile_telephone_wght_age_15_to_49_men,
+    mobile_fm_ratio,
+    internet_fm_ratio,
+    internet_n_sample_f, internet_n_sample_m,
+    mobile_n_sample_f, mobile_n_sample_m
+  ) %>%
+  pivot_longer(
+    cols = c(internet_women, internet_men, mobile_women, mobile_men,
+             mobile_fm_ratio, internet_fm_ratio),
+    names_to = "outcome",
+    values_to = "observed"
+  ) %>%
+  mutate(
+    sample_size = case_when(
+      outcome == "mobile_women"      ~ mobile_n_sample_f,
+      outcome == "mobile_men"        ~ mobile_n_sample_m,
+      outcome == "internet_women"    ~ internet_n_sample_f,
+      outcome == "internet_men"      ~ internet_n_sample_m,
+      outcome == "mobile_fm_ratio"   ~ pmin(mobile_n_sample_f, mobile_n_sample_m),
+      outcome == "internet_fm_ratio" ~ pmin(internet_n_sample_f, internet_n_sample_m),
+      TRUE ~ NA_real_
+    )
+  ) %>% 
+  select(gid_0, gid_1, year, outcome, observed, sample_size, survey_type)
+
+## LSMS Estimates 
+ground_truth_long <- ground_truth_long 
+# %>% 
+#   filter(!(gid_0 == "NGA" & outcome %in% c("mobile_women", "mobile_men", "mobile_fm_ratio"))) %>% 
+#   filter(sample_size > 150)
+
+## top code at 1 
+ground_truth_long <-  ground_truth_long %>%
+  mutate(observed = case_when(observed > 1 ~ 1, TRUE ~ observed))
+
+
+write_csv(ground_truth_long, here("data", "subnational_ground_truth.csv"))
+```
+
+## Complete list of all surveys with multiple 
+
+```{r}
+## identify surveys with multiple 
+multi_survey <- ground_truth_long %>% 
+  count(gid_0, year, survey_type) %>% 
+  group_by(gid_0) %>% 
+  filter(n() > 1) %>% 
+  arrange(desc(gid_0)) %>% 
+  select(gid_0, year, survey_type)
+```
+
+
+
+
+
+
+

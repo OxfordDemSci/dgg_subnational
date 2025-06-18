@@ -177,8 +177,6 @@ gini_plot <- gini_results %>%
 ```{r}
 trend_plot_combined <- cowplot::plot_grid(trend_plot, gini_plot, ncol = 1, labels = c("", "D"))
 
-ggsave(plot = trend_plot_combined, filename = here("figures", "trend_plot_combined.png"), height = 8, width = 10)
-
 ggsave(plot = trend_plot_combined , filename = here("figures", "fig7_trend_plot_combined.pdf"), height = 8, width = 11)
 ```
 
