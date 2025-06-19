@@ -19,7 +19,7 @@ source(here("code", "helpers.R"))
 ```{r}
 ## read in training and test datasets 
 master_file <- read_csv(here("data","master_data_file_march12_with_national.csv")) %>% 
-  filter(!(country ==  "Tanzania" & dhsyear == 2015)) %>% 
+  filter(!(country ==  "Tanzania" & dhsyear == 2015)) %>% ## drop earlier surveys 
   filter(!(country ==  "Nepal" & dhsyear == 2016)) %>% 
   filter(!(country == "Lesotho"))
 

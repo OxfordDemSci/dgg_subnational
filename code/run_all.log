@@ -1,14 +1,6 @@
-================================
-Running  02_make_predictions.Rmd 
-Finished with 02_make_predictions.Rmd, time:: 177.513 sec elapsed
-================================
-================================
-Running  03_model_performance.Rmd 
-Finished with 03_model_performance.Rmd, time:: 37.338 sec elapsed
-================================
-================================
-Running  04_within_country_analysis.Rmd 
-Finished with 04_within_country_analysis.Rmd, time:: 1.463 sec elapsed
-================================
-================================
-Running  05_geo_map.Rmd 
+ [1] "02_make_predictions.Rmd"           "03_model_performance.Rmd"          "04_within_country_analysis.Rmd"    "05_geo_map.Rmd"                    "06_feature_importance.Rmd"         "07_superlearner_weights.Rmd"      
+ [7] "08_residual_analysis.Rmd"          "09_var_explained.Rmd"              "11_disparities_plots.Rmd"          "13_var_coverage_table.Rmd"         "14_trends.Rmd"                     "15_tanzania_analysis.Rmd"         
+[13] "16_validation_of_uncertainty.Rmd"  "17_lsms_comparison.Rmd"            "18_mics_comparison.Rmd"            "19_mics_comparison_national.Rmd"   "20_trends_validation.Rmd"          "21_trend_validation_aggregate.Rmd"
+Error: unexpected '/' in "length(https:/"
+[1] 18
+

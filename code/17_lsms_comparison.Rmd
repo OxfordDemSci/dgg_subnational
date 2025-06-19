@@ -154,6 +154,7 @@ ggsave(plot = lsms_plot, filename = here("figures", "lsms_comparison_subnational
 ```{r}
 ## ground truth 
 dhs_vs_lsms_df <- ground_truth_dhs %>% 
+  filter(!(survey_type == "dhs" & gid_0 == "SEN" & year != 2019)) %>% 
   rename(observed_dhs = observed, year_dhs = year) %>% 
   left_join(ground_truth_lsms, by = c("gid_0", "gid_1", "outcome")) %>% 
   mutate(survey_diff = year_dhs - year) %>% 
