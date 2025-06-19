@@ -4,11 +4,11 @@ This repository contains code and materials to replicate ["Mapping subnational g
 
 ### Replication Package
 
-This repository includes code to replicate all figures and tables in the paper. Please note that to run the bootstrap replication code, you will need access to all DHS surveys from 2015-2022.  
+This repository includes code to replicate all figures and tables in the paper. Please note that to run the code, you will need access to data stored in a dedicated [OSF repository](https://osf.io/5e8wf/). 
 
 1. Clone this repository
-2. Download all data from the `/data/` repository
-2. Run the `00_run_all.Rmd` script, which will run all code (or run scripts `01` to `10` individually)
+2. Download the `data.zip` file from the [OSF repository](https://osf.io/5e8wf/), move it to the root level of this repository, and unzip it. 
+2. Run the `00_run_all.Rmd` script, which will run all code (or run scripts `01` to `21` individually)
 
 #### Computing 
 
@@ -18,7 +18,7 @@ All computations were carried out on 2023 MacBook Pro with an Apple M2 Pro chip,
 
 Please download the open science framework repository. In the same directory as your /code/ folder, create a /data/ folder and place all data files in this folder.
 
-Note: Running script 12, which create a table with number of interviews per DHS survey, requires access to the underlying women and men's DHS microdata recodes. These files are available upon registration from the [DHS program](https://dhsprogram.com/)
+Note: Running script 10_bootstrap_analysis and script 12_dhs_table requires access to the underlying women and men's DHS microdata files. These files are available upon registration from the [DHS program](https://dhsprogram.com/). 
 
 #### Code 
 

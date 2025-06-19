@@ -361,13 +361,15 @@ media data”</a></p>
 <div id="replication-package" class="section level3">
 <h3>Replication Package</h3>
 <p>This repository includes code to replicate all figures and tables in
-the paper. Please note that to run the bootstrap replication code, you
-will need access to all DHS surveys from 2015-2022.</p>
+the paper. Please note that to run the code, you will need access to
+data stored in a dedicated <a href="https://osf.io/5e8wf/">OSF
+repository</a>.</p>
 <ol style="list-style-type: decimal">
 <li>Clone this repository</li>
-<li>Download all data from the <code>/data/</code> repository</li>
+<li>Download the <code>data.zip</code> file from the <a href="https://osf.io/5e8wf/">OSF repository</a>, move it to the root
+level of this repository, and unzip it.</li>
 <li>Run the <code>00_run_all.Rmd</code> script, which will run all code
-(or run scripts <code>01</code> to <code>10</code> individually)</li>
+(or run scripts <code>01</code> to <code>21</code> individually)</li>
 </ol>
 <div id="computing" class="section level4">
 <h4>Computing</h4>
@@ -379,10 +381,9 @@ M2 Pro chip, 16GB memory, and Sonoma 14.1 operating system.</p>
 <p>Please download the open science framework repository. In the same
 directory as your /code/ folder, create a /data/ folder and place all
 data files in this folder.</p>
-<p>Note: Running script 12, which create a table with number of
-interviews per DHS survey, requires access to the underlying women and
-men’s DHS microdata recodes. These files are available upon registration
-from the <a href="https://dhsprogram.com/">DHS program</a></p>
+<p>Note: Running script 10_bootstrap_analysis and script 12_dhs_table
+requires access to the underlying women and men’s DHS microdata files.
+These files are available upon registration from the <a href="https://dhsprogram.com/">DHS program</a>.</p>
 </div>
 <div id="code" class="section level4">
 <h4>Code</h4>
@@ -394,65 +395,55 @@ following script to replicate all figures and tables:</p>
 <p>Alternatively, researchers can run the following files individually
 in order:</p>
 <ul>
-<li><strong><code>00_run_all.Rmd</code></strong> – Master script to run
-the full analysis pipeline in sequence.</li>
-<li><strong><code>01_fit_models_crossvalidation.Rmd</code></strong> –
-Fits subnational prediction models using both leave-one-country-out
-(LOCO) and 10-fold cross-validation.</li>
-<li><strong><code>02_make_predictions.Rmd</code></strong> – Uses the
-trained models to generate predictions for all LMICs and estimates
-associated uncertainty.</li>
-<li><strong><code>03_model_performance.Rmd</code></strong> – Produces
-summary figures and tables for overall model performance metrics (e.g.,
-RMSE, R²).</li>
-<li><strong><code>04_within_country_analysis.Rmd</code></strong> –
-Evaluates and visualizes within-country performance across models.</li>
-<li><strong><code>05_geo_map.Rmd</code></strong> – Generates geographic
-visualizations (maps) of predicted values and associated prediction
-errors.</li>
-<li><strong><code>06_feature_importance.Rmd</code></strong> – Assesses
-and visualizes the relative importance of input features across
-models.</li>
-<li><strong><code>07_superlearner_weights.Rmd</code></strong> – Computes
-and reports SuperLearner ensemble weights, indicating the relative
-contribution of each learner.</li>
-<li><strong><code>08_residual_analysis.Rmd</code></strong> – Analyzes
-and plots model residuals to assess spatial and structural model
-fit.</li>
-<li><strong><code>09_var_explained.Rmd</code></strong> – Decomposes
-variance explained into within- and between-country components.</li>
-<li><strong><code>10_bootstrap_analysis.Rmd</code></strong> – Runs
-bootstrap procedures to estimate uncertainty around key model metrics,
-including R².</li>
-<li><strong><code>11_disparities_plots.Rmd</code></strong> – Generates
-plots to explore subnational disparities and patterns in predicted
-outcomes.</li>
-<li><strong><code>12_dhs_table.Rmd</code></strong> – Constructs an
-appendix-style table summarizing the number of individuals sampled in
-each DHS survey (requires access to raw DHS microdata).</li>
-<li><strong><code>13_var_coverage_table.Rmd</code></strong> – Produces a
-table indicating availability of key predictor variables across
-country-year units.</li>
-<li><strong><code>14_trends.Rmd</code></strong> – Analyzes and
-visualizes time trends in model predictions and covariates.</li>
-<li><strong><code>15_tanzania_analysis.Rmd</code></strong> – Focused
-analysis of model results and validation in Tanzania as a case
-study.</li>
-<li><strong><code>16_validation_of_uncertainty.Rmd</code></strong> –
-Validates uncertainty estimates through empirical coverage and interval
-accuracy checks.</li>
-<li><strong><code>17_lsms_comparison.Rmd</code></strong> – Compares
-predictions against external LSMS-based benchmarks where available.</li>
-<li><strong><code>18_mics_comparison.Rmd</code></strong> – Compares
-predictions to MICS data at the subnational level.</li>
-<li><strong><code>19_mics_comparison_national.Rmd</code></strong> –
-Compares predictions to MICS at the national level for robustness.</li>
-<li><strong><code>20_trends_validation.Rmd</code></strong> – Validates
-predicted trends over time against external benchmarks and survey
-data.</li>
-<li><strong><code>21_trend_validation_aggregate.Rmd</code></strong> –
-Aggregates trend validations across all countries and produces summary
-figures.</li>
+<li><code>00_run_all.Rmd</code> – Master script to run the full analysis
+pipeline in sequence.</li>
+<li><code>01_fit_models_crossvalidation.Rmd</code> – Fits subnational
+prediction models using both leave-one-country-out (LOCO) and 10-fold
+cross-validation.</li>
+<li><code>02_make_predictions.Rmd</code> – Uses the trained models to
+generate predictions for all LMICs and estimates associated
+uncertainty.</li>
+<li><code>03_model_performance.Rmd</code> – Produces summary figures and
+tables for overall model performance metrics (e.g., RMSE, R²).</li>
+<li><code>04_within_country_analysis.Rmd</code> – Evaluates and
+visualizes within-country performance across models.</li>
+<li><code>05_geo_map.Rmd</code> – Generates geographic visualizations
+(maps) of predicted values and associated prediction errors.</li>
+<li><code>06_feature_importance.Rmd</code> – Assesses and visualizes the
+relative importance of input features for each model.</li>
+<li><code>07_superlearner_weights.Rmd</code> – Computes and reports
+SuperLearner ensemble weights, indicating the relative contribution of
+each learner.</li>
+<li><code>08_residual_analysis.Rmd</code> – Analyzes and plots model
+residuals to assess spatial and structural model fit.</li>
+<li><code>09_var_explained.Rmd</code> – Decomposes variance explained
+into within- and between-country components.</li>
+<li><code>10_bootstrap_analysis.Rmd</code> – Runs bootstrap procedures
+to estimate uncertainty around DHS ground truth.</li>
+<li><code>11_disparities_plots.Rmd</code> – Generates plots to explore
+subnational disparities and patterns in predicted outcomes.</li>
+<li><code>12_dhs_table.Rmd</code> – Constructs a table summarizing the
+number of individuals sampled in each DHS survey (requires access to raw
+DHS microdata).</li>
+<li><code>13_var_coverage_table.Rmd</code> – Produces a table indicating
+availability of key predictor variables across country-year units.</li>
+<li><code>14_trends.Rmd</code> – Analyzes and visualizes time trends in
+model predictions and covariates.</li>
+<li><code>15_tanzania_analysis.Rmd</code> – Focused analysis of model
+results and validation in Tanzania as a case study.</li>
+<li><code>16_validation_of_uncertainty.Rmd</code> – Validates
+uncertainty estimates through empirical coverage and interval accuracy
+checks.</li>
+<li><code>17_lsms_comparison.Rmd</code> – Compares subnational
+predictions against LSMS.</li>
+<li><code>18_mics_comparison.Rmd</code> – Compares subnational
+predictions against MICS</li>
+<li><code>19_mics_comparison_national.Rmd</code> – Compares predictions
+to MICS at the national level for robustness.</li>
+<li><code>20_trends_validation.Rmd</code> – Validates predicted trends
+over time against external benchmarks and survey data.</li>
+<li><code>21_trend_validation_aggregate.Rmd</code> – Aggregates trend
+validations across all countries and produces summary figures.</li>
 </ul>
 </div>
 </div>

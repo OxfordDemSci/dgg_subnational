@@ -4,9 +4,7 @@ auhor: "Casey Breen"
 ---
 
 Summary: Generate figures and tables summarizing model performance 
-
-* write out latex tables directly 
-
+ 
 ```{r}
 ## libary packages + custom functions 
 library(here)

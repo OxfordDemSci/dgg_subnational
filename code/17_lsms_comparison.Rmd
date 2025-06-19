@@ -3,7 +3,7 @@ title: "LSMS Comparison"
 author: Casey Breen
 ---
 
-## additional checks and analyses 
+Summary: LSMS comparison (subnational-level)
 
 ```{r}
 ## libary packages + custom functions 

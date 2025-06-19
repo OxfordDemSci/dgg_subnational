@@ -22,7 +22,7 @@ master_file <- read_csv(here("data", "master_data_file_march12_with_national.csv
                                TRUE ~ 0)) %>% 
   dplyr::select(gid_1, country, all_of(c(dhs_vars, fb_feats, off_feats))) %>% 
   filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% drop_na() %>% 
-  filter(!(country ==  "Tanzania" & dhsyear == 2015)) %>% 
+  filter(!(country ==  "Tanzania" & dhsyear == 2015)) %>%  ## drop earlier surveys and Lesotho (only became available after R&R)
   filter(!(country ==  "Nepal" & dhsyear == 2016)) %>% 
   filter(country != "Lesotho")
 
@@ -78,7 +78,7 @@ predictions_internet <- bind_rows(sl_predictions_internet_wom[[2]], sl_predictio
     TRUE ~ predicted_perc_used_internet_past12months_wght_age_15_to_49_fm_ratio))
 ```
 
-## uncertainty predictions for mobile 
+## Uncertainty predictions for mobile 
 
 ```{r}
 ## sl predictions 

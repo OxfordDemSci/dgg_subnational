@@ -3,7 +3,7 @@ title: "National comparison"
 author: Casey Breen
 ---
 
-Summary: Make national-level comparison with 
+Summary: Make national-level comparison with MICS surveys 
 
 ```{r}
 ## libary packages + custom functions 

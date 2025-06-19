@@ -3,7 +3,7 @@ title: "Validation of trends"
 author: Casey Breen
 ---
 
-Summary: Validate trends estimates
+Summary: Validate trends estimates (aggregate plots)
 
 ```{r}
 ## libary packages + custom functions 

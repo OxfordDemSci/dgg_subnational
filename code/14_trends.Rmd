@@ -3,7 +3,7 @@ title: "Make trends figure"
 author: Casey Breen
 ---
 
-Summary: create trend figure 
+Summary: Create trend figure for main paper 
 
 ```{r}
 ## libary packages + custom functions 

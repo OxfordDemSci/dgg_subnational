@@ -3,7 +3,7 @@ title: "MICS Surveys"
 author: Casey Breen
 ---
 
-Summary: Calculate subnational estimates for MICS surveys. 
+Summary: Calculate subnational estimates for MICS surveys 
 
 
 ```{r}

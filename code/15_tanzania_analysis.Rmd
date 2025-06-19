@@ -3,7 +3,7 @@ title: "Tanzania"
 author: Casey Breen
 ---
 
-Summary: Quick analysis for Tanzania 2015
+Summary: Analysis estimates for Tanzania 2015
 
 ```{r}
 ## libary packages + custom functions 

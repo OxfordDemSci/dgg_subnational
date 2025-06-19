@@ -17,7 +17,7 @@ source(here("code", "helpers.R"))
 ## list of Rmd files excluding '00_run_all.Rmd's
 rmd_files <- list.files(path = here("code"), pattern = "\\.Rmd$")
 
-## Long script that take a long time to run 
+## Drop Longer script that take a long time to run (best to run individually)
 rmd_files <- rmd_files[!rmd_files %in% c("00_run_all.Rmd", "01_fit_models_crossvalidation.Rmd", "10_bootstrap_analysis.Rmd", "12_dhs_table.Rmd")]
 
 ## set seed for reproducibility
