@@ -36,8 +36,13 @@ pacman::p_load(
   tidyverse,    # data manipulation and visualization
   conflicted,   # custom functions
   caret,        # modeling functions
-  ineq,           # machine learning 
-  ggalt
+  ineq,         # machine learning 
+  ggalt,        # special ggplot extensions 
+  glmnet,       # LASSO / Ridge / Elastic Net (for Lrnr_glmnet)
+  polspline,    # flexible spline regression (for Lrnr_polspline)
+  gbm,          # gradient boosting machine (for Lrnr_gbm)
+  xgboost,      # XGBoost learner (for Lrnr_xgboost)
+  hal9001       # highly adaptive lasso (for Lrnr_hal9001)
 )
 
 ## custom functions 
