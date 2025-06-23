@@ -43,8 +43,7 @@ predictions_uncertainty <- read_csv(here("out", "predictions_with_uncertainty.cs
 
 ## loco predictions 
 loco_predictions <- read_csv(here("out", "combined_predictions_lmics_national_covars_full.csv")) %>% 
-  filter(model == "superlearner" & feature_set == "fb_and_offline" & cv_method == "loco") %>% 
-  filter()
+  filter(model == "superlearner" & feature_set == "fb_and_offline" & cv_method == "loco") 
 ```
 
 
