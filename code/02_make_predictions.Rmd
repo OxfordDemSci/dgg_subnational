@@ -74,7 +74,7 @@ predictions_internet <- bind_rows(sl_predictions_internet_wom[[2]], sl_predictio
     TRUE ~ predicted_perc_used_internet_past12months_wght_age_15_to_49_men)) %>% 
   mutate(predicted_perc_used_internet_past12months_wght_age_15_to_49_fm_ratio = case_when(
     predicted_perc_used_internet_past12months_wght_age_15_to_49_fm_ratio < 0 ~ 0,
-    predicted_perc_used_internet_past12months_wght_age_15_to_49_fm_ratio > 1.5 ~ 1.5,
+    predicted_perc_used_internet_past12months_wght_age_15_to_49_fm_ratio > 1 ~ 1,
     TRUE ~ predicted_perc_used_internet_past12months_wght_age_15_to_49_fm_ratio))
 ```
 
@@ -119,7 +119,7 @@ predictions_mobile <- bind_rows(sl_predictions_mobile_wom[[2]], sl_predictions_m
     TRUE ~ predicted_perc_owns_mobile_telephone_wght_age_15_to_49_men)) %>% 
   mutate(predicted_perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio = case_when(
     predicted_perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio < 0 ~ 0,
-    predicted_perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio > 1.1 ~ 1.1,
+    predicted_perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio > 1 ~ 1,
     TRUE ~ predicted_perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio))
 ```
 

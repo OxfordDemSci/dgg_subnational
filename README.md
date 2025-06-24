@@ -1,35 +1,68 @@
 ## Mapping subnational gender gaps in internet and mobile adoption using social media data
 
-This repository contains code and materials to replicate ["Mapping subnational gender gaps in internet and mobile adoption using social media data"]([https://osf.io/](https://osf.io/preprints/socarxiv/qnzsw_v2))
+[![OSF](https://img.shields.io/badge/OSF-project-blue)](https://osf.io/5e8wf/)
+[![Generic badge](https://img.shields.io/badge/R-4.3.1-orange.svg)](https://cran.r-project.org/bin/macosx/)
+[![Generic badge](https://img.shields.io/badge/License-GNU-<green>.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
+[![Generic badge](https://img.shields.io/badge/Maintained-Yes-red.svg)]()
+
+
+This repository contains code and materials to replicate the paper ["Mapping subnational gender gaps in internet and mobile adoption using social media data"]([https://osf.io/](https://osf.io/preprints/socarxiv/qnzsw_v2))
+
+
+**Abstract**: The digital revolution has ushered in many societal and economic benefits. Yet access to
+digital technologies such as mobile phones and internet remains highly unequal, especially
+by gender in the context of low- and middle-income countries (LMICs). While national-level
+estimates are increasingly available for many countries, reliable, quantitative estimates of
+digital gender inequalities at the subnational level are lacking. These estimates, however, are
+essential for monitoring gaps within countries and implementing targeted interventions within
+the global sustainable development goals, which emphasize the need to close inequalities
+both between and within countries. We develop estimates of internet and mobile adoption by
+gender and digital gender gaps at the subnational level for 2,075 regions in 117 LMICs from
+2015 through 2025, a context where digital penetration is low and national-level gender gaps
+disfavoring women are large. We construct these estimates by applying machine-learning
+algorithms to Facebook user counts, geospatial data, development indicators, and population
+composition data. We calibrate and assess the performance of these algorithms using ground-
+truth data from subnationally-representative household survey data from 33 LMICs. Our
+results reveal striking disparities in access to mobile and internet technologies between and
+within LMICs. These disparities imply that as of 2025, women are 19% less likely to use the
+internet and 8% less likely to own a mobile phone in LMICs, corresponding to over 190 million
+fewer women owning a mobile phone and over 320 million fewer women using the interne
+
+### Interactive Dashboard
+
+------------
+
+An interactive dashboard displaying these estimates is available here: [digitalgendergaps.org/dashboard/](https://digitalgendergaps.org/dashboard/)
+
 
 ### Replication Package
 
-This repository includes code to replicate all figures and tables in the paper. Please note that to run the code, you will need access to data stored in a dedicated [OSF repository](https://osf.io/5e8wf/). 
+------------
+
+
+This repository includes code to replicate all figures and tables in the paper. To replicate, follow the steps outlined below: 
 
 1. Clone this repository
 2. Download the `data.zip` file from the [OSF repository](https://osf.io/5e8wf/), move it to the root level of this repository, and unzip it. 
 2. Run the `00_run_all.Rmd` script, which will run all code (or run scripts `01` to `21` individually)
 
-#### Computing 
+### Data 
 
-All computations were carried out on 2023 MacBook Pro with an Apple M2 Pro chip, 16GB memory, and Sonoma 14.1 operating system.
-
-Note: The SL3 package is no longer available on CRAN, and needs to be installed directly from [Github](https://github.com/tlverse/sl3):  
-
-```
-remotes::install_github("tlverse/sl3")
-```
+------------
 
 
-#### Data 
+Please download the `data.zip` file from the Open Science Framework repository. At the root level of this repository (alongside the `code/` folder), unzip 
+the archive to create a `data/` folder containing all required data files for the analysis.
 
-Please download the open science framework repository. In the same directory as your /code/ folder, create a /data/ folder and place all data files in this folder.
+**Note**: Running the scripts `10_bootstrap_analysis.Rmd` and `12_dhs_table.Rmd` requires access to the underlying women
+and men's DHS microdata files. These files are available from the [DHS program](https://dhsprogram.com/) following registration. 
 
-Note: Running script 10_bootstrap_analysis and script 12_dhs_table requires access to the underlying women and men's DHS microdata files. These files are available upon registration from the [DHS program](https://dhsprogram.com/). 
+### Code 
 
-#### Code 
+------------
 
-After downloading the required data, researchers can run the following script to replicate all figures and tables: 
+
+After downloading the required data, researchers can run the following script to replicate all figures and tables in the paper: 
   
 - `00_run_all.Rmd` - this file runs all scripts. 
 
@@ -60,7 +93,7 @@ Alternatively, researchers can run the following files individually in order:
 
 ### Authors
 
-- [Casey Breen](https:://caseybreen.com)
+- [Casey Breen](https://caseybreen.com)
 - Masoomali Fatehkia
 - Jiani Yan
 - Xinyi Zhao
@@ -68,10 +101,33 @@ Alternatively, researchers can run the following files individually in order:
 - Ingmar Weber
 - Ridhi Kashyap
 
+## Acknowledgements 
 
+For helpful discussions and feedback, we thank Dennis Feehan, Michelle Niemann, Anna Bolgrien,
+Sharada Srinivasan, and participants of the PAA 2024 “Digital Demography” session, the EPC 2024 “Modelling Subnational and
+Spatial Variation” session, the Digital Inequality and Sustainable Development workshop, the Johns Hopkins Population Health
+seminar series, the Max Planck Institute for Demographic Research Digital and Computational Demography seminar series, the
+Sciences Po Digital Inequality Symposium, and the Leverhulme Centre for Demographic Science seminar series. We thank Jiaxuan
+Li for excellent research assistance. The authors acknowledge financial support from the Bill and Melinda Gates Foundation
+(INV-045370), the Leverhulme Trust (Grant RC-2018-003) for the Leverhulme Centre for Demographic Science, and the Alexander
+von Humboldt Foundation and its founder, the Federal Ministry of Education and Research (Bundesministerium fur Bildung und
+Forschung).
 
-## System info:
+## Replication
 
+All analyses and computations were carried out on 2023 MacBook Pro with an Apple M2 Pro chip, 16GB memory, and Sonoma 14.1 operating system.
+
+All analyses were originally conducted using R version 4.3.1 and the package versions recorded below in the attached session info file. 
+Re-running the pipeline with updated R or package versions, or a different seed, may yield minor numerical differences. 
+These do not affect the paper’s results or conclusions.
+
+**Note**: The SL3 package is no longer available on CRAN, and needs to be installed directly from [Github](https://github.com/tlverse/sl3):  
+
+```
+remotes::install_github("tlverse/sl3")
+```
+
+## Session info:
 
 ```
 sessionInfo()

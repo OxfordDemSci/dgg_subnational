@@ -48,10 +48,10 @@ pacman::p_load(
   janitor       # janitor package for data cleaning   
 )
 
-## custom functions 
-conflict_prefer("select", "dplyr")
-conflict_prefer("filter", "dplyr")
-conflict_prefer("shift", "data.table")
+## Explicitly say what package in a conflict  
+suppressMessages(conflict_prefer("select", "dplyr"))
+suppressMessages(conflict_prefer("filter", "dplyr"))
+suppressMessages(conflict_prefer("shift", "data.table"))
 
 ## Source .Rmd 
 
@@ -393,12 +393,13 @@ superlearner_train_and_predict <- function(data,
   sl_fit <- sl$train(task = superlearner_task)
   
   # Create SL3 task for secondary data for making predictions
-  prediction_task <- make_sl3_Task(
+  ## Here we suppress a warning the says there's missing outcome data — there should be (this is fine for prediction)
+  prediction_task <- suppressWarnings(make_sl3_Task(
     data = predict_data,
     covariates = covars,
     outcome = outcome,
     outcome_type = "continuous"
-  )
+  ))
   
   # Make predictions using superlearner
   secondary_predictions <- data.frame(
