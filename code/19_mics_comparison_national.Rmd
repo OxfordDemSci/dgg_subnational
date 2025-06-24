@@ -14,20 +14,20 @@ source(here("code", "helpers.R"))
 
 ```{r}
 ### read in training and test datasets 
-master_file <- fread(here("data", "master_data_file_march12_with_national.csv")) %>%
+master_file <- read_csv(here("data", "master_data_file_march12_with_national.csv")) %>%
   filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% 
   drop_na() %>% 
   filter(year != 2024)
 
-master_file_full <- fread(here("data", "master_data_file_march12_with_national.csv")) %>%
+master_file_full <- read_csv(here("data", "master_data_file_march12_with_national.csv")) %>%
   filter(!is.na(fb_pntr_18p_female))
 
 ## read in predictions
-predictions <- fread(here("out", "predictions_with_uncertainty.csv")) %>% 
+predictions <- read_csv(here("out", "predictions_with_uncertainty.csv")) %>% 
   filter(year != 2024)
 
 ## ground truth data 
-ground_truth <- fread(here("data", "national_ground_truth.csv")) 
+ground_truth <- read_csv(here("data", "national_ground_truth.csv")) 
 ```
 
 
@@ -137,7 +137,7 @@ ggsave(plot = mics_comparison_fig, filename = here("figures", "mics_comparison.p
 
 ```{r}
 ## read in predictions
-predictions_wide <- fread(here("out", "predictions_wide.csv")) 
+predictions_wide <- read_csv(here("out", "predictions_wide.csv")) 
 
 predictions_wide <- predictions_wide %>% 
   left_join(master_file_full, by = c("gid_0", "gid_1", "year", "month"))

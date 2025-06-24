@@ -12,9 +12,15 @@ library(here)
 source(here("code", "helpers.R"))
 
 ## read in training and test datasets 
-master_file <- read_csv(here("data", "master_data_file_march12_with_national.csv")) %>% 
-  dplyr::select(country, all_of(c(dhs_vars, fb_feats, off_feats))) %>% 
-  filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% drop_na() 
+master_file <- read_csv(here("data", "master_data_file_march12_with_national.csv")) %>%
+  janitor::clean_names() %>% 
+  mutate(continent = case_when(continent == "Africa" ~ 1,
+                               TRUE ~ 0)) %>% 
+  dplyr::select(gid_1, country, all_of(c(dhs_vars, fb_feats, off_feats))) %>% 
+  filter(!is.na(perc_used_internet_past12months_wght_age_15_to_49_wom)) %>% drop_na() %>% 
+  filter(!(country ==  "Tanzania" & dhsyear == 2015)) %>%  ## drop earlier surveys and Lesotho (only became available after R&R)
+  filter(!(country ==  "Nepal" & dhsyear == 2016)) %>% 
+  filter(country != "Lesotho")
 ```
 
 ## Read in data 
@@ -48,7 +54,8 @@ learner_names <- c("glm", "lasso", "ridge", "elastic_new", "poly_spline", "range
 names(learners) <- learner_names
 
 # Create super learner stack
-stack <- make_learner(Stack, learners)
+#stack <- make_learner(Stack, learners)
+stack <- sl3::Stack$new(learners)
 
 # Extract covariates from training data
 covars <- colnames(master_file %>% dplyr::select(all_of(covar_list)))
@@ -77,8 +84,8 @@ for (outcome in outcomes) {
   sl_fit <- sl$train(task = superlearner_task)
   
   # Extract weights from the Lrnr_nnls metalearner
-  nnls_fit <- sl_fit$fit_object$full_fit$learner_fits$Lrnr_nnls_FALSE
-  weights <- nnls_fit$coefficients
+  nnls_fit <- sl_fit$fit_object$cv_meta_fit
+  weights <- nnls_fit$fit_object$coefficients
   coef_df <- data.frame(
     outcome = rep(outcome, length(weights)),
     learner = learner_names,

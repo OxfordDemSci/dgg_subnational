@@ -10,7 +10,7 @@ if (!require("pacman")) install.packages("pacman")
 # Use pacman to load all necessary packages
 pacman::p_load(
   here,         # relative file paths
-  data.table,   # data wrangling
+#  data.table,   # data wrangling
   knitr,        # dynamic report generation
   SuperLearner, # ensemble learning
   sl3,          # machine learning
@@ -42,13 +42,16 @@ pacman::p_load(
   polspline,    # flexible spline regression (for Lrnr_polspline)
   gbm,          # gradient boosting machine (for Lrnr_gbm)
   xgboost,      # XGBoost learner (for Lrnr_xgboost)
-  hal9001,       # highly adaptive lasso (for Lrnr_hal9001)
-  stats        # stats package s
+  hal9001,      # highly adaptive lasso (for Lrnr_hal9001)
+  stats,        # stats packages (for Lrnr_glm)
+  tictoc,       # package for timing how long scripts take 
+  janitor       # janitor package for data cleaning   
 )
 
 ## custom functions 
 conflict_prefer("select", "dplyr")
 conflict_prefer("filter", "dplyr")
+conflict_prefer("shift", "data.table")
 
 ## Source .Rmd 
 
@@ -131,6 +134,7 @@ compute_mae <- function(predicted, observed) {
 
 
 run_loco_model <- function(data, outcome, covar_list = c(fb_feats, off_feats)) {
+  
   # Define list of countries
   countries <- unique(data$country)
   
@@ -145,14 +149,14 @@ run_loco_model <- function(data, outcome, covar_list = c(fb_feats, off_feats)) {
     gadm1_holdout <- data %>% filter(country == holdout_country)
     
     # Define learners for the super learner ensemble
-    lrn_glm <- make_learner(Lrnr_glm)
-    lrn_lasso <- make_learner(Lrnr_glmnet)
+    lrn_glm <- make_learner("Lrnr_glm")
+    lrn_lasso <- make_learner("Lrnr_glmnet")
     lrn_ridge <- Lrnr_glmnet$new(alpha = 0)
-    lrn_enet.5 <- make_learner(Lrnr_glmnet, alpha = 0.5)
+    lrn_enet.5 <- make_learner("Lrnr_glmnet", alpha = 0.5)
     lrn_polspline <- Lrnr_polspline$new()
-    lrn_ranger100 <- make_learner(Lrnr_ranger, num.trees = 100)
+    lrn_ranger100 <- make_learner("Lrnr_ranger", num.trees = 100)
     lrn_hal_faster <- Lrnr_hal9001$new(max_degree = 2, reduce_basis = 0.05)
-    lrnr_gbm <- make_learner(Lrnr_gbm)
+    lrnr_gbm <- make_learner("Lrnr_gbm")
     lrnr_xgb <- Lrnr_xgboost$new()
     
     # Create list of learners and assign names
@@ -160,7 +164,7 @@ run_loco_model <- function(data, outcome, covar_list = c(fb_feats, off_feats)) {
     names(learners) <- c("glm", "lasso", "ridge", "elastic_new", "poly_spline", "ranger", "gbm", "xgb")
     
     # Create super learner stack
-    stack <- make_learner(Stack, learners)
+    stack <- sl3::Stack$new(learners)
     
     # Extract covariates from training data
     covars <- colnames(gadm1_train %>% dplyr::select(all_of(covar_list)))
@@ -242,13 +246,13 @@ run_model_10fold <- function(data, outcome, covar_list = c(fb_feats, off_feats))
   predictions_list <- list()
   
   # Define learners for the super learner ensemble
-  lrn_glm <- make_learner(Lrnr_glm)
-  lrn_lasso <- make_learner(Lrnr_glmnet)
+  lrn_glm <- make_learner("Lrnr_glm")
+  lrn_lasso <- make_learner("Lrnr_glmnet")
   lrn_ridge <- Lrnr_glmnet$new(alpha = 0)
-  lrn_enet.5 <- make_learner(Lrnr_glmnet, alpha = 0.5)
+  lrn_enet.5 <- make_learner("Lrnr_glmnet", alpha = 0.5)
   lrn_polspline <- Lrnr_polspline$new()
-  lrn_ranger100 <- make_learner(Lrnr_ranger, num.trees = 100)
-  lrnr_gbm <- make_learner(Lrnr_gbm)
+  lrn_ranger100 <- make_learner("Lrnr_ranger", num.trees = 100)
+  lrnr_gbm <- make_learner("Lrnr_gbm")
   lrnr_xgb <- Lrnr_xgboost$new()
   
   # Create list of learners and assign names
@@ -256,7 +260,7 @@ run_model_10fold <- function(data, outcome, covar_list = c(fb_feats, off_feats))
   names(learners) <- c("glm", "lasso", "ridge", "elastic_new", "poly_spline", "ranger", "gbm", "xgb")
   
   # Create super learner stack
-  stack <- make_learner(Stack, learners)
+  stack <- sl3::Stack$new(learners)
   
   # Extract covariates from data
   covars <- colnames(data %>% dplyr::select(all_of(covar_list)))
@@ -348,14 +352,14 @@ superlearner_train_and_predict <- function(data,
   
   
   # Define learners for the super learner ensemble
-  lrn_glm <- make_learner(Lrnr_glm)
-  lrn_lasso <- make_learner(Lrnr_glmnet)
+  lrn_glm <- make_learner("Lrnr_glm")
+  lrn_lasso <- make_learner("Lrnr_glmnet")
   lrn_ridge <- Lrnr_glmnet$new(alpha = 0)
-  lrn_enet.5 <- make_learner(Lrnr_glmnet, alpha = 0.5)
+  lrn_enet.5 <- make_learner("Lrnr_glmnet", alpha = 0.5)
   lrn_polspline <- Lrnr_polspline$new()
-  lrn_ranger100 <- make_learner(Lrnr_ranger, num.trees = 100)
+  lrn_ranger100 <- make_learner("Lrnr_ranger", num.trees = 100)
   lrn_hal_faster <- Lrnr_hal9001$new(max_degree = 2, reduce_basis = 0.05)
-  lrnr_gbm <- make_learner(Lrnr_gbm)
+  lrnr_gbm <- make_learner("Lrnr_gbm")
   lrnr_xgb <- Lrnr_xgboost$new()
   
   # Create list of learners and assign names
@@ -363,7 +367,7 @@ superlearner_train_and_predict <- function(data,
   names(learners) <- c("glm", "lasso", "ridge", "elastic_new", "poly_spline", "ranger", "gbm", "xgb")
   
   # Create super learner stack
-  stack <- make_learner(Stack, learners)
+  stack <- sl3::Stack$new(learners)
   
   # Extract covariates from training data
   covars <- colnames(data %>% dplyr::select(all_of(covar_list)))

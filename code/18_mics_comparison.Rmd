@@ -12,7 +12,7 @@ library(here)
 source(here("code", "helpers.R"))
 
 ## Read in predictions
-predictions <- fread(here("out", "predictions_with_uncertainty.csv")) 
+predictions <- read_csv(here("out", "predictions_with_uncertainty.csv")) 
 
 ## Read in data file with all subnational estimates 
 ground_truth_mics <- read_csv(here("data", "subnational_ground_truth.csv")) %>% 

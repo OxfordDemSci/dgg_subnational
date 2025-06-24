@@ -5,12 +5,20 @@ author: Casey Breen
 
 ## Summary 
 
-This script runs all code to replicate figures and tables. 
+This script runs all code to replicate figures and tables. The scripts are numbered in the order they should be run.
 
-The scripts are numbered in the order they should be run.
+Note: The SL3 package is no longer on CRAN, and needs to be installed directly from github. To do so, uncomment and run the following lines: 
 
 ```{r}
-## library packages
+## install.packages("remotes") 
+## remotes::install_github("tlverse/sl3")
+```
+
+
+
+```{r}
+## library packages 
+# install.packages("here")
 library(here)
 source(here("code", "helpers.R"))
 
