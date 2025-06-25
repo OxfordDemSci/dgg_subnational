@@ -107,7 +107,7 @@ Alternatively, researchers can run the following files individually in order:
 All analyses and computations were carried out on 2023 MacBook Pro with an Apple M2 Pro chip, 16GB memory, and Sonoma 14.1 operating system.
 
 All analyses were originally conducted using R version 4.3.1 and the package versions recorded in the attached session info at the bottom of the README. 
-Re-running the pipeline with updated R or package versions, or a different seed, may yield minor numerical differences. 
+Re-running the full pipeline (including all models) with updated R or package versions, or a different seed, may yield minor numerical differences. 
 These do not affect the paper’s results or conclusions.
 
 **Note**: The SL3 package is no longer available on CRAN, and needs to be installed directly from [Github](https://github.com/tlverse/sl3):  

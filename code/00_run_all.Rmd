@@ -26,7 +26,7 @@ source(here("code", "helpers.R"))
 rmd_files <- list.files(path = here("code"), pattern = "\\.Rmd$")
 
 ## Drop Longer scripts that take a long time to run (best to run individually)
-rmd_files <- rmd_files[!rmd_files %in% c("00_run_all.Rmd", "01_fit_models_crossvalidation.Rmd", "10_bootstrap_analysis.Rmd", "12_dhs_table.Rmd")] ##  
+rmd_files <- rmd_files[!rmd_files %in% c("00_run_all.Rmd", "01_fit_models_crossvalidation.Rmd",  "02_make_predictions.Rmd", "10_bootstrap_analysis.Rmd", "12_dhs_table.Rmd")] ##  
 
 ## set seed for reproducibility
 set.seed(1)
@@ -37,7 +37,7 @@ sink(con, append=TRUE, split=TRUE)
 sink(con, append=TRUE, type = "message")
 
 ## Loop to process files
-for (cur_file in rmd_files[1:18]) { 
+for (cur_file in rmd_files[1:17]) { 
 
   cat("================================\n")
   source(here("code", "helpers.R"))

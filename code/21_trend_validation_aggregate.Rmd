@@ -141,7 +141,7 @@ time_series_plot <- change_df_metrics %>%
   theme_cowplot() + 
   xlim(-.4, 1) + 
   ylim(-.4, 1)  + 
-  labs(x = "Observed Change (Admin-1)",
+  labs(x = "Estimated Change from Surveys (Admin-1)",
        y = "Predicted Change (Admin-1)") + 
   theme(
     strip.background = element_rect(fill = "white", color = "black", linewidth = 0.8),
@@ -178,7 +178,7 @@ time_series_plot_scatter_country <- change_df_metrics %>%
   xlim(-.5, 0.5) + 
   ylim(-.5, .5) + 
   facet_grid(gid_0 ~ outcome_clean, scales = "free") + 
-  labs(x = "Observed Change (Admin-1)",
+  labs(x = "Estimated Change from Surveys (Admin-1)",
        y = "Predicted Change (Admin-1)") + 
   theme(
     strip.background = element_rect(fill = "white", color = "black", linewidth = 0.8),
