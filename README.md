@@ -99,7 +99,7 @@ Alternatively, researchers can run the following files individually in order:
 - Xinyi Zhao
 - Douglas R. Leasure
 - Ingmar Weber
-- Ridhi Kashyap
+- [Ridhi Kashyap](https://www.nuffield.ox.ac.uk/people/profiles/ridhi-kashyap/)
 
 
 ## Replication
