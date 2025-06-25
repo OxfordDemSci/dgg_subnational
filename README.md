@@ -6,7 +6,7 @@
 [![Generic badge](https://img.shields.io/badge/Maintained-Yes-red.svg)]()
 
 
-This repository contains code and materials to replicate the paper ["Mapping subnational gender gaps in internet and mobile adoption using social media data"]([https://osf.io/](https://osf.io/preprints/socarxiv/qnzsw_v2))
+This repository contains code and materials to replicate the paper ["Mapping subnational gender gaps in internet and mobile adoption using social media data"](https://osf.io/preprints/socarxiv/qnzsw_v2). 
 
 
 **Abstract**: The digital revolution has ushered in many societal and economic benefits. Yet access to
