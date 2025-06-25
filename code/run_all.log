@@ -1,22 +1,22 @@
 ================================
 Running  02_make_predictions.Rmd 
-Finished with 02_make_predictions.Rmd, time:: 178.403 sec elapsed
+Finished with 02_make_predictions.Rmd, time:: 176.342 sec elapsed
 ================================
 ================================
 Running  03_model_performance.Rmd 
-Finished with 03_model_performance.Rmd, time:: 36.769 sec elapsed
+Finished with 03_model_performance.Rmd, time:: 36.221 sec elapsed
 ================================
 ================================
 Running  04_within_country_analysis.Rmd 
-Finished with 04_within_country_analysis.Rmd, time:: 1.76 sec elapsed
+Finished with 04_within_country_analysis.Rmd, time:: 1.652 sec elapsed
 ================================
 ================================
 Running  05_geo_map.Rmd 
-Finished with 05_geo_map.Rmd, time:: 657.56 sec elapsed
+Finished with 05_geo_map.Rmd, time:: 195.374 sec elapsed
 ================================
 ================================
 Running  06_feature_importance.Rmd 
-Finished with 06_feature_importance.Rmd, time:: 13.178 sec elapsed
+Finished with 06_feature_importance.Rmd, time:: 5.95 sec elapsed
 ================================
 ================================
 Running  07_superlearner_weights.Rmd 
@@ -26,11 +26,11 @@ perc_owns_mobile_telephone_wght_age_15_to_49_men
 perc_used_internet_past12months_wght_age_15_to_49_men 
 perc_used_internet_past12months_wght_age_15_to_49_fm_ratio 
 perc_owns_mobile_telephone_wght_age_15_to_49_fm_ratio 
-Finished with 07_superlearner_weights.Rmd, time:: 2315.98 sec elapsed
+Finished with 07_superlearner_weights.Rmd, time:: 148.736 sec elapsed
 ================================
 ================================
 Running  08_residual_analysis.Rmd 
-Finished with 08_residual_analysis.Rmd, time:: 0.795 sec elapsed
+Finished with 08_residual_analysis.Rmd, time:: 0.786 sec elapsed
 ================================
 ================================
 Running  09_var_explained.Rmd 
@@ -114,45 +114,45 @@ Within-country MLD (MLD_W): 0.003000031
 Between-country MLD (MLD_B): 0.02509694 
 Total MLD: 0.02809697 
 Ratio of Within-country to Between-country MLD: 0.1195377 
-Finished with 09_var_explained.Rmd, time:: 664.087 sec elapsed
+Finished with 09_var_explained.Rmd, time:: 1.125 sec elapsed
 ================================
 ================================
 Running  11_disparities_plots.Rmd 
-Finished with 11_disparities_plots.Rmd, time:: 3.602 sec elapsed
+Finished with 11_disparities_plots.Rmd, time:: 3.56 sec elapsed
 ================================
 ================================
 Running  13_var_coverage_table.Rmd 
-Finished with 13_var_coverage_table.Rmd, time:: 1.223 sec elapsed
+Finished with 13_var_coverage_table.Rmd, time:: 1.043 sec elapsed
 ================================
 ================================
 Running  14_trends.Rmd 
-Finished with 14_trends.Rmd, time:: 3.888 sec elapsed
+Finished with 14_trends.Rmd, time:: 1.723 sec elapsed
 ================================
 ================================
 Running  15_tanzania_analysis.Rmd 
-Finished with 15_tanzania_analysis.Rmd, time:: 3.436 sec elapsed
+Finished with 15_tanzania_analysis.Rmd, time:: 1.359 sec elapsed
 ================================
 ================================
 Running  16_validation_of_uncertainty.Rmd 
-Finished with 16_validation_of_uncertainty.Rmd, time:: 1.318 sec elapsed
+Finished with 16_validation_of_uncertainty.Rmd, time:: 0.5 sec elapsed
 ================================
 ================================
 Running  17_lsms_comparison.Rmd 
-Finished with 17_lsms_comparison.Rmd, time:: 912.709 sec elapsed
+Finished with 17_lsms_comparison.Rmd, time:: 6.205 sec elapsed
 ================================
 ================================
 Running  18_mics_comparison.Rmd 
-Finished with 18_mics_comparison.Rmd, time:: 1035.336 sec elapsed
+Finished with 18_mics_comparison.Rmd, time:: 4.27 sec elapsed
 ================================
 ================================
 Running  19_mics_comparison_national.Rmd 
-Finished with 19_mics_comparison_national.Rmd, time:: 2.703 sec elapsed
+Finished with 19_mics_comparison_national.Rmd, time:: 3.005 sec elapsed
 ================================
 ================================
 Running  20_trends_validation.Rmd 
-Finished with 20_trends_validation.Rmd, time:: 1304.109 sec elapsed
+Finished with 20_trends_validation.Rmd, time:: 222.725 sec elapsed
 ================================
 ================================
 Running  21_trend_validation_aggregate.Rmd 
-Finished with 21_trend_validation_aggregate.Rmd, time:: 9.514 sec elapsed
+Finished with 21_trend_validation_aggregate.Rmd, time:: 7.986 sec elapsed
 ================================

@@ -26,7 +26,7 @@ truth data from subnationally-representative household survey data from 33 LMICs
 results reveal striking disparities in access to mobile and internet technologies between and
 within LMICs. These disparities imply that as of 2025, women are 19% less likely to use the
 internet and 8% less likely to own a mobile phone in LMICs, corresponding to over 190 million
-fewer women owning a mobile phone and over 320 million fewer women using the interne
+fewer women owning a mobile phone and over 320 million fewer women using the internet. 
 
 ### Interactive Dashboard
 
@@ -101,6 +101,22 @@ Alternatively, researchers can run the following files individually in order:
 - Ingmar Weber
 - Ridhi Kashyap
 
+
+## Replication
+
+All analyses and computations were carried out on 2023 MacBook Pro with an Apple M2 Pro chip, 16GB memory, and Sonoma 14.1 operating system.
+
+All analyses were originally conducted using R version 4.3.1 and the package versions recorded in the attached session info at the bottom of the README. 
+Re-running the pipeline with updated R or package versions, or a different seed, may yield minor numerical differences. 
+These do not affect the paper’s results or conclusions.
+
+**Note**: The SL3 package is no longer available on CRAN, and needs to be installed directly from [Github](https://github.com/tlverse/sl3):  
+
+```
+remotes::install_github("tlverse/sl3")
+```
+
+
 ## Acknowledgements 
 
 For helpful discussions and feedback, we thank Dennis Feehan, Michelle Niemann, Anna Bolgrien,
@@ -113,19 +129,6 @@ Li for excellent research assistance. The authors acknowledge financial support 
 von Humboldt Foundation and its founder, the Federal Ministry of Education and Research (Bundesministerium fur Bildung und
 Forschung).
 
-## Replication
-
-All analyses and computations were carried out on 2023 MacBook Pro with an Apple M2 Pro chip, 16GB memory, and Sonoma 14.1 operating system.
-
-All analyses were originally conducted using R version 4.3.1 and the package versions recorded below in the attached session info file. 
-Re-running the pipeline with updated R or package versions, or a different seed, may yield minor numerical differences. 
-These do not affect the paper’s results or conclusions.
-
-**Note**: The SL3 package is no longer available on CRAN, and needs to be installed directly from [Github](https://github.com/tlverse/sl3):  
-
-```
-remotes::install_github("tlverse/sl3")
-```
 
 ## Session info:
 
